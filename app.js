@@ -280,7 +280,7 @@ let state = {
   progress: {}, // trackNum: { status, score, maxScore, answers: [], dictation: "", notes: "" }
   activeTab: 'tracks',
   volume: 0.8,
-  language: 'en'
+  language: 'uz'
 };
 
 let activeTourStep = 0;
@@ -622,7 +622,7 @@ function loadLocalStorage() {
   if (savedLang) {
     state.language = savedLang;
   } else {
-    state.language = 'en';
+    state.language = 'uz';
   }
   updateLanguageUI();
 }
