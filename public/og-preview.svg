@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Basic IELTS Listening preview</title>
+  <desc id="desc">Uzbekcha IELTS Listening mashq ilovasi uchun ijtimoiy tarmoq preview rasmi.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#051226"/>
+      <stop offset="0.55" stop-color="#0d1736"/>
+      <stop offset="1" stop-color="#101827"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#00d9ff"/>
+      <stop offset="1" stop-color="#7c5cff"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="24" flood-color="#000000" flood-opacity="0.38"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="1050" cy="95" r="220" fill="#00d9ff" opacity="0.08"/>
+  <circle cx="130" cy="560" r="260" fill="#7c5cff" opacity="0.12"/>
+  <rect x="72" y="66" width="1056" height="498" rx="34" fill="#0b1228" opacity="0.72" stroke="#263a66"/>
+  <g filter="url(#softShadow)">
+    <rect x="760" y="126" width="290" height="360" rx="24" fill="url(#accent)"/>
+    <rect x="790" y="164" width="122" height="12" rx="6" fill="#ffffff" opacity="0.45"/>
+    <text x="790" y="260" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="54" font-weight="800">
+      <tspan x="790" dy="0">Tinglang</tspan>
+      <tspan x="790" dy="58">IELTS</tspan>
+    </text>
+    <rect x="790" y="380" width="190" height="12" rx="6" fill="#ffffff" opacity="0.3"/>
+    <rect x="790" y="410" width="130" height="12" rx="6" fill="#ffffff" opacity="0.22"/>
+    <g transform="translate(790 454)">
+      <rect x="0" y="12" width="14" height="28" rx="7" fill="#ffffff" opacity="0.72"/>
+      <rect x="28" y="0" width="14" height="40" rx="7" fill="#ffffff" opacity="0.92"/>
+      <rect x="56" y="18" width="14" height="22" rx="7" fill="#ffffff" opacity="0.68"/>
+      <rect x="84" y="6" width="14" height="34" rx="7" fill="#ffffff" opacity="0.85"/>
+      <rect x="112" y="24" width="14" height="16" rx="7" fill="#ffffff" opacity="0.58"/>
+    </g>
+  </g>
+  <text x="128" y="170" fill="#7ddfff" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="800" letter-spacing="3">
+    UZBEKCHA MASHQ ILOVASI
+  </text>
+  <text x="128" y="265" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="900">
+    <tspan x="128" dy="0">Tinglang</tspan>
+    <tspan x="128" dy="82" font-size="44">Basic IELTS Listening</tspan>
+  </text>
+  <text x="128" y="425" fill="#cbd5e1" font-family="Arial, Helvetica, sans-serif" font-size="30">
+    <tspan x="128" dy="0">Audio treklar, PDF kitob, diktant</tspan>
+    <tspan x="128" dy="42">va progress saqlash bir joyda.</tspan>
+  </text>
+  <g transform="translate(128 506)">
+    <rect width="160" height="48" rx="12" fill="#17233d" stroke="#2c426d"/>
+    <text x="24" y="32" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700">97 audio</text>
+    <rect x="178" width="150" height="48" rx="12" fill="#17233d" stroke="#2c426d"/>
+    <text x="202" y="32" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700">5 bo'lim</text>
+    <rect x="346" width="170" height="48" rx="12" fill="#17233d" stroke="#2c426d"/>
+    <text x="370" y="32" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700">A-B repeat</text>
+  </g>
+</svg>

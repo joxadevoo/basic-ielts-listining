@@ -2,9 +2,11 @@ import { TRACKS } from './tracks.js';
 
 const TRANSLATIONS = {
   en: {
-    logo_title: "Basic IELTS Listening",
+    logo_title: "TinglangApp",
+    logo_subtitle: "IELTS listening practice",
     landing_kicker: "IELTS listening practice suite",
     landing_title: "Basic IELTS Listening",
+    landing_author: "Book by Li Ya Bin",
     landing_subtitle: "Study with the book, stream every track, write dictation, and save your progress in one focused workspace.",
     landing_start: "Start practice",
     landing_preview: "View workspace",
@@ -109,6 +111,10 @@ const TRANSLATIONS = {
     support_modal_title: "Support Developer",
     support_desc: "If you find this application helpful, you can support the developer.",
     support_footer_note: "You can support the developer through this card.",
+    about_app_title: "About TinglangApp",
+    about_app_desc: "TinglangApp is a focused practice tool for Basic IELTS Listening. It combines the PDF book, public audio tracks, dictation, notes, progress saving, and a guided tour in one browser app.",
+    about_app_book_label: "Book",
+    about_app_dev_label: "Developer",
     btn_copy_card: "Copy Card Number",
     toast_card_copied: "Card number copied to clipboard!",
     btn_close: "Close",
@@ -133,9 +139,11 @@ const TRANSLATIONS = {
     confirm_reset_data: "Are you absolutely sure you want to delete all practice history? This will delete all your written answers, dictation transcriptions, notes, and scores forever."
   },
   uz: {
-    logo_title: "Basic IELTS Listening",
+    logo_title: "TinglangApp",
+    logo_subtitle: "IELTS listening mashq ilovasi",
     landing_kicker: "IELTS listening mashq to'plami",
     landing_title: "Basic IELTS Listening",
+    landing_author: "Kitob muallifi: Li Ya Bin",
     landing_subtitle: "Kitob bilan ishlang, barcha treklarni tinglang, diktant yozing va natijangizni bitta qulay oynada saqlang.",
     landing_start: "Mashqni boshlash",
     landing_preview: "Ish oynasini ko'rish",
@@ -240,6 +248,10 @@ const TRANSLATIONS = {
     support_modal_title: "Dasturchini qo'llab-quvvatlash",
     support_desc: "Agar ushbu ilova sizga yoqqan bo'lsa, dasturchini qo'llab-quvvatlashingiz mumkin.",
     support_footer_note: "Karta orqali dasturchini qo'llab-quvvatlashingiz mumkin.",
+    about_app_title: "TinglangApp haqida",
+    about_app_desc: "TinglangApp Basic IELTS Listening uchun yaratilgan qulay mashq vositasi. Unda PDF kitob, ochiq audio treklar, diktant, eslatmalar, progress saqlash va guided tour bitta brauzer ilovasida jamlangan.",
+    about_app_book_label: "Kitob",
+    about_app_dev_label: "Dasturchi",
     btn_copy_card: "Karta raqamini nusxalash",
     toast_card_copied: "Karta raqami nusxalandi!",
     btn_close: "Yopish",
@@ -367,6 +379,11 @@ const tourNext = document.getElementById('tour-next');
 // Support Modal
 const supportModal = document.getElementById('support-modal');
 const btnCloseSupport = document.getElementById('btn-close-support');
+
+// About App Modal
+const aboutAppModal = document.getElementById('about-app-modal');
+const floatingCodeBtn = document.getElementById('floating-code-btn');
+const btnCloseAboutApp = document.getElementById('btn-close-about-app');
 
 // Themes
 const themeToggle = document.getElementById('theme-toggle');
@@ -501,6 +518,17 @@ function clearTourHighlight() {
 }
 
 function positionTourPopover(target) {
+  if (window.innerWidth <= 768) {
+    tourPopover.style.left = '16px';
+    tourPopover.style.right = '16px';
+    tourPopover.style.top = 'auto';
+    tourPopover.style.bottom = '16px';
+    return;
+  }
+
+  tourPopover.style.right = 'auto';
+  tourPopover.style.bottom = 'auto';
+
   const rect = target.getBoundingClientRect();
   const popoverRect = tourPopover.getBoundingClientRect();
   const margin = 16;
@@ -538,7 +566,11 @@ function renderTourStep() {
   clearTourHighlight();
   highlightedTourElement = target;
   highlightedTourElement.classList.add('tour-highlight');
-  highlightedTourElement.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+  highlightedTourElement.scrollIntoView({
+    behavior: 'smooth',
+    block: window.innerWidth <= 768 ? 'start' : 'center',
+    inline: 'center'
+  });
 
   tourCount.textContent = `${activeTourStep + 1} / ${steps.length}`;
   tourTitle.textContent = step.title;
@@ -1260,6 +1292,18 @@ function setupEventListeners() {
   if (btnCloseSupport) {
     btnCloseSupport.addEventListener('click', () => {
       supportModal.classList.remove('active');
+    });
+  }
+
+  if (floatingCodeBtn) {
+    floatingCodeBtn.addEventListener('click', () => {
+      aboutAppModal.classList.add('active');
+    });
+  }
+
+  if (btnCloseAboutApp) {
+    btnCloseAboutApp.addEventListener('click', () => {
+      aboutAppModal.classList.remove('active');
     });
   }
 

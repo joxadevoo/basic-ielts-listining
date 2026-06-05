@@ -159,6 +159,15 @@ h1, h2, h3, h4, h5, h6 {
   -webkit-text-fill-color: transparent;
 }
 
+.logo-subtitle {
+  display: block;
+  margin-top: 1px;
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  line-height: 1.1;
+  font-weight: 600;
+}
+
 .header-controls {
   display: flex;
   align-items: center;
@@ -240,7 +249,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .app-container:not(.landing-dismissed) .main-workspace,
-.app-container:not(.landing-dismissed) .floating-feedback-btn {
+.app-container:not(.landing-dismissed) .floating-feedback-btn,
+.app-container:not(.landing-dismissed) .floating-code-btn {
   display: none;
 }
 
@@ -273,6 +283,17 @@ h1, h2, h3, h4, h5, h6 {
   background: linear-gradient(135deg, var(--text-primary) 10%, var(--color-secondary) 52%, var(--color-primary) 95%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+.landing-author {
+  width: fit-content;
+  padding: 7px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid hsla(190, 95%, 50%, 0.28);
+  background: hsla(190, 95%, 50%, 0.08);
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  font-weight: 700;
 }
 
 .landing-subtitle {
@@ -1827,6 +1848,93 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 4px 12px rgba(0, 240, 255, 0.1);
 }
 
+.about-app-modal-box {
+  width: 520px;
+}
+
+.about-app-content {
+  display: grid;
+  gap: 16px;
+}
+
+.about-app-badge {
+  width: 54px;
+  height: 54px;
+  border-radius: var(--radius-sm);
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, var(--color-secondary), var(--color-primary));
+  color: #fff;
+  font-family: var(--font-title);
+  font-size: 1.05rem;
+  font-weight: 900;
+  box-shadow: 0 0 22px hsla(190, 95%, 50%, 0.28);
+}
+
+.about-app-content p {
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.65;
+}
+
+.about-app-meta {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.about-app-meta div {
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+}
+
+.about-app-meta span {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.about-app-meta strong {
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.floating-code-btn {
+  position: fixed;
+  bottom: 166px;
+  right: 24px;
+  width: 46px;
+  height: 46px;
+  border: none;
+  border-radius: 50%;
+  background: var(--bg-card);
+  color: var(--color-secondary);
+  border: 1px solid hsla(190, 95%, 50%, 0.35);
+  box-shadow: var(--shadow-md);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  z-index: 98;
+  transition: var(--transition-fast);
+}
+
+.floating-code-btn svg {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+}
+
+.floating-code-btn:hover {
+  transform: translateY(-3px);
+  color: var(--text-primary);
+  background: var(--bg-card-hover);
+  box-shadow: 0 10px 26px rgba(0, 240, 255, 0.22);
+}
+
 /* Responsive styles */
 @media (max-width: 768px) {
   .app-header {
@@ -1836,6 +1944,17 @@ h1, h2, h3, h4, h5, h6 {
 
   .logo-text {
     font-size: 1.05rem;
+  }
+
+  .logo-text-group {
+    max-width: 150px;
+  }
+
+  .logo-subtitle {
+    font-size: 0.58rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .logo-icon {
@@ -1886,6 +2005,11 @@ h1, h2, h3, h4, h5, h6 {
   .landing-subtitle {
     font-size: 0.9rem;
     line-height: 1.55;
+  }
+
+  .landing-author {
+    font-size: 0.78rem;
+    padding: 6px 9px;
   }
 
   .landing-actions {
@@ -2193,9 +2317,17 @@ h1, h2, h3, h4, h5, h6 {
   .tour-popover {
     left: 16px !important;
     right: 16px;
+    top: auto !important;
+    bottom: 16px;
     width: auto;
-    max-height: 42vh;
+    max-height: 34vh;
     overflow-y: auto;
+    padding: 14px;
+  }
+
+  .tour-highlight {
+    scroll-margin-top: 72px;
+    scroll-margin-bottom: 280px;
   }
 
   .tour-actions .btn-secondary,
@@ -2222,6 +2354,13 @@ h1, h2, h3, h4, h5, h6 {
     right: 16px;
     padding: 8px 12px;
     font-size: 0.75rem;
+  }
+
+  .floating-code-btn {
+    bottom: 274px;
+    right: 16px;
+    width: 40px;
+    height: 40px;
   }
 }
 
