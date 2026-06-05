@@ -511,6 +511,30 @@
       </div>
     </div>
 
+    <!-- About App Modal -->
+    <div class="modal-overlay" id="about-app-modal">
+      <div class="modal-box about-app-modal-box">
+        <h3 class="modal-title" data-i18n="about_app_title">About TinglangApp</h3>
+        <div class="about-app-content">
+          <div class="about-app-badge">&lt;/&gt;</div>
+          <p data-i18n="about_app_desc">TinglangApp is a focused practice tool for Basic IELTS Listening. It combines the PDF book, public audio tracks, dictation, notes, progress saving, and a guided tour in one browser app.</p>
+          <div class="about-app-meta">
+            <div>
+              <span data-i18n="about_app_book_label">Book</span>
+              <strong>Basic IELTS Listening</strong>
+            </div>
+            <div>
+              <span data-i18n="about_app_dev_label">Developer</span>
+              <strong>Jakhongir Toshpulatov</strong>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="btn-close-about-app" class="btn-primary" data-i18n="btn_close">Close</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Dedicated Support Modal -->
     <div class="modal-overlay" id="support-modal">
       <div class="modal-box">
@@ -552,6 +576,13 @@
       </svg>
       <span class="floating-feedback-text" data-i18n="feedback_btn_text">Feedback & Bugs</span>
     </a>
+
+    <!-- Landing About App Button -->
+    <button id="floating-code-btn" class="floating-code-btn" title="About the app" aria-label="About the app">
+      <svg viewBox="0 0 24 24">
+        <path d="M9.4 16.6 4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0L19.2 12l-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/>
+      </svg>
+    </button>
 
     <!-- Toast Notification Popup -->
     <div class="toast toast-cyan" id="toast-message">

@@ -116,6 +116,10 @@ const TRANSLATIONS = {
     support_modal_title: "Support Developer",
     support_desc: "If you find this application helpful, you can support the developer.",
     support_footer_note: "You can support the developer through this card.",
+    about_app_title: "About TinglangApp",
+    about_app_desc: "TinglangApp is a focused practice tool for Basic IELTS Listening. It combines the PDF book, public audio tracks, dictation, notes, progress saving, and a guided tour in one browser app.",
+    about_app_book_label: "Book",
+    about_app_dev_label: "Developer",
     btn_copy_card: "Copy Card Number",
     toast_card_copied: "Card number copied to clipboard!",
     btn_close: "Close",
@@ -254,6 +258,10 @@ const TRANSLATIONS = {
     support_modal_title: "Dasturchini qo'llab-quvvatlash",
     support_desc: "Agar ushbu ilova sizga yoqqan bo'lsa, dasturchini qo'llab-quvvatlashingiz mumkin.",
     support_footer_note: "Karta orqali dasturchini qo'llab-quvvatlashingiz mumkin.",
+    about_app_title: "TinglangApp haqida",
+    about_app_desc: "TinglangApp Basic IELTS Listening uchun yaratilgan qulay mashq vositasi. Unda PDF kitob, ochiq audio treklar, diktant, eslatmalar, progress saqlash va guided tour bitta brauzer ilovasida jamlangan.",
+    about_app_book_label: "Kitob",
+    about_app_dev_label: "Dasturchi",
     btn_copy_card: "Karta raqamini nusxalash",
     toast_card_copied: "Karta raqami nusxalandi!",
     btn_close: "Yopish",
@@ -384,6 +392,11 @@ const tourNext = document.getElementById('tour-next');
 // Support Modal
 const supportModal = document.getElementById('support-modal');
 const btnCloseSupport = document.getElementById('btn-close-support');
+
+// About App Modal
+const aboutAppModal = document.getElementById('about-app-modal');
+const floatingCodeBtn = document.getElementById('floating-code-btn');
+const btnCloseAboutApp = document.getElementById('btn-close-about-app');
 
 // Themes
 const themeToggle = document.getElementById('theme-toggle');
@@ -1350,6 +1363,18 @@ function setupEventListeners() {
   if (btnCloseSupport) {
     btnCloseSupport.addEventListener('click', () => {
       supportModal.classList.remove('active');
+    });
+  }
+
+  if (floatingCodeBtn) {
+    floatingCodeBtn.addEventListener('click', () => {
+      aboutAppModal.classList.add('active');
+    });
+  }
+
+  if (btnCloseAboutApp) {
+    btnCloseAboutApp.addEventListener('click', () => {
+      aboutAppModal.classList.remove('active');
     });
   }
 

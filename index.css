@@ -259,6 +259,10 @@ h1, h2, h3, h4, h5, h6 {
   display: none;
 }
 
+.app-container.landing-dismissed .floating-code-btn {
+  display: none;
+}
+
 .landing-copy {
   max-width: 620px;
   display: flex;
@@ -1853,6 +1857,93 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 4px 12px rgba(0, 240, 255, 0.1);
 }
 
+.about-app-modal-box {
+  width: 520px;
+}
+
+.about-app-content {
+  display: grid;
+  gap: 16px;
+}
+
+.about-app-badge {
+  width: 54px;
+  height: 54px;
+  border-radius: var(--radius-sm);
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, var(--color-secondary), var(--color-primary));
+  color: #fff;
+  font-family: var(--font-title);
+  font-size: 1.05rem;
+  font-weight: 900;
+  box-shadow: 0 0 22px hsla(190, 95%, 50%, 0.28);
+}
+
+.about-app-content p {
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.65;
+}
+
+.about-app-meta {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.about-app-meta div {
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+}
+
+.about-app-meta span {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.about-app-meta strong {
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.floating-code-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 46px;
+  height: 46px;
+  border: none;
+  border-radius: 50%;
+  background: var(--bg-card);
+  color: var(--color-secondary);
+  border: 1px solid hsla(190, 95%, 50%, 0.35);
+  box-shadow: var(--shadow-md);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  z-index: 98;
+  transition: var(--transition-fast);
+}
+
+.floating-code-btn svg {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+}
+
+.floating-code-btn:hover {
+  transform: translateY(-3px);
+  color: var(--text-primary);
+  background: var(--bg-card-hover);
+  box-shadow: 0 10px 26px rgba(0, 240, 255, 0.22);
+}
+
 /* Responsive styles */
 @media (max-width: 768px) {
   .app-header {
@@ -2292,6 +2383,22 @@ h1, h2, h3, h4, h5, h6 {
     right: 16px;
     padding: 8px 12px;
     font-size: 0.75rem;
+  }
+
+  .about-app-modal-box {
+    width: 92%;
+    padding: 22px;
+  }
+
+  .about-app-meta {
+    grid-template-columns: 1fr;
+  }
+
+  .floating-code-btn {
+    bottom: 16px;
+    right: 16px;
+    width: 42px;
+    height: 42px;
   }
 }
 
