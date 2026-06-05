@@ -115,6 +115,14 @@ h1, h2, h3, h4, h5, h6 {
   width: 100vw;
 }
 
+.app-container:not(.landing-dismissed) {
+  overflow-y: auto;
+}
+
+.app-container.landing-dismissed {
+  overflow: hidden;
+}
+
 /* Top Navigation Header */
 .app-header {
   height: 64px;
@@ -256,6 +264,12 @@ h1, h2, h3, h4, h5, h6 {
 
 .app-container:not(.landing-dismissed) .main-workspace,
 .app-container:not(.landing-dismissed) .floating-feedback-btn {
+  display: none;
+}
+
+.app-container:not(.landing-dismissed) #tutorial-toggle,
+.app-container:not(.landing-dismissed) #btn-coffee-header,
+.app-container:not(.landing-dismissed) #settings-toggle {
   display: none;
 }
 
@@ -2010,11 +2024,12 @@ h1, h2, h3, h4, h5, h6 {
   }
 
   .landing-screen {
-    height: calc(100vh - 56px);
+    min-height: calc(100vh - 56px);
+    height: auto;
     grid-template-columns: 1fr;
-    align-content: center;
+    align-content: start;
     gap: 18px;
-    padding: 18px 16px;
+    padding: 18px 16px 72px;
   }
 
   .landing-copy {
