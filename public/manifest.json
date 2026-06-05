@@ -1,7 +1,7 @@
 {
-  "short_name": "IELTS List",
-  "name": "Basic IELTS Listening Practice Suite",
-  "description": "An elegant, premium practice suite for Basic IELTS Listening. Built by Jaxongir Toshpo'latov.",
+  "short_name": "TinglangApp",
+  "name": "TinglangApp - Basic IELTS Listening",
+  "description": "Basic IELTS Listening uchun Uzbekcha qulay mashq ilovasi.",
   "icons": [
     {
       "src": "favicon.svg",
@@ -22,7 +22,8 @@
       "purpose": "maskable"
     }
   ],
-  "start_url": ".",
+  "start_url": "/",
+  "scope": "/",
   "background_color": "#040815",
   "theme_color": "#040815",
   "display": "standalone",

@@ -125,6 +125,9 @@ h1, h2, h3, h4, h5, h6 {
   align-items: center;
   justify-content: space-between;
   padding: 0 24px;
+  position: sticky;
+  top: 0;
+  flex-shrink: 0;
   z-index: 100;
 }
 
@@ -132,6 +135,7 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
 }
 
 .logo-icon {
@@ -172,6 +176,7 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   align-items: center;
   gap: 16px;
+  flex-shrink: 0;
 }
 
 /* UI Buttons */
@@ -195,6 +200,7 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--text-secondary);
   background: var(--bg-card);
   border: 1px solid var(--border-color);
+  flex: 0 0 auto;
 }
 
 .btn-icon:hover {
@@ -249,8 +255,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .app-container:not(.landing-dismissed) .main-workspace,
-.app-container:not(.landing-dismissed) .floating-feedback-btn,
-.app-container:not(.landing-dismissed) .floating-code-btn {
+.app-container:not(.landing-dismissed) .floating-feedback-btn {
   display: none;
 }
 
@@ -1848,106 +1853,30 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 4px 12px rgba(0, 240, 255, 0.1);
 }
 
-.about-app-modal-box {
-  width: 520px;
-}
-
-.about-app-content {
-  display: grid;
-  gap: 16px;
-}
-
-.about-app-badge {
-  width: 54px;
-  height: 54px;
-  border-radius: var(--radius-sm);
-  display: grid;
-  place-items: center;
-  background: linear-gradient(135deg, var(--color-secondary), var(--color-primary));
-  color: #fff;
-  font-family: var(--font-title);
-  font-size: 1.05rem;
-  font-weight: 900;
-  box-shadow: 0 0 22px hsla(190, 95%, 50%, 0.28);
-}
-
-.about-app-content p {
-  color: var(--text-secondary);
-  font-size: 0.92rem;
-  line-height: 1.65;
-}
-
-.about-app-meta {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-}
-
-.about-app-meta div {
-  padding: 12px;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  background: var(--bg-card);
-}
-
-.about-app-meta span {
-  display: block;
-  margin-bottom: 4px;
-  color: var(--text-muted);
-  font-size: 0.72rem;
-  font-weight: 700;
-}
-
-.about-app-meta strong {
-  color: var(--text-primary);
-  font-size: 0.9rem;
-}
-
-.floating-code-btn {
-  position: fixed;
-  bottom: 166px;
-  right: 24px;
-  width: 46px;
-  height: 46px;
-  border: none;
-  border-radius: 50%;
-  background: var(--bg-card);
-  color: var(--color-secondary);
-  border: 1px solid hsla(190, 95%, 50%, 0.35);
-  box-shadow: var(--shadow-md);
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  z-index: 98;
-  transition: var(--transition-fast);
-}
-
-.floating-code-btn svg {
-  width: 22px;
-  height: 22px;
-  fill: currentColor;
-}
-
-.floating-code-btn:hover {
-  transform: translateY(-3px);
-  color: var(--text-primary);
-  background: var(--bg-card-hover);
-  box-shadow: 0 10px 26px rgba(0, 240, 255, 0.22);
-}
-
 /* Responsive styles */
 @media (max-width: 768px) {
   .app-header {
     height: 56px;
     padding: 0 12px;
+    position: sticky;
+    top: 0;
+    z-index: 300;
+    gap: 8px;
+  }
+
+  .logo-section {
+    gap: 8px;
+    flex: 1 1 auto;
+    min-width: 108px;
   }
 
   .logo-text {
-    font-size: 1.05rem;
+    font-size: 0.95rem;
   }
 
   .logo-text-group {
-    max-width: 150px;
+    max-width: 118px;
+    min-width: 0;
   }
 
   .logo-subtitle {
@@ -1968,7 +1897,15 @@ h1, h2, h3, h4, h5, h6 {
   }
 
   .header-controls {
-    gap: 8px;
+    gap: 6px;
+    max-width: 62vw;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scrollbar-width: none;
+  }
+
+  .header-controls::-webkit-scrollbar {
+    display: none;
   }
 
   .header-controls .shortcut-helper-tip {
@@ -1978,6 +1915,7 @@ h1, h2, h3, h4, h5, h6 {
   .btn-icon {
     width: 36px;
     height: 36px;
+    flex-basis: 36px;
   }
 
   .landing-screen {
@@ -2354,13 +2292,6 @@ h1, h2, h3, h4, h5, h6 {
     right: 16px;
     padding: 8px 12px;
     font-size: 0.75rem;
-  }
-
-  .floating-code-btn {
-    bottom: 274px;
-    right: 16px;
-    width: 40px;
-    height: 40px;
   }
 }
 

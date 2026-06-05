@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ielts-listening-v17';
+const CACHE_NAME = 'ielts-listening-v18';
 const ASSETS_TO_CACHE = [
   './',
   './favicon.svg',

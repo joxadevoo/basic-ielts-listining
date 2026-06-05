@@ -10,6 +10,11 @@ const TRANSLATIONS = {
     landing_subtitle: "Study with the book, stream every track, write dictation, and save your progress in one focused workspace.",
     landing_start: "Start practice",
     landing_preview: "View workspace",
+    install_app: "Install app",
+    install_ready: "TinglangApp is ready to install on this device.",
+    install_unavailable: "Use your browser menu and choose Install or Add to Home Screen.",
+    install_done: "TinglangApp installed.",
+    install_dismissed: "Install was cancelled.",
     landing_stat_tracks: "audio tracks",
     landing_stat_units: "study units",
     landing_stat_loop: "repeat loop",
@@ -111,10 +116,6 @@ const TRANSLATIONS = {
     support_modal_title: "Support Developer",
     support_desc: "If you find this application helpful, you can support the developer.",
     support_footer_note: "You can support the developer through this card.",
-    about_app_title: "About TinglangApp",
-    about_app_desc: "TinglangApp is a focused practice tool for Basic IELTS Listening. It combines the PDF book, public audio tracks, dictation, notes, progress saving, and a guided tour in one browser app.",
-    about_app_book_label: "Book",
-    about_app_dev_label: "Developer",
     btn_copy_card: "Copy Card Number",
     toast_card_copied: "Card number copied to clipboard!",
     btn_close: "Close",
@@ -147,6 +148,11 @@ const TRANSLATIONS = {
     landing_subtitle: "Kitob bilan ishlang, barcha treklarni tinglang, diktant yozing va natijangizni bitta qulay oynada saqlang.",
     landing_start: "Mashqni boshlash",
     landing_preview: "Ish oynasini ko'rish",
+    install_app: "Ilovani o'rnatish",
+    install_ready: "TinglangApp'ni qurilmangizga o'rnatishingiz mumkin.",
+    install_unavailable: "Brauzer menyusidan Install yoki Add to Home Screen ni tanlang.",
+    install_done: "TinglangApp o'rnatildi.",
+    install_dismissed: "O'rnatish bekor qilindi.",
     landing_stat_tracks: "audio trek",
     landing_stat_units: "o'quv bo'lim",
     landing_stat_loop: "takrorlash",
@@ -248,10 +254,6 @@ const TRANSLATIONS = {
     support_modal_title: "Dasturchini qo'llab-quvvatlash",
     support_desc: "Agar ushbu ilova sizga yoqqan bo'lsa, dasturchini qo'llab-quvvatlashingiz mumkin.",
     support_footer_note: "Karta orqali dasturchini qo'llab-quvvatlashingiz mumkin.",
-    about_app_title: "TinglangApp haqida",
-    about_app_desc: "TinglangApp Basic IELTS Listening uchun yaratilgan qulay mashq vositasi. Unda PDF kitob, ochiq audio treklar, diktant, eslatmalar, progress saqlash va guided tour bitta brauzer ilovasida jamlangan.",
-    about_app_book_label: "Kitob",
-    about_app_dev_label: "Dasturchi",
     btn_copy_card: "Karta raqamini nusxalash",
     toast_card_copied: "Karta raqami nusxalandi!",
     btn_close: "Yopish",
@@ -297,6 +299,7 @@ let state = {
 
 let activeTourStep = 0;
 let highlightedTourElement = null;
+let deferredInstallPrompt = null;
 
 // Media files are served from the public Vercel Blob store in production.
 const DEFAULT_MEDIA_BASE_URL = 'https://3rdqnprfkrc5djuh.public.blob.vercel-storage.com';
@@ -357,6 +360,7 @@ const toastText = document.getElementById('toast-text');
 const appContainer = document.querySelector('.app-container');
 const landingStartBtn = document.getElementById('landing-start');
 const landingPreviewBtn = document.getElementById('landing-preview');
+const landingInstallBtn = document.getElementById('landing-install');
 
 // Settings Modal
 const settingsModal = document.getElementById('settings-modal');
@@ -367,6 +371,7 @@ const btnResetData = document.getElementById('btn-reset-data');
 
 // Guided Tutorial Tour
 const tutorialToggle = document.getElementById('tutorial-toggle');
+const installToggle = document.getElementById('install-toggle');
 const tourShade = document.getElementById('tour-shade');
 const tourPopover = document.getElementById('tour-popover');
 const tourClose = document.getElementById('tour-close');
@@ -379,11 +384,6 @@ const tourNext = document.getElementById('tour-next');
 // Support Modal
 const supportModal = document.getElementById('support-modal');
 const btnCloseSupport = document.getElementById('btn-close-support');
-
-// About App Modal
-const aboutAppModal = document.getElementById('about-app-modal');
-const floatingCodeBtn = document.getElementById('floating-code-btn');
-const btnCloseAboutApp = document.getElementById('btn-close-about-app');
 
 // Themes
 const themeToggle = document.getElementById('theme-toggle');
@@ -675,6 +675,41 @@ function showToast(message, type = 'cyan') {
   setTimeout(() => {
     toastElement.classList.remove('active');
   }, 2500);
+}
+
+function isAppInstalled() {
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+
+function updateInstallButtons() {
+  const shouldHide = isAppInstalled();
+  [installToggle, landingInstallBtn].forEach((button) => {
+    if (!button) return;
+    button.style.display = shouldHide ? 'none' : '';
+  });
+}
+
+async function handleInstallClick() {
+  if (isAppInstalled()) {
+    showToast(t('install_done'), "success");
+    updateInstallButtons();
+    return;
+  }
+
+  if (!deferredInstallPrompt) {
+    showToast(t('install_unavailable'), "violet");
+    return;
+  }
+
+  deferredInstallPrompt.prompt();
+  const choice = await deferredInstallPrompt.userChoice;
+  deferredInstallPrompt = null;
+
+  showToast(
+    choice.outcome === 'accepted' ? t('install_done') : t('install_dismissed'),
+    choice.outcome === 'accepted' ? "success" : "violet"
+  );
+  updateInstallButtons();
 }
 
 // Render Playlist
@@ -1217,6 +1252,29 @@ function setupEventListeners() {
     landingPreviewBtn.addEventListener('click', openPracticeWorkspace);
   }
 
+  if (installToggle) {
+    installToggle.addEventListener('click', handleInstallClick);
+  }
+
+  if (landingInstallBtn) {
+    landingInstallBtn.addEventListener('click', handleInstallClick);
+  }
+
+  window.addEventListener('beforeinstallprompt', (event) => {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+    updateInstallButtons();
+    showToast(t('install_ready'), "cyan");
+  });
+
+  window.addEventListener('appinstalled', () => {
+    deferredInstallPrompt = null;
+    updateInstallButtons();
+    showToast(t('install_done'), "success");
+  });
+
+  updateInstallButtons();
+
   // Tab switching
   tabButtons.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -1292,18 +1350,6 @@ function setupEventListeners() {
   if (btnCloseSupport) {
     btnCloseSupport.addEventListener('click', () => {
       supportModal.classList.remove('active');
-    });
-  }
-
-  if (floatingCodeBtn) {
-    floatingCodeBtn.addEventListener('click', () => {
-      aboutAppModal.classList.add('active');
-    });
-  }
-
-  if (btnCloseAboutApp) {
-    btnCloseAboutApp.addEventListener('click', () => {
-      aboutAppModal.classList.remove('active');
     });
   }
 
