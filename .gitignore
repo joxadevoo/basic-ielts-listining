@@ -2,6 +2,8 @@ node_modules/
 dist/
 .DS_Store
 .env
+.env.*
+!.env.example
 public/basic-ielts-listening1/
 public/basic-ielts-listening2/
 public/basic-ielts-listening3/

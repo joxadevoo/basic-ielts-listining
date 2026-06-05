@@ -239,14 +239,22 @@ let state = {
   language: 'en'
 };
 
-// Firebase Configuration for Streaming Audio & PDF
-const USE_FIREBASE_STORAGE = false; // Set to false if you want to use local public/ folder files instead (e.g. on Netlify or Vercel)
-const FIREBASE_BUCKET = "basic-ielts.firebasestorage.app";
+// Media files can be served from Vercel Blob in production.
+// Use VITE_MEDIA_PROXY_PATH for private Blob stores, VITE_MEDIA_BASE_URL for public Blob stores.
+const MEDIA_BASE_URL = (import.meta.env.VITE_MEDIA_BASE_URL || '').replace(/\/$/, '');
+const MEDIA_PROXY_PATH = (import.meta.env.VITE_MEDIA_PROXY_PATH || '').replace(/\/$/, '');
 
-function getFirebaseStorageUrl(localPath) {
+function getMediaUrl(localPath) {
   const cleanPath = localPath.replace(/^\.\//, '');
-  const encodedPath = encodeURIComponent(cleanPath);
-  return `https://firebasestorage.googleapis.com/v0/b/${FIREBASE_BUCKET}/o/${encodedPath}?alt=media`;
+  if (MEDIA_PROXY_PATH) {
+    return `${MEDIA_PROXY_PATH}?pathname=${encodeURIComponent(cleanPath)}`;
+  }
+  return MEDIA_BASE_URL ? `${MEDIA_BASE_URL}/${cleanPath}` : `./${cleanPath}`;
+}
+
+function withQueryParam(url, key, value) {
+  const separator = url.includes('?') ? '&' : '?';
+  return `${url}${separator}${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
 }
 
 // DOM Elements
@@ -547,7 +555,7 @@ function selectTrack(track, autoplay = true) {
   }
 
   state.currentTrack = track;
-  audio.src = USE_FIREBASE_STORAGE ? getFirebaseStorageUrl(track.path) : track.path;
+  audio.src = getMediaUrl(track.path);
   audio.load();
   
   // Update Player UI info
@@ -608,13 +616,8 @@ function selectTrack(track, autoplay = true) {
 // Sync PDF IFrame
 function syncPdfViewer(pageNum) {
   const adjustedPage = pageNum + state.pdfOffset;
-  if (USE_FIREBASE_STORAGE) {
-    const baseUrl = getFirebaseStorageUrl('basic-ielts-listening.pdf');
-    pdfFrame.src = `${baseUrl}&p=${adjustedPage}#page=${adjustedPage}`;
-  } else {
-    // Append a query param ?p=N to force the iframe to reload and scroll to #page=N
-    pdfFrame.src = `./basic-ielts-listening.pdf?p=${adjustedPage}#page=${adjustedPage}`;
-  }
+  // Append a query param ?p=N to force the iframe to reload and scroll to #page=N
+  pdfFrame.src = `${withQueryParam(getMediaUrl('basic-ielts-listening.pdf'), 'p', adjustedPage)}#page=${adjustedPage}`;
 }
 
 // Update Play/Pause Icons in Playlist
