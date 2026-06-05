@@ -421,6 +421,7 @@ function init() {
   renderPlaylist();
   updateStatsDashboard();
   selectTrack(state.tracks[0], false); // Load first track but don't autoplay
+  syncPdfViewer(5);
   applyTheme();
   if (window.location.hash === '#practice') {
     openPracticeWorkspace();
@@ -637,9 +638,6 @@ function selectTrack(track, autoplay = true) {
       card.classList.add('in-progress');
     }
   }
-
-  // Update PDF Viewer to the exercise page
-  syncPdfViewer(track.bookPage);
 
   if (autoplay) {
     playAudio();
@@ -1105,10 +1103,6 @@ function setupEventListeners() {
     localStorage.setItem('ielts_pdf_offset', state.pdfOffset);
     settingsModal.classList.remove('active');
     showToast(t('toast_settings_applied'), "success");
-    // Reload PDF with new offset
-    if (state.currentTrack) {
-      syncPdfViewer(state.currentTrack.bookPage);
-    }
   });
 
   btnResetData.addEventListener('click', resetLocalData);
