@@ -1,10 +1,6 @@
-const CACHE_NAME = 'ielts-listening-v1';
+const CACHE_NAME = 'ielts-listening-v2';
 const ASSETS_TO_CACHE = [
   './',
-  './index.html',
-  './index.css',
-  './app.js',
-  './tracks.js',
   './favicon.svg',
   './manifest.json'
 ];
@@ -12,7 +8,9 @@ const ASSETS_TO_CACHE = [
 self.addEventListener('install', (e) => {
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
+      return Promise.all(
+        ASSETS_TO_CACHE.map((asset) => cache.add(asset).catch(() => null))
+      );
     })
   );
   self.skipWaiting();
@@ -40,6 +38,11 @@ self.addEventListener('fetch', (e) => {
   }
 
   const url = new URL(e.request.url);
+
+  if (url.pathname.startsWith('/api/media')) {
+    e.respondWith(fetch(e.request));
+    return;
+  }
 
   // Bypass cache-first for large media files (.mp3, .pdf) to prevent range request/quota errors
   if (url.pathname.endsWith('.mp3') || url.pathname.endsWith('.pdf')) {

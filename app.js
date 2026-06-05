@@ -258,7 +258,8 @@ let state = {
 // Media files can be served from Vercel Blob in production.
 // Use VITE_MEDIA_PROXY_PATH for private Blob stores, VITE_MEDIA_BASE_URL for public Blob stores.
 const MEDIA_BASE_URL = (import.meta.env.VITE_MEDIA_BASE_URL || '').replace(/\/$/, '');
-const MEDIA_PROXY_PATH = (import.meta.env.VITE_MEDIA_PROXY_PATH || '').replace(/\/$/, '');
+const CONFIGURED_MEDIA_PROXY_PATH = (import.meta.env.VITE_MEDIA_PROXY_PATH || '').replace(/\/$/, '');
+const MEDIA_PROXY_PATH = CONFIGURED_MEDIA_PROXY_PATH || (import.meta.env.PROD && !MEDIA_BASE_URL ? '/api/media' : '');
 
 function getMediaUrl(localPath) {
   const cleanPath = localPath.replace(/^\.\//, '');
