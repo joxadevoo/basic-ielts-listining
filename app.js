@@ -273,6 +273,11 @@ function getMediaUrl(localPath) {
     return `${MEDIA_BASE_URL}/audio/${filename}`;
   }
 
+  if (cleanPath.endsWith('.pdf')) {
+    const filename = cleanPath.split('/').pop();
+    return `${MEDIA_BASE_URL}/audio/${filename}`;
+  }
+
   return `${MEDIA_BASE_URL}/${cleanPath}`;
 }
 
