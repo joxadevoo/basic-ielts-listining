@@ -255,18 +255,25 @@ let state = {
   language: 'en'
 };
 
-// Media files can be served from Vercel Blob in production.
-// Use VITE_MEDIA_PROXY_PATH for private Blob stores, VITE_MEDIA_BASE_URL for public Blob stores.
-const MEDIA_BASE_URL = (import.meta.env.VITE_MEDIA_BASE_URL || '').replace(/\/$/, '');
-const CONFIGURED_MEDIA_PROXY_PATH = (import.meta.env.VITE_MEDIA_PROXY_PATH || '').replace(/\/$/, '');
-const MEDIA_PROXY_PATH = CONFIGURED_MEDIA_PROXY_PATH || (import.meta.env.PROD && !MEDIA_BASE_URL ? '/api/media' : '');
+// Media files are served from the public Vercel Blob store in production.
+const DEFAULT_MEDIA_BASE_URL = 'https://3rdqnprfkrc5djuh.public.blob.vercel-storage.com';
+const MEDIA_BASE_URL = (
+  import.meta.env.VITE_MEDIA_BASE_URL ||
+  (import.meta.env.PROD ? DEFAULT_MEDIA_BASE_URL : '')
+).replace(/\/$/, '');
 
 function getMediaUrl(localPath) {
   const cleanPath = localPath.replace(/^\.\//, '');
-  if (MEDIA_PROXY_PATH) {
-    return `${MEDIA_PROXY_PATH}?pathname=${encodeURIComponent(cleanPath)}`;
+  if (!MEDIA_BASE_URL) {
+    return `./${cleanPath}`;
   }
-  return MEDIA_BASE_URL ? `${MEDIA_BASE_URL}/${cleanPath}` : `./${cleanPath}`;
+
+  if (cleanPath.endsWith('.mp3')) {
+    const filename = cleanPath.split('/').pop();
+    return `${MEDIA_BASE_URL}/audio/${filename}`;
+  }
+
+  return `${MEDIA_BASE_URL}/${cleanPath}`;
 }
 
 function withQueryParam(url, key, value) {

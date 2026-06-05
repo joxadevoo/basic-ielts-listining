@@ -6,30 +6,24 @@ Basic IELTS Listening practice app.
 
 Audio and PDF files can be served from Vercel Blob without changing `tracks.js`.
 
-For a private Blob store, set these environment variables in Vercel:
+For the public Blob store, set this environment variable in Vercel:
 
 ```txt
-VITE_MEDIA_PROXY_PATH=/api/media
-BLOB_PRIVATE_BASE_URL=https://fujtbsiuzitsemue.private.blob.vercel-storage.com
-BLOB_STORE_ID=store_yourStoreId
-BLOB_READ_WRITE_TOKEN=vercel_blob_rw_yourStoreId_secret
+VITE_MEDIA_BASE_URL=https://3rdqnprfkrc5djuh.public.blob.vercel-storage.com
 ```
 
-Keep the uploaded Blob paths the same as the old `public/` paths:
+Audio files are served from the Blob `audio/` folder:
+
+```txt
+audio/01.mp3
+audio/02.mp3
+audio/47.mp3
+```
+
+The PDF is served from the Blob root:
 
 ```txt
 basic-ielts-listening.pdf
-basic-ielts-listening1/01.mp3
-basic-ielts-listening2/47.mp3
-basic-ielts-listening3/77.mp3
 ```
 
-The browser requests media through `/api/media?pathname=...`; the token stays on the Vercel server and is never exposed to frontend code. Audio files are read from `basic-ielts-listining-blob/audio/01.mp3`, `02.mp3`, and so on.
-
-For a public Blob store, use this instead:
-
-```txt
-VITE_MEDIA_BASE_URL=https://your-store-id.public.blob.vercel-storage.com
-```
-
-If both `VITE_MEDIA_PROXY_PATH` and `VITE_MEDIA_BASE_URL` are empty, the app uses local files from `public/`.
+If `VITE_MEDIA_BASE_URL` is empty, the app uses local files from `public/`.
