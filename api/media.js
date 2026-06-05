@@ -1,3 +1,5 @@
+import { Readable } from 'node:stream';
+
 const PRIVATE_BLOB_HOST_SUFFIX = '.private.blob.vercel-storage.com';
 
 function getPrivateBlobHost() {
@@ -8,11 +10,17 @@ function getPrivateBlobHost() {
 
   const token = process.env.BLOB_READ_WRITE_TOKEN || '';
   const match = token.match(/^vercel_blob_rw_([^_]+)_/);
-  if (match) {
-    return `${match[1]}${PRIVATE_BLOB_HOST_SUFFIX}`;
-  }
+  return match ? `${match[1]}${PRIVATE_BLOB_HOST_SUFFIX}` : null;
+}
 
-  return null;
+function isSafePathname(pathname) {
+  return (
+    typeof pathname === 'string' &&
+    pathname.length > 0 &&
+    !pathname.startsWith('/') &&
+    !pathname.includes('..') &&
+    !pathname.includes('\\')
+  );
 }
 
 function encodePathname(pathname) {
@@ -25,30 +33,47 @@ function encodePathname(pathname) {
 export default async function handler(request, response) {
   const token = process.env.BLOB_READ_WRITE_TOKEN;
   const host = getPrivateBlobHost();
-  const pathname = request.query.pathname;
+  const { pathname } = request.query;
 
   if (!token || !host) {
     return response.status(500).json({ error: 'Blob credentials are not configured.' });
   }
 
-  if (!pathname || Array.isArray(pathname) || pathname.includes('..')) {
+  if (!isSafePathname(pathname)) {
     return response.status(400).json({ error: 'Invalid pathname.' });
   }
 
-  const blobUrl = `https://${host}/${encodePathname(pathname)}`;
   const headers = {
     Authorization: `Bearer ${token}`,
   };
 
-  if (request.headers.range) {
-    headers.Range = request.headers.range;
+  for (const [incoming, outgoing] of [
+    ['range', 'Range'],
+    ['if-none-match', 'If-None-Match'],
+    ['if-modified-since', 'If-Modified-Since'],
+  ]) {
+    if (request.headers[incoming]) {
+      headers[outgoing] = request.headers[incoming];
+    }
   }
 
-  const blobResponse = await fetch(blobUrl, { headers });
+  const method = request.method === 'HEAD' ? 'HEAD' : 'GET';
+  const candidatePathnames = pathname.startsWith('public/')
+    ? [pathname]
+    : [pathname, `public/${pathname}`];
 
-  if (!blobResponse.ok && blobResponse.status !== 206 && blobResponse.status !== 304) {
-    return response.status(blobResponse.status).send(blobResponse.statusText || 'Blob request failed');
+  let blobResponse;
+
+  for (const candidatePathname of candidatePathnames) {
+    const blobUrl = `https://${host}/${encodePathname(candidatePathname)}`;
+    blobResponse = await fetch(blobUrl, { method, headers });
+
+    if (blobResponse.ok || blobResponse.status === 206 || blobResponse.status === 304) {
+      break;
+    }
   }
+
+  response.status(blobResponse.status);
 
   for (const headerName of [
     'content-type',
@@ -65,23 +90,14 @@ export default async function handler(request, response) {
   }
 
   response.setHeader('Cache-Control', 'private, no-cache');
-  response.status(blobResponse.status);
 
-  if (!blobResponse.body) {
+  if (!blobResponse.ok && blobResponse.status !== 206 && blobResponse.status !== 304) {
+    return response.send(blobResponse.statusText || 'Blob request failed');
+  }
+
+  if (request.method === 'HEAD' || !blobResponse.body) {
     return response.end();
   }
 
-  const reader = blobResponse.body.getReader();
-
-  async function writeChunk() {
-    const { done, value } = await reader.read();
-    if (done) {
-      response.end();
-      return;
-    }
-    response.write(Buffer.from(value));
-    await writeChunk();
-  }
-
-  return writeChunk();
+  return Readable.fromWeb(blobResponse.body).pipe(response);
 }

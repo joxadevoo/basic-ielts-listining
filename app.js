@@ -3,6 +3,14 @@ import { TRACKS } from './tracks.js';
 const TRANSLATIONS = {
   en: {
     logo_title: "Basic IELTS Listening",
+    landing_kicker: "IELTS listening practice suite",
+    landing_title: "Basic IELTS Listening",
+    landing_subtitle: "Study with the book, stream every track, write dictation, and save your progress in one focused workspace.",
+    landing_start: "Start practice",
+    landing_preview: "View workspace",
+    landing_stat_tracks: "audio tracks",
+    landing_stat_units: "study units",
+    landing_stat_loop: "repeat loop",
     header_progress: "Progress:",
     tab_tracks: "Tracks",
     tab_dictation: "Dictation",
@@ -112,6 +120,14 @@ const TRANSLATIONS = {
   },
   uz: {
     logo_title: "Basic IELTS Listening",
+    landing_kicker: "IELTS listening mashq to'plami",
+    landing_title: "Basic IELTS Listening",
+    landing_subtitle: "Kitob bilan ishlang, barcha treklarni tinglang, diktant yozing va natijangizni bitta qulay oynada saqlang.",
+    landing_start: "Mashqni boshlash",
+    landing_preview: "Ish oynasini ko'rish",
+    landing_stat_tracks: "audio trek",
+    landing_stat_units: "o'quv bo'lim",
+    landing_stat_loop: "takrorlash",
     header_progress: "O'zlashtirish:",
     tab_tracks: "Treklar",
     tab_dictation: "Diktant",
@@ -282,6 +298,9 @@ const volumeSlider = document.getElementById('volume-slider');
 const pdfFrame = document.getElementById('pdf-frame');
 const toastElement = document.getElementById('toast-message');
 const toastText = document.getElementById('toast-text');
+const appContainer = document.querySelector('.app-container');
+const landingStartBtn = document.getElementById('landing-start');
+const landingPreviewBtn = document.getElementById('landing-preview');
 
 // Settings Modal
 const settingsModal = document.getElementById('settings-modal');
@@ -382,6 +401,11 @@ function updateLanguageUI() {
   }
 }
 
+function openPracticeWorkspace() {
+  appContainer.classList.add('landing-dismissed');
+  window.location.hash = 'practice';
+}
+
 // Initialize App
 function init() {
   loadLocalStorage();
@@ -390,6 +414,9 @@ function init() {
   updateStatsDashboard();
   selectTrack(state.tracks[0], false); // Load first track but don't autoplay
   applyTheme();
+  if (window.location.hash === '#practice') {
+    openPracticeWorkspace();
+  }
 }
 
 // Local Storage Handlers
@@ -978,6 +1005,14 @@ function setupEventListeners() {
 
   // A-B repeat toggle
   btnAbLoop.addEventListener('click', handleAbLoop);
+
+  if (landingStartBtn) {
+    landingStartBtn.addEventListener('click', openPracticeWorkspace);
+  }
+
+  if (landingPreviewBtn) {
+    landingPreviewBtn.addEventListener('click', openPracticeWorkspace);
+  }
 
   // Tab switching
   tabButtons.forEach(btn => {
