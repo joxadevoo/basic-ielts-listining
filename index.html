@@ -63,6 +63,13 @@
           </div>
         </div>
 
+        <!-- Tutorial Button -->
+        <button id="tutorial-toggle" class="btn-icon" title="How to use" aria-label="How to use">
+          <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: currentColor;">
+            <path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/>
+          </svg>
+        </button>
+
         <!-- Support Developer Button -->
         <button id="btn-coffee-header" class="btn-icon" title="Support Developer" aria-label="Support Developer">
           <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: currentColor;">
@@ -430,6 +437,64 @@
         <div class="modal-footer">
           <button id="btn-close-settings" class="btn-primary" data-i18n="btn_save_close">Save & Close</button>
         </div>
+      </div>
+    </div>
+
+    <!-- Tutorial Modal -->
+    <div class="modal-overlay" id="tutorial-modal">
+      <div class="modal-box tutorial-modal-box">
+        <h3 class="modal-title" data-i18n="tutorial_title">How to use this app</h3>
+        <div class="tutorial-steps">
+          <div class="tutorial-step">
+            <div class="tutorial-step-number">1</div>
+            <div>
+              <strong data-i18n="tutorial_step_1_title">Choose a track</strong>
+              <p data-i18n="tutorial_step_1_desc">Open the Tracks tab and click any audio. The PDF will stay where you scroll it.</p>
+            </div>
+          </div>
+          <div class="tutorial-step">
+            <div class="tutorial-step-number">2</div>
+            <div>
+              <strong data-i18n="tutorial_step_2_title">Control listening</strong>
+              <p data-i18n="tutorial_step_2_desc">Use play, previous, next, 5-second rewind, speed, volume, and A-B repeat from the bottom player.</p>
+            </div>
+          </div>
+          <div class="tutorial-step">
+            <div class="tutorial-step-number">3</div>
+            <div>
+              <strong data-i18n="tutorial_step_3_title">Use the book freely</strong>
+              <p data-i18n="tutorial_step_3_desc">Scroll the PDF by yourself. Unit and answer buttons above the PDF are optional shortcuts.</p>
+            </div>
+          </div>
+          <div class="tutorial-step">
+            <div class="tutorial-step-number">4</div>
+            <div>
+              <strong data-i18n="tutorial_step_4_title">Practice actively</strong>
+              <p data-i18n="tutorial_step_4_desc">Write what you hear in Dictation, save vocabulary in Notebook, and your progress will be remembered.</p>
+            </div>
+          </div>
+        </div>
+        <div class="tutorial-shortcuts">
+          <span><kbd>Esc</kbd> <span data-i18n="shortcut_play_pause">Play/Pause</span></span>
+          <span><kbd>Space</kbd> <span data-i18n="shortcut_play_pause">Play/Pause</span></span>
+          <span><kbd>←</kbd> / <kbd>→</kbd> <span data-i18n="tutorial_shortcut_seek">Seek 5s</span></span>
+        </div>
+        <div class="modal-footer">
+          <button id="btn-close-tutorial" class="btn-primary" data-i18n="tutorial_got_it">Got it</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Guided Tutorial Tour -->
+    <div class="tour-shade" id="tour-shade"></div>
+    <div class="tour-popover" id="tour-popover" role="dialog" aria-live="polite">
+      <button class="tour-close" id="tour-close" aria-label="Close tutorial">x</button>
+      <div class="tour-count" id="tour-count">1 / 5</div>
+      <h3 id="tour-title">Choose a track</h3>
+      <p id="tour-desc">Open the Tracks tab and click any audio.</p>
+      <div class="tour-actions">
+        <button id="tour-prev" class="btn-secondary" data-i18n="tutorial_back">Back</button>
+        <button id="tour-next" class="btn-primary" data-i18n="tutorial_next">Next</button>
       </div>
     </div>
 

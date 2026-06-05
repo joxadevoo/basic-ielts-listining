@@ -1488,6 +1488,155 @@ h1, h2, h3, h4, h5, h6 {
   margin-top: 12px;
 }
 
+.tour-shade {
+  position: fixed;
+  inset: 0;
+  z-index: 1001;
+  display: none;
+  background: rgba(0, 0, 0, 0.58);
+  backdrop-filter: blur(3px);
+}
+
+.tour-shade.active {
+  display: block;
+}
+
+.tour-highlight {
+  position: relative !important;
+  z-index: 1002 !important;
+  box-shadow: 0 0 0 3px var(--color-secondary), 0 0 32px hsla(190, 95%, 50%, 0.45) !important;
+  border-radius: var(--radius-sm);
+}
+
+.tour-popover {
+  position: fixed;
+  z-index: 1003;
+  width: min(360px, calc(100vw - 32px));
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+  border: 1px solid hsla(190, 95%, 50%, 0.38);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-lg), 0 0 24px hsla(250, 89%, 65%, 0.2);
+}
+
+.tour-popover.active {
+  display: flex;
+}
+
+.tour-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.tour-count {
+  width: fit-content;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: hsla(190, 95%, 50%, 0.12);
+  color: var(--color-secondary);
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+.tour-popover h3 {
+  padding-right: 28px;
+  font-size: 1.1rem;
+  line-height: 1.25;
+}
+
+.tour-popover p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.tour-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.tour-actions .btn-secondary,
+.tour-actions .btn-primary {
+  padding: 8px 14px;
+}
+
+.tour-actions .btn-secondary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.tutorial-modal-box {
+  width: 560px;
+}
+
+.tutorial-steps {
+  display: grid;
+  gap: 14px;
+}
+
+.tutorial-step {
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.tutorial-step-number {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  color: #fff;
+  font-family: var(--font-title);
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+
+.tutorial-step strong {
+  display: block;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+}
+
+.tutorial-step p {
+  color: var(--text-secondary);
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
+.tutorial-shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+.tutorial-shortcuts span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
 /* Toast Notification */
 .toast {
   position: fixed;
@@ -2019,6 +2168,39 @@ h1, h2, h3, h4, h5, h6 {
 
   .setting-row button {
     width: 100%;
+  }
+
+  .tutorial-modal-box {
+    width: 92%;
+    padding: 22px;
+  }
+
+  .tutorial-step {
+    grid-template-columns: 30px 1fr;
+    gap: 10px;
+  }
+
+  .tutorial-step-number {
+    width: 30px;
+    height: 30px;
+    font-size: 0.8rem;
+  }
+
+  .tutorial-step p {
+    font-size: 0.8rem;
+  }
+
+  .tour-popover {
+    left: 16px !important;
+    right: 16px;
+    width: auto;
+    max-height: 42vh;
+    overflow-y: auto;
+  }
+
+  .tour-actions .btn-secondary,
+  .tour-actions .btn-primary {
+    flex: 1;
   }
 
   /* Toast Notification positioning on Mobile */

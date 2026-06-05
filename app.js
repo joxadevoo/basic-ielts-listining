@@ -11,6 +11,20 @@ const TRANSLATIONS = {
     landing_stat_tracks: "audio tracks",
     landing_stat_units: "study units",
     landing_stat_loop: "repeat loop",
+    tutorial_title: "How to use this app",
+    tutorial_step_1_title: "Choose a track",
+    tutorial_step_1_desc: "Open the Tracks tab and click any audio. The PDF will stay where you scroll it.",
+    tutorial_step_2_title: "Control listening",
+    tutorial_step_2_desc: "Use play, previous, next, 5-second rewind, speed, volume, and A-B repeat from the bottom player.",
+    tutorial_step_3_title: "Use the book freely",
+    tutorial_step_3_desc: "Scroll the PDF by yourself. Unit and answer buttons above the PDF are optional shortcuts.",
+    tutorial_step_4_title: "Practice actively",
+    tutorial_step_4_desc: "Write what you hear in Dictation, save vocabulary in Notebook, and your progress will be remembered.",
+    tutorial_shortcut_seek: "Seek 5s",
+    tutorial_got_it: "Got it",
+    tutorial_back: "Back",
+    tutorial_next: "Next",
+    tutorial_finish: "Finish",
     header_progress: "Progress:",
     tab_tracks: "Tracks",
     tab_dictation: "Dictation",
@@ -128,6 +142,20 @@ const TRANSLATIONS = {
     landing_stat_tracks: "audio trek",
     landing_stat_units: "o'quv bo'lim",
     landing_stat_loop: "takrorlash",
+    tutorial_title: "Ilovadan qanday foydalaniladi",
+    tutorial_step_1_title: "Trek tanlang",
+    tutorial_step_1_desc: "Treklar bo'limidan istalgan audioni bosing. PDF esa siz scroll qilgan joyida qoladi.",
+    tutorial_step_2_title: "Tinglashni boshqaring",
+    tutorial_step_2_desc: "Pastdagi pleyerdan play, oldingi/keyingi trek, 5 soniya orqaga, tezlik, ovoz va A-B takrorlashni ishlating.",
+    tutorial_step_3_title: "Kitobdan erkin foydalaning",
+    tutorial_step_3_desc: "PDFni o'zingiz scroll qiling. Yuqoridagi bo'lim va javob tugmalari faqat tez o'tish uchun.",
+    tutorial_step_4_title: "Faol mashq qiling",
+    tutorial_step_4_desc: "Eshitganingizni Diktantga yozing, so'zlarni Daftarga saqlang va progress eslab qolinadi.",
+    tutorial_shortcut_seek: "5s surish",
+    tutorial_got_it: "Tushunarli",
+    tutorial_back: "Orqaga",
+    tutorial_next: "Keyingi",
+    tutorial_finish: "Tugatish",
     header_progress: "O'zlashtirish:",
     tab_tracks: "Treklar",
     tab_dictation: "Diktant",
@@ -255,6 +283,9 @@ let state = {
   language: 'en'
 };
 
+let activeTourStep = 0;
+let highlightedTourElement = null;
+
 // Media files are served from the public Vercel Blob store in production.
 const DEFAULT_MEDIA_BASE_URL = 'https://3rdqnprfkrc5djuh.public.blob.vercel-storage.com';
 const MEDIA_BASE_URL = (
@@ -321,6 +352,17 @@ const settingsToggle = document.getElementById('settings-toggle');
 const btnCloseSettings = document.getElementById('btn-close-settings');
 const settingOffset = document.getElementById('setting-offset');
 const btnResetData = document.getElementById('btn-reset-data');
+
+// Guided Tutorial Tour
+const tutorialToggle = document.getElementById('tutorial-toggle');
+const tourShade = document.getElementById('tour-shade');
+const tourPopover = document.getElementById('tour-popover');
+const tourClose = document.getElementById('tour-close');
+const tourCount = document.getElementById('tour-count');
+const tourTitle = document.getElementById('tour-title');
+const tourDesc = document.getElementById('tour-desc');
+const tourPrev = document.getElementById('tour-prev');
+const tourNext = document.getElementById('tour-next');
 
 // Support Modal
 const supportModal = document.getElementById('support-modal');
@@ -417,6 +459,124 @@ function updateLanguageUI() {
 function openPracticeWorkspace() {
   appContainer.classList.add('landing-dismissed');
   window.location.hash = 'practice';
+}
+
+function getTourSteps() {
+  return [
+    {
+      selector: '.pane-tabs-nav',
+      title: t('tutorial_step_1_title'),
+      desc: t('tutorial_step_1_desc')
+    },
+    {
+      selector: '#playlist-container',
+      title: t('tutorial_step_1_title'),
+      desc: state.language === 'en'
+        ? 'Pick any track from this list. Audio starts independently from the book.'
+        : "Ushbu ro'yxatdan trek tanlang. Audio kitobdan alohida ishlaydi."
+    },
+    {
+      selector: '.pdf-pane',
+      title: t('tutorial_step_3_title'),
+      desc: t('tutorial_step_3_desc')
+    },
+    {
+      selector: '.audio-player-footer',
+      title: t('tutorial_step_2_title'),
+      desc: t('tutorial_step_2_desc')
+    },
+    {
+      selector: '#panel-dictation',
+      title: t('tutorial_step_4_title'),
+      desc: t('tutorial_step_4_desc')
+    }
+  ];
+}
+
+function clearTourHighlight() {
+  if (highlightedTourElement) {
+    highlightedTourElement.classList.remove('tour-highlight');
+    highlightedTourElement = null;
+  }
+}
+
+function positionTourPopover(target) {
+  const rect = target.getBoundingClientRect();
+  const popoverRect = tourPopover.getBoundingClientRect();
+  const margin = 16;
+
+  let left = rect.right + margin;
+  let top = rect.top + Math.min(24, Math.max(0, rect.height / 4));
+
+  if (left + popoverRect.width + margin > window.innerWidth) {
+    left = rect.left - popoverRect.width - margin;
+  }
+
+  if (left < margin) {
+    left = Math.min(window.innerWidth - popoverRect.width - margin, margin);
+    top = rect.bottom + margin;
+  }
+
+  if (top + popoverRect.height + margin > window.innerHeight) {
+    top = window.innerHeight - popoverRect.height - margin;
+  }
+
+  tourPopover.style.left = `${Math.max(margin, left)}px`;
+  tourPopover.style.top = `${Math.max(margin, top)}px`;
+}
+
+function renderTourStep() {
+  const steps = getTourSteps();
+  const step = steps[activeTourStep];
+  const target = document.querySelector(step.selector);
+
+  if (!target) {
+    endTour();
+    return;
+  }
+
+  clearTourHighlight();
+  highlightedTourElement = target;
+  highlightedTourElement.classList.add('tour-highlight');
+  highlightedTourElement.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+
+  tourCount.textContent = `${activeTourStep + 1} / ${steps.length}`;
+  tourTitle.textContent = step.title;
+  tourDesc.textContent = step.desc;
+  tourPrev.disabled = activeTourStep === 0;
+  tourNext.textContent = activeTourStep === steps.length - 1 ? t('tutorial_finish') : t('tutorial_next');
+
+  setTimeout(() => positionTourPopover(target), 180);
+}
+
+function startTour() {
+  openPracticeWorkspace();
+  activeTourStep = 0;
+  tourShade.classList.add('active');
+  tourPopover.classList.add('active');
+  renderTourStep();
+}
+
+function endTour() {
+  clearTourHighlight();
+  tourShade.classList.remove('active');
+  tourPopover.classList.remove('active');
+}
+
+function nextTourStep() {
+  const steps = getTourSteps();
+  if (activeTourStep >= steps.length - 1) {
+    endTour();
+    return;
+  }
+  activeTourStep += 1;
+  renderTourStep();
+}
+
+function previousTourStep() {
+  if (activeTourStep === 0) return;
+  activeTourStep -= 1;
+  renderTourStep();
 }
 
 // Initialize App
@@ -1074,6 +1234,20 @@ function setupEventListeners() {
     settingsModal.classList.add('active');
   });
 
+  if (tutorialToggle) {
+    tutorialToggle.addEventListener('click', startTour);
+  }
+
+  tourClose.addEventListener('click', endTour);
+  tourShade.addEventListener('click', endTour);
+  tourPrev.addEventListener('click', previousTourStep);
+  tourNext.addEventListener('click', nextTourStep);
+  window.addEventListener('resize', () => {
+    if (tourPopover.classList.contains('active') && highlightedTourElement) {
+      positionTourPopover(highlightedTourElement);
+    }
+  });
+
   // Support button opens dedicated support modal
   const btnCoffeeHeader = document.getElementById('btn-coffee-header');
   if (btnCoffeeHeader) {
@@ -1182,6 +1356,14 @@ function setupEventListeners() {
 
   // Keyboard Shortcuts (Global listener)
   document.addEventListener('keydown', (e) => {
+    if (tourPopover.classList.contains('active')) {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        endTour();
+      }
+      return;
+    }
+
     // Esc play/pause shortcut (works even in textareas!)
     if (e.key === 'Escape') {
       e.preventDefault();
