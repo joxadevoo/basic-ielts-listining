@@ -1,17 +1,9 @@
 import { Readable } from 'node:stream';
 
-const PRIVATE_BLOB_HOST_SUFFIX = '.private.blob.vercel-storage.com';
-
-function getPrivateBlobHost() {
-  const storeId = process.env.BLOB_STORE_ID;
-  if (storeId) {
-    return `${storeId.replace(/^store_/, '')}${PRIVATE_BLOB_HOST_SUFFIX}`;
-  }
-
-  const token = process.env.BLOB_READ_WRITE_TOKEN || '';
-  const match = token.match(/^vercel_blob_rw_([^_]+)_/);
-  return match ? `${match[1]}${PRIVATE_BLOB_HOST_SUFFIX}` : null;
-}
+const PRIVATE_BLOB_BASE_URL = (
+  process.env.BLOB_PRIVATE_BASE_URL ||
+  'https://fujtbsiuzitsemue.private.blob.vercel-storage.com'
+).replace(/\/$/, '');
 
 function isSafePathname(pathname) {
   return (
@@ -32,24 +24,23 @@ function encodePathname(pathname) {
 
 function getCandidatePathnames(pathname) {
   const candidates = [pathname];
+  const filename = pathname.split('/').pop();
 
-  if (!pathname.startsWith('public/')) {
-    candidates.push(`public/${pathname}`);
+  if (pathname.endsWith('.mp3')) {
+    candidates.unshift(`basic-ielts-listining-blob/audio/${filename}`);
+    candidates.push(`audio/${filename}`);
   }
 
   if (!pathname.startsWith('basic-ielts-listining-blob/')) {
     candidates.push(`basic-ielts-listining-blob/${pathname}`);
   }
 
-  if (pathname.endsWith('.mp3')) {
-    const filename = pathname.split('/').pop();
-    candidates.push(`basic-ielts-listining-blob/audio/${filename}`);
-    candidates.push(`audio/${filename}`);
+  if (!pathname.startsWith('public/')) {
+    candidates.push(`public/${pathname}`);
   }
 
   if (pathname.endsWith('.pdf')) {
-    const filename = pathname.split('/').pop();
-    candidates.push(`basic-ielts-listining-blob/${filename}`);
+    candidates.unshift(`basic-ielts-listining-blob/${filename}`);
   }
 
   return [...new Set(candidates)];
@@ -57,11 +48,10 @@ function getCandidatePathnames(pathname) {
 
 export default async function handler(request, response) {
   const token = process.env.BLOB_READ_WRITE_TOKEN;
-  const host = getPrivateBlobHost();
   const { pathname } = request.query;
   const debug = request.query.debug === '1';
 
-  if (!token || !host) {
+  if (!token) {
     return response.status(500).json({ error: 'Blob credentials are not configured.' });
   }
 
@@ -90,10 +80,11 @@ export default async function handler(request, response) {
   const attempts = [];
 
   for (const candidatePathname of candidatePathnames) {
-    const blobUrl = `https://${host}/${encodePathname(candidatePathname)}`;
+    const blobUrl = `${PRIVATE_BLOB_BASE_URL}/${encodePathname(candidatePathname)}`;
     blobResponse = await fetch(blobUrl, { method, headers });
     attempts.push({
       pathname: candidatePathname,
+      url: blobUrl,
       status: blobResponse.status,
       statusText: blobResponse.statusText,
     });
@@ -125,7 +116,7 @@ export default async function handler(request, response) {
     if (debug) {
       return response.json({
         error: 'Blob file was not found with the attempted pathnames.',
-        host,
+        baseUrl: PRIVATE_BLOB_BASE_URL,
         attempts,
       });
     }
