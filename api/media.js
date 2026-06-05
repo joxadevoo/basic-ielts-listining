@@ -30,10 +30,36 @@ function encodePathname(pathname) {
     .join('/');
 }
 
+function getCandidatePathnames(pathname) {
+  const candidates = [pathname];
+
+  if (!pathname.startsWith('public/')) {
+    candidates.push(`public/${pathname}`);
+  }
+
+  if (!pathname.startsWith('basic-ielts-listining-blob/')) {
+    candidates.push(`basic-ielts-listining-blob/${pathname}`);
+  }
+
+  if (pathname.endsWith('.mp3')) {
+    const filename = pathname.split('/').pop();
+    candidates.push(`basic-ielts-listining-blob/audio/${filename}`);
+    candidates.push(`audio/${filename}`);
+  }
+
+  if (pathname.endsWith('.pdf')) {
+    const filename = pathname.split('/').pop();
+    candidates.push(`basic-ielts-listining-blob/${filename}`);
+  }
+
+  return [...new Set(candidates)];
+}
+
 export default async function handler(request, response) {
   const token = process.env.BLOB_READ_WRITE_TOKEN;
   const host = getPrivateBlobHost();
   const { pathname } = request.query;
+  const debug = request.query.debug === '1';
 
   if (!token || !host) {
     return response.status(500).json({ error: 'Blob credentials are not configured.' });
@@ -58,15 +84,19 @@ export default async function handler(request, response) {
   }
 
   const method = request.method === 'HEAD' ? 'HEAD' : 'GET';
-  const candidatePathnames = pathname.startsWith('public/')
-    ? [pathname]
-    : [pathname, `public/${pathname}`];
+  const candidatePathnames = getCandidatePathnames(pathname);
 
   let blobResponse;
+  const attempts = [];
 
   for (const candidatePathname of candidatePathnames) {
     const blobUrl = `https://${host}/${encodePathname(candidatePathname)}`;
     blobResponse = await fetch(blobUrl, { method, headers });
+    attempts.push({
+      pathname: candidatePathname,
+      status: blobResponse.status,
+      statusText: blobResponse.statusText,
+    });
 
     if (blobResponse.ok || blobResponse.status === 206 || blobResponse.status === 304) {
       break;
@@ -92,6 +122,13 @@ export default async function handler(request, response) {
   response.setHeader('Cache-Control', 'private, no-cache');
 
   if (!blobResponse.ok && blobResponse.status !== 206 && blobResponse.status !== 304) {
+    if (debug) {
+      return response.json({
+        error: 'Blob file was not found with the attempted pathnames.',
+        host,
+        attempts,
+      });
+    }
     return response.send(blobResponse.statusText || 'Blob request failed');
   }
 
