@@ -56,20 +56,31 @@ export default async function handler(req, res) {
 
     let reportText = '';
     if (stats) {
-      const today = new Date().toISOString().split('T')[0];
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().split('T')[0];
+
+      let monthlyActive = 0;
+      if (stats.users) {
+        for (const uData of Object.values(stats.users)) {
+          if (uData.lastActive && uData.lastActive >= thirtyDaysAgoStr) {
+            monthlyActive++;
+          }
+        }
+      }
+
       reportText = `📊 <b>TinglangApp Foydalanish Statistikasi</b>\n\n` +
                    `👥 <b>Jami unikal qurilmalar:</b> <code>${stats.totalUnique || 0}</code> ta\n` +
-                   `📈 <b>Jami kirishlar soni:</b> <code>${stats.totalVisits || 0}</code> marta\n\n` +
+                   `📈 <b>Jami kirishlar soni:</b> <code>${stats.totalVisits || 0}</code> marta\n` +
+                   `📅 <b>Oylik faol foydalanuvchilar (MAU):</b> <code>${monthlyActive}</code> ta\n\n` +
                    `👤 <b>Faol qurilmalar va ularning faolligi:</b>\n`;
       
       // Sort users by total visits descending
       const sortedUsers = Object.entries(stats.users || {}).sort((a, b) => b[1].totalVisits - a[1].totalVisits);
 
       sortedUsers.forEach(([name, uData], index) => {
-        const todayVisits = (uData.dailyVisits && uData.dailyVisits[today]) || 0;
         reportText += `${index + 1}. 👤 <b>${name}</b>\n` +
                       `   • Jami kirishlar: <b>${uData.totalVisits}</b> marta\n` +
-                      `   • Bugun kirgan: <b>${todayVisits}</b> marta\n` +
                       `   • Oxirgi faollik: <code>${uData.lastActive}</code>\n\n`;
       });
       

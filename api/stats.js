@@ -20,7 +20,7 @@ export default async function handler(req, res) {
   const chatId = process.env.TELEGRAM_CHAT_ID || process.env.VITE_TELEGRAM_CHAT_ID;
 
   if (!token || !chatId) {
-    return res.status(200).json({ totalUnique: 0, totalVisits: 0, activeToday: 0 });
+    return res.status(200).json({ totalUnique: 0, totalVisits: 0, monthlyActive: 0 });
   }
 
   try {
@@ -28,39 +28,42 @@ export default async function handler(req, res) {
     const chatData = await chatRes.json();
 
     if (!chatRes.ok || !chatData.ok) {
-      return res.status(200).json({ totalUnique: 0, totalVisits: 0, activeToday: 0 });
+      return res.status(200).json({ totalUnique: 0, totalVisits: 0, monthlyActive: 0 });
     }
 
     const pinnedMessage = chatData.result.pinned_message;
-    let stats = { totalUnique: 0, totalVisits: 0, activeToday: 0 };
+    let stats = { totalUnique: 0, totalVisits: 0, monthlyActive: 0 };
 
     if (pinnedMessage) {
       const match = pinnedMessage.text.match(/<!--STATS_DATA:(.*?)-->/);
       if (match) {
         try {
           const fullStats = JSON.parse(match[1]);
-          // Anonymize and return aggregate statistics
           stats.totalUnique = fullStats.totalUnique || 0;
           stats.totalVisits = fullStats.totalVisits || 0;
           
-          const today = new Date().toISOString().split('T')[0];
-          let activeToday = 0;
+          // Calculate active users in the last 30 days (Monthly Active Users)
+          const thirtyDaysAgo = new Date();
+          thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+          const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().split('T')[0];
+
+          let monthlyActive = 0;
           if (fullStats.users) {
             for (const uData of Object.values(fullStats.users)) {
-              if (uData.dailyVisits && uData.dailyVisits[today]) {
-                activeToday++;
+              if (uData.lastActive && uData.lastActive >= thirtyDaysAgoStr) {
+                monthlyActive++;
               }
             }
           }
-          stats.activeToday = activeToday;
+          stats.monthlyActive = monthlyActive;
         } catch (e) {
-          console.error("JSON parse failure for stats endpoint:", e);
+          console.error("JSON parse failure in stats endpoint:", e);
         }
       }
     }
 
     return res.status(200).json(stats);
   } catch (err) {
-    return res.status(200).json({ totalUnique: 0, totalVisits: 0, activeToday: 0, error: err.message });
+    return res.status(200).json({ totalUnique: 0, totalVisits: 0, monthlyActive: 0, error: err.message });
   }
 }

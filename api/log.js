@@ -105,22 +105,24 @@ async function updatePinnedStats(token, chatId, nickname) {
     user.lastActive = today;
     stats.totalVisits = (stats.totalVisits || 0) + 1;
 
-    // Format the pinned summary message text
-    let statsText = `📌 <b>TinglangApp Foydalanish Statistikasi</b>\n\n` +
-                    `👥 <b>Jami unikal qurilmalar:</b> ${stats.totalUnique} ta\n` +
-                    `📈 <b>Jami kirishlar soni:</b> ${stats.totalVisits} marta\n\n` +
-                    `📅 <b>Bugun kirganlar faolligi:</b>\n`;
-    
-    let activeToday = 0;
-    for (const [name, uData] of Object.entries(stats.users)) {
-      if (uData.dailyVisits && uData.dailyVisits[today]) {
-        statsText += `• 👤 <b>${name}</b>: ${uData.dailyVisits[today]} marta\n`;
-        activeToday++;
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().split('T')[0];
+
+    let monthlyActive = 0;
+    if (stats.users) {
+      for (const uData of Object.values(stats.users)) {
+        if (uData.lastActive && uData.lastActive >= thirtyDaysAgoStr) {
+          monthlyActive++;
+        }
       }
     }
-    if (activeToday === 0) {
-      statsText += `<i>Bugun faollik qayd etilmadi.</i>\n`;
-    }
+
+    // Format the pinned summary message text
+    let statsText = `📌 <b>TinglangApp Foydalanish Statistikasi</b>\n\n` +
+                    `👥 <b>Jami unikal qurilmalar:</b> ${stats.totalUnique || 0} ta\n` +
+                    `📈 <b>Jami kirishlar soni:</b> ${stats.totalVisits || 0} marta\n` +
+                    `📅 <b>Oylik faol foydalanuvchilar (MAU):</b> ${monthlyActive} ta\n`;
 
     statsText += `\n🕒 <b>Oxirgi yangilanish:</b> ${new Date().toLocaleString()}`;
     statsText += `\n\n<!--STATS_DATA:${JSON.stringify(stats)}-->`;

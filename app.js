@@ -125,7 +125,7 @@ const TRANSLATIONS = {
     modal_public_stats_title: "Usage Statistics",
     stats_unique_devices: "Unique Devices",
     stats_total_visits: "Total Visits",
-    stats_active_today: "Active Devices Today",
+    stats_monthly_active: "Monthly Active Users",
     about_app_title: "About TinglangApp",
     about_app_desc: "TinglangApp is a focused practice tool for Basic IELTS Listening. It combines the PDF book, public audio tracks, dictation, notes, progress saving, and a guided tour in one browser app.",
     about_app_book_label: "Book",
@@ -276,7 +276,7 @@ const TRANSLATIONS = {
     modal_public_stats_title: "Foydalanish statistikasi",
     stats_unique_devices: "Unikal qurilmalar",
     stats_total_visits: "Umumiy kirishlar",
-    stats_active_today: "Bugun faol qurilmalar",
+    stats_monthly_active: "Oylik faol foydalanuvchilar",
     about_app_title: "TinglangApp haqida",
     about_app_desc: "TinglangApp Basic IELTS Listening uchun yaratilgan qulay mashq vositasi. Unda PDF kitob, ochiq audio treklar, diktant, eslatmalar, progress saqlash va guided tour bitta brauzer ilovasida jamlangan.",
     about_app_book_label: "Kitob",
@@ -403,7 +403,7 @@ const publicStatsModal = document.getElementById('public-stats-modal');
 const btnClosePublicStats = document.getElementById('btn-close-public-stats');
 const pubStatsUnique = document.getElementById('pub-stats-unique');
 const pubStatsVisits = document.getElementById('pub-stats-visits');
-const pubStatsActive = document.getElementById('pub-stats-active');
+const pubStatsMonthly = document.getElementById('pub-stats-monthly');
 
 // Guided Tutorial Tour
 const tutorialToggle = document.getElementById('tutorial-toggle');
@@ -1465,7 +1465,7 @@ function setupEventListeners() {
           const stats = await res.json();
           if (pubStatsUnique) pubStatsUnique.textContent = stats.totalUnique || 0;
           if (pubStatsVisits) pubStatsVisits.textContent = stats.totalVisits || 0;
-          if (pubStatsActive) pubStatsActive.textContent = stats.activeToday || 0;
+          if (pubStatsMonthly) pubStatsMonthly.textContent = stats.monthlyActive || 0;
         }
       } catch (err) {
         console.error("Failed to fetch public stats:", err);
