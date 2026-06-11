@@ -32,6 +32,11 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
+  // Only handle GET requests (exclude POST, PUT, DELETE, etc. which aren't cacheable)
+  if (e.request.method !== 'GET') {
+    return;
+  }
+
   // Only handle HTTP/HTTPS schemes (exclude chrome-extension://, data://, etc.)
   if (!e.request.url.startsWith('http')) {
     return;
