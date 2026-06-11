@@ -1,7 +1,7 @@
 const BOT_TOKEN = import.meta.env.VITE_TELEGRAM_BOT_TOKEN || "";
 const CHAT_ID = import.meta.env.VITE_TELEGRAM_CHAT_ID || "";
 
-let cachedLocation = null;
+let locationData = null;
 let deviceInfo = null;
 const loggedTracks = new Set();
 
@@ -31,62 +31,101 @@ function getDeviceInfo() {
 }
 
 // Fetch geolocation data
-async function getLocation() {
-  if (cachedLocation) return cachedLocation;
+async function getLocationData() {
+  if (locationData) return locationData;
 
   try {
     const res = await fetch("https://ipapi.co/json/");
     if (res.ok) {
-      const data = await res.json();
-      cachedLocation = `${data.city || "Noma'lum"}, ${data.country_name || "Noma'lum"} (${data.ip || "Noma'lum"})`;
-      return cachedLocation;
+      locationData = await res.json();
+      return locationData;
     }
   } catch (err) {
     console.warn("Geolocation fetch failed:", err);
   }
-
-  cachedLocation = "Noma'lum Joylashuv";
-  return cachedLocation;
+  return null;
 }
 
-// Universal function to send Telegram message
-export async function sendTelegramMessage(text) {
+// Universal function to send Telegram message with optional buttons
+export async function sendTelegramMessage(text, replyMarkup = null) {
   if (!BOT_TOKEN || !CHAT_ID) {
     console.warn("Telegram bot token or Chat ID is missing in environment variables.");
     return;
   }
 
   const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+  const payload = {
+    chat_id: CHAT_ID,
+    text: text,
+    parse_mode: "HTML"
+  };
+
+  if (replyMarkup) {
+    payload.reply_markup = replyMarkup;
+  }
+
   try {
     await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({
-        chat_id: CHAT_ID,
-        text: text,
-        parse_mode: "HTML"
-      })
+      body: JSON.stringify(payload)
     });
   } catch (err) {
     console.error("Failed to send Telegram message:", err);
   }
 }
 
+// Helper to construct location keyboard buttons
+function buildButtons(loc) {
+  const buttons = [];
+  const locationRow = [];
+
+  if (loc) {
+    if (loc.latitude && loc.longitude) {
+      locationRow.push({
+        text: "📍 Xaritada ko'rish",
+        url: `https://www.google.com/maps/search/?api=1&query=${loc.latitude},${loc.longitude}`
+      });
+    }
+    if (loc.ip) {
+      locationRow.push({
+        text: "🔍 IP Tafsilotlari",
+        url: `https://ipinfo.io/${loc.ip}`
+      });
+    }
+  }
+
+  if (locationRow.length > 0) {
+    buttons.push(locationRow);
+  }
+
+  // Row for App Link
+  buttons.push([
+    {
+      text: "🌐 TinglangApp'ni ochish",
+      url: window.location.origin || "https://tinglash.vercel.app/"
+    }
+  ]);
+
+  return { inline_keyboard: buttons };
+}
+
 // Track Session Start
 export async function logSessionStart() {
-  const location = await getLocation();
+  const loc = await getLocationData();
+  const locationStr = loc ? `${loc.city || "Noma'lum"}, ${loc.country_name || "Noma'lum"} (${loc.ip || "Noma'lum"})` : "Noma'lum Joylashuv";
   const device = getDeviceInfo();
   const language = localStorage.getItem("ielts_lang")?.toUpperCase() || "UZ";
 
   const message = `🚀 <b>Yangi foydalanuvchi kirdi!</b>\n\n` +
-                  `📍 <b>Joylashuv:</b> ${location}\n` +
+                  `📍 <b>Joylashuv:</b> ${locationStr}\n` +
                   `🖥️ <b>Qurilma:</b> ${device}\n` +
                   `🌐 <b>Til:</b> ${language}\n` +
                   `🕒 <b>Vaqt:</b> ${new Date().toLocaleString()}`;
 
-  await sendTelegramMessage(message);
+  await sendTelegramMessage(message, buildButtons(loc));
 }
 
 // Track Audio Play
@@ -94,33 +133,36 @@ export async function logTrackPlay(trackNum, trackTitle) {
   if (loggedTracks.has(trackNum)) return; // Log only once per track session
   loggedTracks.add(trackNum);
 
-  const location = await getLocation();
+  const loc = await getLocationData();
+  const locationStr = loc ? `${loc.city || "Noma'lum"}, ${loc.country_name || "Noma'lum"} (${loc.ip || "Noma'lum"})` : "Noma'lum Joylashuv";
   const message = `🎧 <b>Trek eshitildi:</b>\n\n` +
                   `🎵 <b>Trek:</b> #${trackNum.toString().padStart(2, "0")} - ${trackTitle}\n` +
-                  `📍 <b>Foydalanuvchi joylashuvi:</b> ${location}\n` +
+                  `📍 <b>Foydalanuvchi joylashuvi:</b> ${locationStr}\n` +
                   `🕒 <b>Vaqt:</b> ${new Date().toLocaleString()}`;
 
-  await sendTelegramMessage(message);
+  await sendTelegramMessage(message, buildButtons(loc));
 }
 
 // Track Notebook Save
 export async function logNoteSave(trackNum) {
-  const location = await getLocation();
+  const loc = await getLocationData();
+  const locationStr = loc ? `${loc.city || "Noma'lum"}, ${loc.country_name || "Noma'lum"} (${loc.ip || "Noma'lum"})` : "Noma'lum Joylashuv";
   const message = `📝 <b>Daftarga lug'at/eslatma saqlandi:</b>\n\n` +
                   `🎵 <b>Trek:</b> #${trackNum.toString().padStart(2, "0")}\n` +
-                  `📍 <b>Foydalanuvchi:</b> ${location}\n` +
+                  `📍 <b>Foydalanuvchi:</b> ${locationStr}\n` +
                   `🕒 <b>Vaqt:</b> ${new Date().toLocaleString()}`;
 
-  await sendTelegramMessage(message);
+  await sendTelegramMessage(message, buildButtons(loc));
 }
 
 // Track Dictation Save
 export async function logDictationSave(trackNum) {
-  const location = await getLocation();
+  const loc = await getLocationData();
+  const locationStr = loc ? `${loc.city || "Noma'lum"}, ${loc.country_name || "Noma'lum"} (${loc.ip || "Noma'lum"})` : "Noma'lum Joylashuv";
   const message = `✍️ <b>Diktant matni saqlandi:</b>\n\n` +
                   `🎵 <b>Trek:</b> #${trackNum.toString().padStart(2, "0")}\n` +
-                  `📍 <b>Foydalanuvchi:</b> ${location}\n` +
+                  `📍 <b>Foydalanuvchi:</b> ${locationStr}\n` +
                   `🕒 <b>Vaqt:</b> ${new Date().toLocaleString()}`;
 
-  await sendTelegramMessage(message);
+  await sendTelegramMessage(message, buildButtons(loc));
 }
