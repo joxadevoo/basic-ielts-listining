@@ -743,6 +743,19 @@ function loadLocalStorage() {
     state.language = 'uz';
   }
   updateLanguageUI();
+
+  // Load cached public stats
+  const cachedPublicStats = localStorage.getItem('ielts_public_stats');
+  if (cachedPublicStats) {
+    try {
+      const stats = JSON.parse(cachedPublicStats);
+      if (pubStatsUnique) pubStatsUnique.textContent = stats.totalUnique || 0;
+      if (pubStatsVisits) pubStatsVisits.textContent = stats.totalVisits || 0;
+      if (pubStatsMonthly) pubStatsMonthly.textContent = stats.monthlyActive || 0;
+    } catch (e) {
+      // Ignore
+    }
+  }
 }
 
 function saveProgress(reRenderPlaylist = true) {
@@ -1459,6 +1472,27 @@ function setupEventListeners() {
     btnStatsToggle.addEventListener('click', async () => {
       publicStatsModal.classList.add('active');
       
+      const now = Date.now();
+      const lastFetched = localStorage.getItem('ielts_public_stats_timestamp');
+      const cachedStats = localStorage.getItem('ielts_public_stats');
+      
+      // 2 days = 2 * 24 * 60 * 60 * 1000 = 172,800,000 milliseconds
+      const cacheDuration = 172800000;
+      
+      if (cachedStats && lastFetched && (now - parseInt(lastFetched, 10) < cacheDuration)) {
+        // Stats are fresh, use cached data
+        try {
+          const stats = JSON.parse(cachedStats);
+          if (pubStatsUnique) pubStatsUnique.textContent = stats.totalUnique || 0;
+          if (pubStatsVisits) pubStatsVisits.textContent = stats.totalVisits || 0;
+          if (pubStatsMonthly) pubStatsMonthly.textContent = stats.monthlyActive || 0;
+          return;
+        } catch (e) {
+          // Fallback to fetch on parse error
+        }
+      }
+
+      // Fetch fresh stats if no cache or expired (2 days passed)
       try {
         const res = await fetch('/api/stats');
         if (res.ok) {
@@ -1466,6 +1500,10 @@ function setupEventListeners() {
           if (pubStatsUnique) pubStatsUnique.textContent = stats.totalUnique || 0;
           if (pubStatsVisits) pubStatsVisits.textContent = stats.totalVisits || 0;
           if (pubStatsMonthly) pubStatsMonthly.textContent = stats.monthlyActive || 0;
+          
+          // Cache the response
+          localStorage.setItem('ielts_public_stats', JSON.stringify(stats));
+          localStorage.setItem('ielts_public_stats_timestamp', now.toString());
         }
       } catch (err) {
         console.error("Failed to fetch public stats:", err);
