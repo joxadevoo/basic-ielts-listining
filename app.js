@@ -1,5 +1,5 @@
 import { TRACKS } from './tracks.js';
-import { logSessionStart, logTrackPlay, logNoteSave, logDictationSave } from './telegram.js';
+import { logSessionStart, logTrackPlay, logNoteSave, logDictationSave } from './system.js';
 
 const TRANSLATIONS = {
   en: {
