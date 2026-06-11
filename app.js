@@ -1,6 +1,5 @@
 import { TRACKS } from './tracks.js';
-import { initAnalytics, logTrackPlay, logNoteSave, logDictationSave } from './analytics.js';
-import { initDashboard } from './dashboard.js';
+import { logSessionStart, logTrackPlay, logNoteSave, logDictationSave } from './telegram.js';
 
 const TRANSLATIONS = {
   en: {
@@ -639,8 +638,7 @@ function init() {
   if (window.location.hash === '#app') {
     openPracticeWorkspace();
   }
-  initAnalytics();
-  initDashboard();
+  logSessionStart();
 }
 
 // Local Storage Handlers
@@ -1184,7 +1182,7 @@ function setupEventListeners() {
     updatePlaylistPlayState();
     logStatsSession();
     if (state.currentTrack && state.currentTrack.trackNum !== lastLoggedTrackNum) {
-      logTrackPlay(state.currentTrack.trackNum);
+      logTrackPlay(state.currentTrack.trackNum, state.currentTrack.title);
       lastLoggedTrackNum = state.currentTrack.trackNum;
     }
   });
@@ -1435,7 +1433,7 @@ function setupEventListeners() {
       state.progress[state.currentTrack.trackNum].status = 'in-progress';
       saveProgress(false); // save without re-rendering playlist to preserve scroll
       showToast(t('toast_dictation_saved'), "success");
-      logDictationSave();
+      logDictationSave(state.currentTrack.trackNum);
     }
   });
 
@@ -1456,7 +1454,7 @@ function setupEventListeners() {
       state.progress[state.currentTrack.trackNum].notes = notesText.value;
       saveProgress(false); // save without re-rendering playlist to preserve scroll
       showToast(t('toast_notes_saved'), "success");
-      logNoteSave();
+      logNoteSave(state.currentTrack.trackNum);
     }
   });
 
