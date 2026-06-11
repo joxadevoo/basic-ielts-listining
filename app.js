@@ -1483,10 +1483,12 @@ function setupEventListeners() {
         // Stats are fresh, use cached data
         try {
           const stats = JSON.parse(cachedStats);
-          if (pubStatsUnique) pubStatsUnique.textContent = stats.totalUnique || 0;
-          if (pubStatsVisits) pubStatsVisits.textContent = stats.totalVisits || 0;
-          if (pubStatsMonthly) pubStatsMonthly.textContent = stats.monthlyActive || 0;
-          return;
+          if (stats && stats.totalUnique > 0) {
+            if (pubStatsUnique) pubStatsUnique.textContent = stats.totalUnique || 0;
+            if (pubStatsVisits) pubStatsVisits.textContent = stats.totalVisits || 0;
+            if (pubStatsMonthly) pubStatsMonthly.textContent = stats.monthlyActive || 0;
+            return;
+          }
         } catch (e) {
           // Fallback to fetch on parse error
         }
