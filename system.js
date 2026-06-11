@@ -75,8 +75,12 @@ function buildButtons() {
     inline_keyboard: [
       [
         {
-          text: "📊 Statistika olish",
+          text: "📊 Statistika",
           callback_data: "get_stats"
+        },
+        {
+          text: "👥 Foydalanuvchilar",
+          callback_data: "get_users"
         }
       ],
       [

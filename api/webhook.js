@@ -27,18 +27,27 @@ export default async function handler(req, res) {
   try {
     const update = req.body;
     
-    // Check if it's a callback query or a /stats text command
+    // Check if it's a callback query or a /stats / /users text command
     let isStatsQuery = false;
+    let isUsersQuery = false;
     let queryId = null;
 
-    if (update.callback_query && update.callback_query.data === 'get_stats') {
-      isStatsQuery = true;
+    if (update.callback_query) {
       queryId = update.callback_query.id;
-    } else if (update.message && update.message.text && update.message.text.startsWith('/stats')) {
-      isStatsQuery = true;
+      if (update.callback_query.data === 'get_stats') {
+        isStatsQuery = true;
+      } else if (update.callback_query.data === 'get_users') {
+        isUsersQuery = true;
+      }
+    } else if (update.message && update.message.text) {
+      if (update.message.text.startsWith('/stats')) {
+        isStatsQuery = true;
+      } else if (update.message.text.startsWith('/users')) {
+        isUsersQuery = true;
+      }
     }
 
-    if (!isStatsQuery) {
+    if (!isStatsQuery && !isUsersQuery) {
       return res.status(200).end(); // Ignore other updates silently
     }
 
@@ -56,36 +65,39 @@ export default async function handler(req, res) {
 
     let reportText = '';
     if (stats) {
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-      const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().split('T')[0];
+      if (isStatsQuery) {
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().split('T')[0];
 
-      let monthlyActive = 0;
-      if (stats.users) {
-        for (const uData of Object.values(stats.users)) {
-          if (uData.lastActive && uData.lastActive >= thirtyDaysAgoStr) {
-            monthlyActive++;
+        let monthlyActive = 0;
+        if (stats.users) {
+          for (const uData of Object.values(stats.users)) {
+            if (uData.lastActive && uData.lastActive >= thirtyDaysAgoStr) {
+              monthlyActive++;
+            }
           }
         }
-      }
 
-      reportText = `📊 <b>TinglangApp Foydalanish Statistikasi</b>\n\n` +
-                   `👥 <b>Jami unikal qurilmalar:</b> <code>${stats.totalUnique || 0}</code> ta\n` +
-                   `📈 <b>Jami kirishlar soni:</b> <code>${stats.totalVisits || 0}</code> marta\n` +
-                   `📅 <b>Oylik faol foydalanuvchilar (MAU):</b> <code>${monthlyActive}</code> ta\n\n` +
-                   `👤 <b>Faol qurilmalar va ularning faolligi:</b>\n`;
-      
-      // Sort users by total visits descending
-      const sortedUsers = Object.entries(stats.users || {}).sort((a, b) => b[1].totalVisits - a[1].totalVisits);
+        reportText = `📊 <b>TinglangApp Foydalanish Statistikasi</b>\n\n` +
+                     `👥 <b>Jami unikal qurilmalar:</b> <code>${stats.totalUnique || 0}</code> ta\n` +
+                     `📈 <b>Jami kirishlar soni:</b> <code>${stats.totalVisits || 0}</code> marta\n` +
+                     `📅 <b>Oylik faol foydalanuvchilar (MAU):</b> <code>${monthlyActive}</code> ta\n`;
+      } else if (isUsersQuery) {
+        reportText = `👥 <b>TinglangApp Foydalanuvchilar Ro'yxati</b>\n\n`;
+        
+        // Sort users by total visits descending
+        const sortedUsers = Object.entries(stats.users || {}).sort((a, b) => b[1].totalVisits - a[1].totalVisits);
 
-      sortedUsers.forEach(([name, uData], index) => {
-        reportText += `${index + 1}. 👤 <b>${name}</b>\n` +
-                      `   • Jami kirishlar: <b>${uData.totalVisits}</b> marta\n` +
-                      `   • Oxirgi faollik: <code>${uData.lastActive}</code>\n\n`;
-      });
-      
-      if (sortedUsers.length === 0) {
-        reportText += `<i>Hozircha foydalanuvchilar faolligi qayd etilmagan.</i>`;
+        sortedUsers.forEach(([name, uData], index) => {
+          reportText += `${index + 1}. 👤 <b>${name}</b>\n` +
+                        `   • Jami kirishlar: <b>${uData.totalVisits}</b> marta\n` +
+                        `   • Oxirgi faollik: <code>${uData.lastActive}</code>\n\n`;
+        });
+        
+        if (sortedUsers.length === 0) {
+          reportText += `<i>Hozircha foydalanuvchilar faolligi qayd etilmagan.</i>`;
+        }
       }
     } else {
       reportText = `📊 <b>Statistika topilmadi.</b>\n\nIlovaga birinchi foydalanuvchi kirganida statistika xabari shakllanadi va pin qilinadi.`;
@@ -100,6 +112,21 @@ export default async function handler(req, res) {
       });
     }
 
+    const inlineKeyboard = {
+      inline_keyboard: [
+        [
+          {
+            text: "📊 Statistika",
+            callback_data: "get_stats"
+          },
+          {
+            text: "👥 Foydalanuvchilar",
+            callback_data: "get_users"
+          }
+        ]
+      ]
+    };
+
     // Post the statistics report back to the chat
     await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
       method: 'POST',
@@ -107,7 +134,8 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         chat_id: chatId,
         text: reportText,
-        parse_mode: 'HTML'
+        parse_mode: 'HTML',
+        reply_markup: inlineKeyboard
       })
     });
 
