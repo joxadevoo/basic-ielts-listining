@@ -1,4 +1,6 @@
 import { TRACKS } from './tracks.js';
+import { initAnalytics, logTrackPlay, logNoteSave, logDictationSave } from './analytics.js';
+import { initDashboard } from './dashboard.js';
 
 const TRANSLATIONS = {
   en: {
@@ -308,6 +310,7 @@ let state = {
 let activeTourStep = 0;
 let highlightedTourElement = null;
 let deferredInstallPrompt = null;
+let lastLoggedTrackNum = null;
 
 // Media files are served from the public Vercel Blob store in production.
 const DEFAULT_MEDIA_BASE_URL = 'https://3rdqnprfkrc5djuh.public.blob.vercel-storage.com';
@@ -488,7 +491,7 @@ function updateLanguageUI() {
 
 function openPracticeWorkspace() {
   appContainer.classList.add('landing-dismissed');
-  window.location.hash = 'practice';
+  window.location.hash = 'app';
 }
 
 function getTourSteps() {
@@ -633,9 +636,11 @@ function init() {
   selectTrack(state.tracks[0], false); // Load first track but don't autoplay
   syncPdfViewer(5);
   applyTheme();
-  if (window.location.hash === '#practice') {
+  if (window.location.hash === '#app') {
     openPracticeWorkspace();
   }
+  initAnalytics();
+  initDashboard();
 }
 
 // Local Storage Handlers
@@ -1178,6 +1183,10 @@ function setupEventListeners() {
     playPauseBtn.title = t('toast_paused');
     updatePlaylistPlayState();
     logStatsSession();
+    if (state.currentTrack && state.currentTrack.trackNum !== lastLoggedTrackNum) {
+      logTrackPlay(state.currentTrack.trackNum);
+      lastLoggedTrackNum = state.currentTrack.trackNum;
+    }
   });
 
   audio.addEventListener('pause', () => {
@@ -1426,6 +1435,7 @@ function setupEventListeners() {
       state.progress[state.currentTrack.trackNum].status = 'in-progress';
       saveProgress(false); // save without re-rendering playlist to preserve scroll
       showToast(t('toast_dictation_saved'), "success");
+      logDictationSave();
     }
   });
 
@@ -1446,10 +1456,12 @@ function setupEventListeners() {
       state.progress[state.currentTrack.trackNum].notes = notesText.value;
       saveProgress(false); // save without re-rendering playlist to preserve scroll
       showToast(t('toast_notes_saved'), "success");
+      logNoteSave();
     }
   });
 
   btnExportNotes.addEventListener('click', exportNotes);
+
 
   // Filters and Search
   trackSearch.addEventListener('input', renderPlaylist);
