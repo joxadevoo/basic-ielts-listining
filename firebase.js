@@ -3,13 +3,13 @@ import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "",
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "",
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || ""
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyDedEMP7B4uIYFGYFJo2FfuqwwlmeGrW4I",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "inven-8588f.firebaseapp.com",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "inven-8588f",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "inven-8588f.firebasestorage.app",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "186511543097",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:186511543097:web:14c5189d074178ab7576e8",
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-MT6DY8G1N6"
 };
 
 let app = null;
