@@ -67,6 +67,13 @@
           </div>
         </div>
 
+        <!-- Global Stats Button -->
+        <button id="btn-stats-toggle" class="btn-icon" title="Usage Statistics" aria-label="Usage Statistics">
+          <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: currentColor;">
+            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+          </svg>
+        </button>
+
         <!-- Tutorial Button -->
         <button id="tutorial-toggle" class="btn-icon" title="How to use" aria-label="How to use">
           <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: currentColor;">
@@ -112,6 +119,12 @@
           <button id="landing-start" class="btn-primary landing-start-btn" data-i18n="landing_start">Start practice</button>
           <button id="landing-preview" class="btn-secondary landing-preview-btn" data-i18n="landing_preview">View workspace</button>
           <button id="landing-install" class="btn-secondary landing-install-btn" data-i18n="install_app">Ilovani o'rnatish</button>
+        </div>
+        <div class="landing-disclaimer">
+          <svg class="disclaimer-icon" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+          </svg>
+          <span class="disclaimer-text" data-i18n="landing_disclaimer">Diqqat: Statistik tahlil maqsadida sizning kirish ma'lumotlaringiz (shu jumladan qurilma nomi va turi) yig'iladi.</span>
         </div>
         <div class="landing-stats" aria-label="Practice features">
           <div class="landing-stat">
@@ -411,6 +424,24 @@
         </div>
         
 
+        <!-- Device Nickname -->
+        <div class="setting-row" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-color)">
+          <div>
+            <div class="setting-lbl" data-i18n="setting_nickname_title">Device Nickname</div>
+            <div class="setting-desc" data-i18n="setting_nickname_desc">Enter a nickname to identify this device.</div>
+          </div>
+          <input type="text" id="setting-nickname" class="setting-input" style="width: 180px; font-weight: 600;" maxlength="25">
+        </div>
+
+        <!-- Visit Count -->
+        <div class="setting-row" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-color)">
+          <div>
+            <div class="setting-lbl" data-i18n="setting_visits_title">Visit Count</div>
+            <div class="setting-desc" data-i18n="setting_visits_desc">Total number of times this device accessed the app.</div>
+          </div>
+          <span id="setting-visit-count" style="font-weight: bold; font-size: 1.1rem; color: var(--color-secondary);">1</span>
+        </div>
+
         <!-- Statistics settings -->
         <div class="setting-row" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-color)">
           <div>
@@ -532,6 +563,37 @@
         </div>
         <div class="modal-footer">
           <button id="btn-close-about-app" class="btn-primary" data-i18n="btn_close">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Public Statistics Modal -->
+    <div class="modal-overlay" id="public-stats-modal">
+      <div class="modal-box">
+        <h3 class="modal-title" data-i18n="modal_public_stats_title">Usage Statistics</h3>
+        
+        <div style="display: flex; flex-direction: column; gap: 12px; margin: 16px 0;">
+          <!-- Unique Devices Card -->
+          <div class="stats-card-lite">
+            <span class="stats-card-title" data-i18n="stats_unique_devices">Unique Devices</span>
+            <strong class="stats-card-value" id="pub-stats-unique">0</strong>
+          </div>
+          
+          <!-- Total Visits Card -->
+          <div class="stats-card-lite">
+            <span class="stats-card-title" data-i18n="stats_total_visits">Total Visits</span>
+            <strong class="stats-card-value" id="pub-stats-visits">0</strong>
+          </div>
+
+          <!-- Active Today Card -->
+          <div class="stats-card-lite">
+            <span class="stats-card-title" data-i18n="stats_active_today">Active Devices Today</span>
+            <strong class="stats-card-value" id="pub-stats-active">0</strong>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button id="btn-close-public-stats" class="btn-primary" data-i18n="btn_close">Close</button>
         </div>
       </div>
     </div>

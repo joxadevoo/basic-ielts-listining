@@ -9,6 +9,7 @@ const TRANSLATIONS = {
     landing_title: "Basic IELTS Listening",
     landing_author: "Book by Li Ya Bin",
     landing_subtitle: "Study with the book, stream every track, write dictation, and save your progress in one focused workspace.",
+    landing_disclaimer: "Attention: For statistical purposes, your entry data is collected, including your device name and type.",
     landing_start: "Start practice",
     landing_preview: "View workspace",
     install_app: "Install app",
@@ -106,6 +107,10 @@ const TRANSLATIONS = {
     
     // Settings Modal
     modal_settings_title: "Settings & PDF Calibration",
+    setting_nickname_title: "Device Nickname",
+    setting_nickname_desc: "Enter a nickname to identify this device.",
+    setting_visits_title: "Visit Count",
+    setting_visits_desc: "Total number of times this device accessed the app.",
     setting_offset_title: "PDF Page Offset",
     setting_offset_desc: "Adjust this if the browser page numbers do not align with the physical book pages (typically 0, 1, or 2).",
     setting_reset_title: "Reset Progress & Notes",
@@ -117,6 +122,10 @@ const TRANSLATIONS = {
     support_modal_title: "Support Developer",
     support_desc: "If you find this application helpful, you can support the developer.",
     support_footer_note: "You can support the developer through this card.",
+    modal_public_stats_title: "Usage Statistics",
+    stats_unique_devices: "Unique Devices",
+    stats_total_visits: "Total Visits",
+    stats_active_today: "Active Devices Today",
     about_app_title: "About TinglangApp",
     about_app_desc: "TinglangApp is a focused practice tool for Basic IELTS Listening. It combines the PDF book, public audio tracks, dictation, notes, progress saving, and a guided tour in one browser app.",
     about_app_book_label: "Book",
@@ -151,6 +160,7 @@ const TRANSLATIONS = {
     landing_title: "Basic IELTS Listening",
     landing_author: "Kitob muallifi: Li Ya Bin",
     landing_subtitle: "Kitob bilan ishlang, barcha treklarni tinglang, diktant yozing va natijangizni bitta qulay oynada saqlang.",
+    landing_disclaimer: "Diqqat: Statistik tahlil maqsadida sizning kirish ma'lumotlaringiz yig'iladi (shu jumladan qurilma nomi va turi).",
     landing_start: "Mashqni boshlash",
     landing_preview: "Ish oynasini ko'rish",
     install_app: "Ilovani o'rnatish",
@@ -248,6 +258,10 @@ const TRANSLATIONS = {
     
     // Settings Modal
     modal_settings_title: "Sozlamalar va PDF kalibrlash",
+    setting_nickname_title: "Qurilma laqabi",
+    setting_nickname_desc: "Ushbu qurilmani aniqlash uchun laqab kiriting.",
+    setting_visits_title: "Kirishlar soni",
+    setting_visits_desc: "Ushbu qurilmadan ilovaga kirishlar umumiy soni.",
     setting_offset_title: "PDF sahifa surilishi",
     setting_offset_desc: "Agar brauzer sahifa raqamlari kitob sahifalariga to'g'ri kelmasa, sozlang (odatda 0, 1 yoki 2).",
     setting_reset_title: "O'zlashtirish va eslatmalarni tozalash",
@@ -259,6 +273,10 @@ const TRANSLATIONS = {
     support_modal_title: "Dasturchini qo'llab-quvvatlash",
     support_desc: "Agar ushbu ilova sizga yoqqan bo'lsa, dasturchini qo'llab-quvvatlashingiz mumkin.",
     support_footer_note: "Karta orqali dasturchini qo'llab-quvvatlashingiz mumkin.",
+    modal_public_stats_title: "Foydalanish statistikasi",
+    stats_unique_devices: "Unikal qurilmalar",
+    stats_total_visits: "Umumiy kirishlar",
+    stats_active_today: "Bugun faol qurilmalar",
     about_app_title: "TinglangApp haqida",
     about_app_desc: "TinglangApp Basic IELTS Listening uchun yaratilgan qulay mashq vositasi. Unda PDF kitob, ochiq audio treklar, diktant, eslatmalar, progress saqlash va guided tour bitta brauzer ilovasida jamlangan.",
     about_app_book_label: "Kitob",
@@ -378,6 +396,14 @@ const settingsToggle = document.getElementById('settings-toggle');
 const btnCloseSettings = document.getElementById('btn-close-settings');
 const settingOffset = document.getElementById('setting-offset');
 const btnResetData = document.getElementById('btn-reset-data');
+const settingNickname = document.getElementById('setting-nickname');
+const settingVisitCount = document.getElementById('setting-visit-count');
+const btnStatsToggle = document.getElementById('btn-stats-toggle');
+const publicStatsModal = document.getElementById('public-stats-modal');
+const btnClosePublicStats = document.getElementById('btn-close-public-stats');
+const pubStatsUnique = document.getElementById('pub-stats-unique');
+const pubStatsVisits = document.getElementById('pub-stats-visits');
+const pubStatsActive = document.getElementById('pub-stats-active');
 
 // Guided Tutorial Tour
 const tutorialToggle = document.getElementById('tutorial-toggle');
@@ -626,6 +652,49 @@ function previousTourStep() {
   renderTourStep();
 }
 
+function generateRandomNickname() {
+  const adjectives = [
+    'Sleek', 'Golden', 'Cyber', 'Bright', 'Calm', 'Brave', 'Gentle', 'Swift', 'Quick', 'Happy',
+    'Smart', 'Cool', 'Noble', 'Loyal', 'Mystic', 'Fancy', 'Sharp', 'Vibrant', 'Silent', 'Bold'
+  ];
+  const animals = [
+    'Eagle', 'Dolphin', 'Panther', 'Koala', 'Fox', 'Wolf', 'Panda', 'Tiger', 'Lion', 'Falcon',
+    'Owl', 'Bear', 'Rabbit', 'Deer', 'Otter', 'Cheetah', 'Leopard', 'Phoenix', 'Lynx', 'Hawk'
+  ];
+  const randAdj = adjectives[Math.floor(Math.random() * adjectives.length)];
+  const randAnim = animals[Math.floor(Math.random() * animals.length)];
+  const randNum = Math.floor(1000 + Math.random() * 9000);
+  return `${randAdj} ${randAnim} #${randNum}`;
+}
+
+function initDeviceTracking() {
+  let deviceId = localStorage.getItem('device_id');
+  if (!deviceId) {
+    deviceId = 'tinglang-' + Math.random().toString(36).substring(2, 11);
+    localStorage.setItem('device_id', deviceId);
+  }
+
+  let nickname = localStorage.getItem('device_nickname');
+  if (!nickname) {
+    nickname = generateRandomNickname();
+    localStorage.setItem('device_nickname', nickname);
+  }
+
+  let visitCount = parseInt(localStorage.getItem('device_visit_count') || '0', 10);
+  if (!sessionStorage.getItem('device_session_counted')) {
+    visitCount += 1;
+    localStorage.setItem('device_visit_count', visitCount);
+    sessionStorage.setItem('device_session_counted', 'true');
+  }
+
+  if (settingNickname) {
+    settingNickname.value = nickname;
+  }
+  if (settingVisitCount) {
+    settingVisitCount.textContent = visitCount;
+  }
+}
+
 // Initialize App
 function init() {
   loadLocalStorage();
@@ -638,6 +707,7 @@ function init() {
   if (window.location.hash === '#app') {
     openPracticeWorkspace();
   }
+  initDeviceTracking();
   logSessionStart();
 }
 
@@ -1385,6 +1455,30 @@ function setupEventListeners() {
     });
   }
 
+  if (btnStatsToggle) {
+    btnStatsToggle.addEventListener('click', async () => {
+      publicStatsModal.classList.add('active');
+      
+      try {
+        const res = await fetch('/api/stats');
+        if (res.ok) {
+          const stats = await res.json();
+          if (pubStatsUnique) pubStatsUnique.textContent = stats.totalUnique || 0;
+          if (pubStatsVisits) pubStatsVisits.textContent = stats.totalVisits || 0;
+          if (pubStatsActive) pubStatsActive.textContent = stats.activeToday || 0;
+        }
+      } catch (err) {
+        console.error("Failed to fetch public stats:", err);
+      }
+    });
+  }
+
+  if (btnClosePublicStats) {
+    btnClosePublicStats.addEventListener('click', () => {
+      publicStatsModal.classList.remove('active');
+    });
+  }
+
   // Copy support card number
   const btnCopyCard = document.getElementById('btn-copy-card');
   if (btnCopyCard) {
@@ -1402,6 +1496,14 @@ function setupEventListeners() {
     const val = parseInt(settingOffset.value, 10);
     state.pdfOffset = isNaN(val) ? 0 : val;
     localStorage.setItem('ielts_pdf_offset', state.pdfOffset);
+    
+    if (settingNickname) {
+      const newNickname = settingNickname.value.trim();
+      if (newNickname) {
+        localStorage.setItem('device_nickname', newNickname);
+      }
+    }
+    
     settingsModal.classList.remove('active');
     showToast(t('toast_settings_applied'), "success");
   });

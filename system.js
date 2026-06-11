@@ -1,8 +1,7 @@
-let locationData = null;
 let deviceInfo = null;
 const loggedTracks = new Set();
 
-// Helper to get OS and Browser details (Obfuscated / Generic names)
+// Helper to get OS and Browser details
 function getSysInfo() {
   if (deviceInfo) return deviceInfo;
 
@@ -27,27 +26,10 @@ function getSysInfo() {
   return deviceInfo;
 }
 
-// Fetch geolocation data
-async function getLocData() {
-  if (locationData) return locationData;
+// Post metrics to Vercel proxy or Telegram API fallback
+async function postSystemEvent(text, replyMarkup = null, type = null, nickname = null) {
+  const payload = { text, replyMarkup, type, nickname };
 
-  try {
-    const res = await fetch("https://ipapi.co/json/");
-    if (res.ok) {
-      locationData = await res.json();
-      return locationData;
-    }
-  } catch (err) {
-    console.warn("Loc fetch failed:", err);
-  }
-  return null;
-}
-
-// Post metrics to Vercel proxy or Telegram API fallback (Obfuscated)
-async function postSystemEvent(text, replyMarkup = null) {
-  const payload = { text, replyMarkup };
-
-  // 1. Try Vercel Serverless Function Proxy first (highly secure, hides token and URL completely)
   try {
     const response = await fetch("/api/log", {
       method: "POST",
@@ -58,15 +40,13 @@ async function postSystemEvent(text, replyMarkup = null) {
     });
     if (response.ok) return;
   } catch (err) {
-    // Silent fallback to client-side
+    // Silent fallback
   }
 
-  // 2. Client-side fallback (Only works if VITE_TELEGRAM env variables are set in client bundle)
   const t = import.meta.env.VITE_TELEGRAM_BOT_TOKEN || "";
   const c = import.meta.env.VITE_TELEGRAM_CHAT_ID || "";
   if (!t || !c) return;
 
-  // Obfuscated Telegram Bot URL reconstruction
   const base = atob("aHR0cHM6Ly9hcGkudGVsZWdyYW0ub3JnL2JvdA==");
   const method = atob("c2VuZE1lc3NhZ2U=");
   const url = `${base}${t}/${method}`;
@@ -89,54 +69,48 @@ async function postSystemEvent(text, replyMarkup = null) {
   }
 }
 
-// Helper to construct location keyboard buttons
-function buildButtons(loc) {
-  const buttons = [];
-  const locationRow = [];
+// Helper to construct inline keyboard buttons
+function buildButtons() {
+  return {
+    inline_keyboard: [
+      [
+        {
+          text: "📊 Statistika olish",
+          callback_data: "get_stats"
+        }
+      ],
+      [
+        {
+          text: "🌐 TinglangApp'ni ochish",
+          url: window.location.origin || "https://tinglash.vercel.app/"
+        }
+      ]
+    ]
+  };
+}
 
-  if (loc) {
-    if (loc.latitude && loc.longitude) {
-      locationRow.push({
-        text: "📍 Xaritada ko'rish",
-        url: `https://www.google.com/maps/search/?api=1&query=${loc.latitude},${loc.longitude}`
-      });
-    }
-    if (loc.ip) {
-      locationRow.push({
-        text: "🔍 IP Tafsilotlari",
-        url: `https://ipinfo.io/${loc.ip}`
-      });
-    }
-  }
-
-  if (locationRow.length > 0) {
-    buttons.push(locationRow);
-  }
-
-  buttons.push([
-    {
-      text: "🌐 TinglangApp'ni ochish",
-      url: window.location.origin || "https://tinglash.vercel.app/"
-    }
-  ]);
-
-  return { inline_keyboard: buttons };
+// Helper to get device tracking details
+function getDeviceDetails() {
+  return {
+    nickname: localStorage.getItem('device_nickname') || 'Noma\'lum Qurilma',
+    visitCount: localStorage.getItem('device_visit_count') || '1'
+  };
 }
 
 // Track Session Start
 export async function logSessionStart() {
-  const loc = await getLocData();
-  const locationStr = loc ? `${loc.city || "Noma'lum"}, ${loc.country_name || "Noma'lum"} (${loc.ip || "Noma'lum"})` : "Noma'lum Joylashuv";
   const device = getSysInfo();
   const language = localStorage.getItem("ielts_lang")?.toUpperCase() || "UZ";
+  const { nickname, visitCount } = getDeviceDetails();
 
   const message = `🚀 <b>Yangi foydalanuvchi kirdi!</b>\n\n` +
-                  `📍 <b>Joylashuv:</b> ${locationStr}\n` +
+                  `👤 <b>Laqabi (Nickname):</b> ${nickname}\n` +
+                  `🔢 <b>Kirishlar soni:</b> ${visitCount}\n` +
                   `🖥️ <b>Qurilma:</b> ${device}\n` +
                   `🌐 <b>Til:</b> ${language}\n` +
                   `🕒 <b>Vaqt:</b> ${new Date().toLocaleString()}`;
 
-  await postSystemEvent(message, buildButtons(loc));
+  await postSystemEvent(message, buildButtons(), "session_start", nickname);
 }
 
 // Track Audio Play
@@ -144,36 +118,36 @@ export async function logTrackPlay(trackNum, trackTitle) {
   if (loggedTracks.has(trackNum)) return;
   loggedTracks.add(trackNum);
 
-  const loc = await getLocData();
-  const locationStr = loc ? `${loc.city || "Noma'lum"}, ${loc.country_name || "Noma'lum"} (${loc.ip || "Noma'lum"})` : "Noma'lum Joylashuv";
+  const { nickname } = getDeviceDetails();
+
   const message = `🎧 <b>Trek eshitildi:</b>\n\n` +
+                  `👤 <b>Foydalanuvchi (Nickname):</b> ${nickname}\n` +
                   `🎵 <b>Trek:</b> #${trackNum.toString().padStart(2, "0")} - ${trackTitle}\n` +
-                  `📍 <b>Foydalanuvchi joylashuvi:</b> ${locationStr}\n` +
                   `🕒 <b>Vaqt:</b> ${new Date().toLocaleString()}`;
 
-  await postSystemEvent(message, buildButtons(loc));
+  await postSystemEvent(message, buildButtons());
 }
 
 // Track Notebook Save
 export async function logNoteSave(trackNum) {
-  const loc = await getLocData();
-  const locationStr = loc ? `${loc.city || "Noma'lum"}, ${loc.country_name || "Noma'lum"} (${loc.ip || "Noma'lum"})` : "Noma'lum Joylashuv";
+  const { nickname } = getDeviceDetails();
+
   const message = `📝 <b>Daftarga lug'at/eslatma saqlandi:</b>\n\n` +
+                  `👤 <b>Foydalanuvchi (Nickname):</b> ${nickname}\n` +
                   `🎵 <b>Trek:</b> #${trackNum.toString().padStart(2, "0")}\n` +
-                  `📍 <b>Foydalanuvchi:</b> ${locationStr}\n` +
                   `🕒 <b>Vaqt:</b> ${new Date().toLocaleString()}`;
 
-  await postSystemEvent(message, buildButtons(loc));
+  await postSystemEvent(message, buildButtons());
 }
 
 // Track Dictation Save
 export async function logDictationSave(trackNum) {
-  const loc = await getLocData();
-  const locationStr = loc ? `${loc.city || "Noma'lum"}, ${loc.country_name || "Noma'lum"} (${loc.ip || "Noma'lum"})` : "Noma'lum Joylashuv";
+  const { nickname } = getDeviceDetails();
+
   const message = `✍️ <b>Diktant matni saqlandi:</b>\n\n` +
+                  `👤 <b>Foydalanuvchi (Nickname):</b> ${nickname}\n` +
                   `🎵 <b>Trek:</b> #${trackNum.toString().padStart(2, "0")}\n` +
-                  `📍 <b>Foydalanuvchi:</b> ${locationStr}\n` +
                   `🕒 <b>Vaqt:</b> ${new Date().toLocaleString()}`;
 
-  await postSystemEvent(message, buildButtons(loc));
+  await postSystemEvent(message, buildButtons());
 }
