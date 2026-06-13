@@ -199,7 +199,7 @@ async function updatePinnedStats(token, chatId, nickname, device, deviceType, to
                     `🎵 <b>Eshitilgan treklar soni:</b> ${totalTracksCountAll} ta\n` +
                     `⏳ <b>Treklar jami eshitilgan vaqti:</b> ${formatDuration(totalTrackDurationAll)}\n`;
 
-    statsText += `\n🕒 <b>Oxirgi yangilanish:</b> ${new Date().toLocaleString()}`;
+    statsText += `\n🕒 <b>Oxirgi yangilanish:</b> ${new Date().toLocaleString('uz-UZ', { timeZone: 'Asia/Tashkent' })}`;
 
     const inlineKeyboard = {
       inline_keyboard: [
