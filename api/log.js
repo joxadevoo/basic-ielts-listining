@@ -85,9 +85,8 @@ async function updatePinnedStats(token, chatId, nickname, device, deviceType, to
     let pinnedMessageId = null;
 
     if (pinnedMessage) {
-      // Extract JSON payload from the HTML comment in the pinned text (safely checking if it is text)
       const match = (pinnedMessage.text && typeof pinnedMessage.text === 'string')
-        ? pinnedMessage.text.match(/<!--STATS_DATA:(.*?)-->/)
+        ? pinnedMessage.text.match(/(?:<!--STATS_DATA:|STATS_DATA_START:)(.*?)(?:-->|:STATS_DATA_END)/)
         : null;
       if (match) {
         pinnedMessageId = pinnedMessage.message_id;
@@ -173,7 +172,7 @@ async function updatePinnedStats(token, chatId, nickname, device, deviceType, to
                     `⏳ <b>Treklar jami eshitilgan vaqti:</b> ${formatDuration(totalTrackDurationAll)}\n`;
 
     statsText += `\n🕒 <b>Oxirgi yangilanish:</b> ${new Date().toLocaleString()}`;
-    statsText += `\n\n<!--STATS_DATA:${JSON.stringify(stats)}-->`;
+    statsText += `\n\nSTATS_DATA_START:${JSON.stringify(stats)}:STATS_DATA_END`;
 
     const inlineKeyboard = {
       inline_keyboard: [

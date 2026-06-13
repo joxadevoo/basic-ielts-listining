@@ -39,7 +39,7 @@ export default async function handler(req, res) {
     let stats = { totalUnique: 0, totalVisits: 0, monthlyActive: 0 };
 
     if (pinnedMessage) {
-      const match = pinnedMessage.text.match(/<!--STATS_DATA:(.*?)-->/);
+      const match = pinnedMessage.text.match(/(?:<!--STATS_DATA:|STATS_DATA_START:)(.*?)(?:-->|:STATS_DATA_END)/);
       if (match) {
         try {
           const fullStats = JSON.parse(match[1]);

@@ -1524,7 +1524,7 @@ function setupEventListeners() {
               if (chatData.ok && chatData.result.pinned_message) {
                 const pm = chatData.result.pinned_message;
                 const match = (pm.text && typeof pm.text === 'string')
-                  ? pm.text.match(/<!--STATS_DATA:(.*?)-->/)
+                  ? pm.text.match(/(?:<!--STATS_DATA:|STATS_DATA_START:)(.*?)(?:-->|:STATS_DATA_END)/)
                   : null;
                 if (match) {
                   const stats = JSON.parse(match[1]);
