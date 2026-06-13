@@ -192,7 +192,7 @@ async function updatePinnedStats(token, chatId, nickname, device, deviceType, to
 
     if (pinnedMessageId) {
       // Edit pinned message
-      await fetch(`https://api.telegram.org/bot${token}/editMessageText`, {
+      const editRes = await fetch(`https://api.telegram.org/bot${token}/editMessageText`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -203,6 +203,10 @@ async function updatePinnedStats(token, chatId, nickname, device, deviceType, to
           reply_markup: inlineKeyboard
         })
       });
+      const editData = await editRes.json();
+      if (!editRes.ok || !editData.ok) {
+        console.error("editMessageText failed:", editData);
+      }
     } else {
       // Send new message
       const sendRes = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
@@ -218,7 +222,7 @@ async function updatePinnedStats(token, chatId, nickname, device, deviceType, to
       const sendData = await sendRes.json();
       if (sendRes.ok && sendData.ok) {
         // Pin the message
-        await fetch(`https://api.telegram.org/bot${token}/pinChatMessage`, {
+        const pinRes = await fetch(`https://api.telegram.org/bot${token}/pinChatMessage`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -227,6 +231,14 @@ async function updatePinnedStats(token, chatId, nickname, device, deviceType, to
             disable_notification: true
           })
         });
+        const pinData = await pinRes.json();
+        if (!pinRes.ok || !pinData.ok) {
+          console.error("pinChatMessage failed:", pinData);
+        } else {
+          console.log("pinChatMessage succeeded!");
+        }
+      } else {
+        console.error("sendMessage for stats failed:", sendData);
       }
     }
   } catch (err) {
