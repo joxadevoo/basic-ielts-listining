@@ -18,18 +18,20 @@ export default async function handler(req, res) {
   }
 
   const token = process.env.TELEGRAM_BOT_TOKEN || process.env.VITE_TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID || process.env.VITE_TELEGRAM_CHAT_ID;
+  const chatIdEnv = process.env.TELEGRAM_CHAT_ID || process.env.VITE_TELEGRAM_CHAT_ID || "";
+  const chatIds = chatIdEnv.split(',').map(id => id.trim()).filter(id => id);
 
-  if (!token || !chatId) {
+  if (!token || chatIds.length === 0) {
     return res.status(200).json({ error: 'Configuration missing on server.' });
   }
 
   try {
     const update = req.body;
     
-    // Check if it's a callback query or a /stats / /users text command
+    // Check if it's a callback query or a /stats / /users / /start text command
     let isStatsQuery = false;
     let isUsersQuery = false;
+    let isStartQuery = false;
     let queryId = null;
 
     if (update.callback_query) {
@@ -44,27 +46,58 @@ export default async function handler(req, res) {
         isStatsQuery = true;
       } else if (update.message.text.startsWith('/users')) {
         isUsersQuery = true;
+      } else if (update.message.text.startsWith('/start')) {
+        isStartQuery = true;
       }
     }
 
-    if (!isStatsQuery && !isUsersQuery) {
+    if (!isStatsQuery && !isUsersQuery && !isStartQuery) {
       return res.status(200).end(); // Ignore other updates silently
     }
 
+    const incomingChatId = update.callback_query 
+      ? update.callback_query.message.chat.id.toString() 
+      : (update.message ? update.message.chat.id.toString() : null);
+
+    if (!incomingChatId || !chatIds.includes(incomingChatId)) {
+      return res.status(200).end(); // Ignore requests from other chats/users for security
+    }
+
     // Fetch pinned message to extract the JSON statistics
-    const chatRes = await fetch(`https://api.telegram.org/bot${token}/getChat?chat_id=${chatId}`);
+    const chatRes = await fetch(`https://api.telegram.org/bot${token}/getChat?chat_id=${incomingChatId}`);
     const chatData = await chatRes.json();
 
     let stats = null;
     if (chatRes.ok && chatData.ok && chatData.result.pinned_message) {
-      const match = chatData.result.pinned_message.text.match(/<!--STATS_DATA:(.*?)-->/);
+      const pm = chatData.result.pinned_message;
+      const match = (pm.text && typeof pm.text === 'string')
+        ? pm.text.match(/<!--STATS_DATA:(.*?)-->/)
+        : null;
       if (match) {
         stats = JSON.parse(match[1]);
       }
     }
 
     let reportText = '';
-    if (stats) {
+    
+    // Format helper for duration
+    function formatDuration(seconds) {
+      const h = Math.floor(seconds / 3600);
+      const m = Math.floor((seconds % 3600) / 60);
+      if (h > 0) {
+        return `${h} soat ${m} daqiqa`;
+      }
+      return `${m} daqiqa`;
+    }
+
+    if (isStartQuery) {
+      reportText = `👋 <b>Assalomu alaykum! TinglangApp botiga xush kelibsiz!</b>\n\n` +
+                   `Ushbu bot orqali <b>Basic IELTS Listening</b> ilovasining foydalanish statistikasini kuzatishingiz mumkin.\n\n` +
+                   `<b>Mavjud buyruqlar:</b>\n` +
+                   `📊 /stats - Umumiy foydalanish statistikasi\n` +
+                   `👥 /users - Foydalanuvchilar ro'yxati va qurilmalari\n\n` +
+                   `Quyidagi tugmalardan foydalanib kerakli ma'lumotni darhol olishingiz mumkin:`;
+    } else if (stats) {
       if (isStatsQuery) {
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -79,10 +112,25 @@ export default async function handler(req, res) {
           }
         }
 
+        let totalUsageTimeAll = 0;
+        let totalTrackDurationAll = 0;
+        let totalTracksCountAll = 0;
+
+        if (stats.users) {
+          for (const uData of Object.values(stats.users)) {
+            totalUsageTimeAll += uData.totalUsageTime || 0;
+            totalTrackDurationAll += uData.totalTracksDuration || 0;
+            totalTracksCountAll += uData.listenedTracksCount || 0;
+          }
+        }
+
         reportText = `📊 <b>TinglangApp Foydalanish Statistikasi</b>\n\n` +
                      `👥 <b>Jami unikal qurilmalar:</b> <code>${stats.totalUnique || 0}</code> ta\n` +
                      `📈 <b>Jami kirishlar soni:</b> <code>${stats.totalVisits || 0}</code> marta\n` +
-                     `📅 <b>Oylik faol foydalanuvchilar (MAU):</b> <code>${monthlyActive}</code> ta\n`;
+                     `📅 <b>Oylik faol foydalanuvchilar (MAU):</b> <code>${monthlyActive}</code> ta\n` +
+                     `⏱️ <b>Jami foydalanish vaqti:</b> <code>${formatDuration(totalUsageTimeAll)}</code>\n` +
+                     `🎵 <b>Eshitilgan treklar soni:</b> <code>${totalTracksCountAll}</code> ta\n` +
+                     `⏳ <b>Treklar jami eshitilgan vaqti:</b> <code>${formatDuration(totalTrackDurationAll)}</code>\n`;
       } else if (isUsersQuery) {
         reportText = `👥 <b>TinglangApp Foydalanuvchilar Ro'yxati</b>\n\n`;
         
@@ -90,8 +138,18 @@ export default async function handler(req, res) {
         const sortedUsers = Object.entries(stats.users || {}).sort((a, b) => b[1].totalVisits - a[1].totalVisits);
 
         sortedUsers.forEach(([name, uData], index) => {
+          const deviceStr = uData.deviceType 
+            ? `${uData.deviceType} (${uData.device || 'Noma\'lum'})` 
+            : (uData.device || 'Noma\'lum');
+
+          const usageTimeStr = formatDuration(uData.totalUsageTime || 0);
+          const trackDurationStr = formatDuration(uData.totalTracksDuration || 0);
+
           reportText += `${index + 1}. 👤 <b>${name}</b>\n` +
+                        `   • Qurilma: <code>${deviceStr}</code>\n` +
                         `   • Jami kirishlar: <b>${uData.totalVisits}</b> marta\n` +
+                        `   • Foydalanish vaqti: <b>${usageTimeStr}</b>\n` +
+                        `   • Eshitilgan treklar: <b>${uData.listenedTracksCount || 0} ta</b> (${trackDurationStr})\n` +
                         `   • Oxirgi faollik: <code>${uData.lastActive}</code>\n\n`;
         });
         
@@ -100,7 +158,11 @@ export default async function handler(req, res) {
         }
       }
     } else {
-      reportText = `📊 <b>Statistika topilmadi.</b>\n\nIlovaga birinchi foydalanuvchi kirganida statistika xabari shakllanadi va pin qilinadi.`;
+      reportText = `📊 <b>Statistika topilmadi.</b>\n\n` +
+                   `Statistika to'planishi uchun ilovaga kamida bir marta kirilgan bo'lishi va Telegram chatda xabar <b>pin qilingan (mustahkamlangan)</b> bo'lishi kerak.\n\n` +
+                   `⚠️ <b>Muhim shartlar:</b>\n` +
+                   `1. Bot guruhda/kanalda <b>Admin</b> bo'lishi va <b>xabarlarni pin qilish (Pin messages)</b> huquqiga ega bo'lishi shart.\n` +
+                   `2. Agar bot shaxsiy chatda bo'lsa, xabarlarni pin qila olmasligi mumkin. Bot uchun alohida guruh ochib, uni o'sha yerda admin qilish va Guruh ID-sini sozlash tavsiya etiladi.`;
     }
 
     // Acknowledge callback query to stop the loading icon on the user's Telegram client
@@ -132,7 +194,7 @@ export default async function handler(req, res) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        chat_id: chatId,
+        chat_id: incomingChatId,
         text: reportText,
         parse_mode: 'HTML',
         reply_markup: inlineKeyboard

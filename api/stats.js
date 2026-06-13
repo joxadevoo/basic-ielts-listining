@@ -17,11 +17,15 @@ export default async function handler(req, res) {
   }
 
   const token = process.env.TELEGRAM_BOT_TOKEN || process.env.VITE_TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID || process.env.VITE_TELEGRAM_CHAT_ID;
+  const chatIdEnv = process.env.TELEGRAM_CHAT_ID || process.env.VITE_TELEGRAM_CHAT_ID || "";
+  const chatIds = chatIdEnv.split(',').map(id => id.trim()).filter(id => id);
 
-  if (!token || !chatId) {
+  if (!token || chatIds.length === 0) {
     return res.status(200).json({ totalUnique: 0, totalVisits: 0, monthlyActive: 0 });
   }
+
+  // Use the group chat ID (starts with -) if available, otherwise the first chat ID
+  const chatId = chatIds.find(id => id.startsWith('-')) || chatIds[0];
 
   try {
     const chatRes = await fetch(`https://api.telegram.org/bot${token}/getChat?chat_id=${chatId}`);

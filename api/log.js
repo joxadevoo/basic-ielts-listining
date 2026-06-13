@@ -17,48 +17,59 @@ export default async function handler(req, res) {
   }
 
   const token = process.env.TELEGRAM_BOT_TOKEN || process.env.VITE_TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID || process.env.VITE_TELEGRAM_CHAT_ID;
+  const chatIdEnv = process.env.TELEGRAM_CHAT_ID || process.env.VITE_TELEGRAM_CHAT_ID || "";
+  const chatIds = chatIdEnv.split(',').map(id => id.trim()).filter(id => id);
 
-  if (!token || !chatId) {
+  if (!token || chatIds.length === 0) {
     return res.status(500).json({ error: 'Configuration missing on server.' });
   }
 
   try {
-    const { text, replyMarkup, type, nickname } = req.body;
+    const { text, replyMarkup, type, nickname, device, deviceType, totalUsageTime, listenedTracksCount, totalTracksDuration } = req.body;
 
-    // 1. Post the notification message to the Telegram Chat
+    // 1. Post the notification message to the Telegram Chats
     const url = `https://api.telegram.org/bot${token}/sendMessage`;
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text: text,
-        parse_mode: 'HTML',
-        reply_markup: replyMarkup
-      })
+    
+    const sendPromises = chatIds.map(async (cid) => {
+      try {
+        await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            chat_id: cid,
+            text: text,
+            parse_mode: 'HTML',
+            reply_markup: replyMarkup
+          })
+        });
+      } catch (e) {
+        console.error(`Failed to send message to chat ${cid}:`, e);
+      }
     });
 
-    const data = await response.json();
+    await Promise.all(sendPromises);
 
-    // 2. If it is a new session start, update the pinned statistics summary message
-    if (type === 'session_start' && nickname) {
-      await updatePinnedStats(token, chatId, nickname);
+    // 2. Update the pinned statistics summary message in all configured chats if nickname is provided
+    if (nickname) {
+      const updatePromises = chatIds.map(async (cid) => {
+        try {
+          await updatePinnedStats(token, cid, nickname, device, deviceType, totalUsageTime, listenedTracksCount, totalTracksDuration, type);
+        } catch (e) {
+          console.error(`Failed to update pinned stats for chat ${cid}:`, e);
+        }
+      });
+      await Promise.all(updatePromises);
     }
 
-    if (response.ok && data.ok) {
-      return res.status(200).json({ success: true });
-    } else {
-      return res.status(502).json({ error: 'Telegram API rejection', details: data });
-    }
+    return res.status(200).json({ success: true });
   } catch (err) {
     return res.status(500).json({ error: 'Internal server error', details: err.message });
   }
 }
 
-async function updatePinnedStats(token, chatId, nickname) {
+async function updatePinnedStats(token, chatId, nickname, device, deviceType, totalUsageTime, listenedTracksCount, totalTracksDuration, type) {
   try {
     // Get chat to locate the current pinned message
     const chatRes = await fetch(`https://api.telegram.org/bot${token}/getChat?chat_id=${chatId}`);
@@ -74,10 +85,12 @@ async function updatePinnedStats(token, chatId, nickname) {
     let pinnedMessageId = null;
 
     if (pinnedMessage) {
-      pinnedMessageId = pinnedMessage.message_id;
-      // Extract JSON payload from the HTML comment in the pinned text
-      const match = pinnedMessage.text.match(/<!--STATS_DATA:(.*?)-->/);
+      // Extract JSON payload from the HTML comment in the pinned text (safely checking if it is text)
+      const match = (pinnedMessage.text && typeof pinnedMessage.text === 'string')
+        ? pinnedMessage.text.match(/<!--STATS_DATA:(.*?)-->/)
+        : null;
       if (match) {
+        pinnedMessageId = pinnedMessage.message_id;
         try {
           stats = JSON.parse(match[1]);
         } catch (e) {
@@ -99,11 +112,20 @@ async function updatePinnedStats(token, chatId, nickname) {
     }
 
     const user = stats.users[nickname];
-    user.totalVisits = (user.totalVisits || 0) + 1;
-    if (!user.dailyVisits) user.dailyVisits = {};
-    user.dailyVisits[today] = (user.dailyVisits[today] || 0) + 1;
-    user.lastActive = today;
-    stats.totalVisits = (stats.totalVisits || 0) + 1;
+    
+    if (type === 'session_start') {
+      user.totalVisits = (user.totalVisits || 0) + 1;
+      if (!user.dailyVisits) user.dailyVisits = {};
+      user.dailyVisits[today] = (user.dailyVisits[today] || 0) + 1;
+      user.lastActive = today;
+      stats.totalVisits = (stats.totalVisits || 0) + 1;
+    }
+
+    if (device) user.device = device;
+    if (deviceType) user.deviceType = deviceType;
+    if (typeof totalUsageTime === 'number') user.totalUsageTime = totalUsageTime;
+    if (typeof listenedTracksCount === 'number') user.listenedTracksCount = listenedTracksCount;
+    if (typeof totalTracksDuration === 'number') user.totalTracksDuration = totalTracksDuration;
 
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -118,11 +140,37 @@ async function updatePinnedStats(token, chatId, nickname) {
       }
     }
 
+    // Sum stats across all users
+    let totalUsageTimeAll = 0;
+    let totalTrackDurationAll = 0;
+    let totalTracksCountAll = 0;
+
+    if (stats.users) {
+      for (const uData of Object.values(stats.users)) {
+        totalUsageTimeAll += uData.totalUsageTime || 0;
+        totalTrackDurationAll += uData.totalTracksDuration || 0;
+        totalTracksCountAll += uData.listenedTracksCount || 0;
+      }
+    }
+
+    // Format helper for duration
+    function formatDuration(seconds) {
+      const h = Math.floor(seconds / 3600);
+      const m = Math.floor((seconds % 3600) / 60);
+      if (h > 0) {
+        return `${h} soat ${m} daqiqa`;
+      }
+      return `${m} daqiqa`;
+    }
+
     // Format the pinned summary message text
     let statsText = `📌 <b>TinglangApp Foydalanish Statistikasi</b>\n\n` +
                     `👥 <b>Jami unikal qurilmalar:</b> ${stats.totalUnique || 0} ta\n` +
                     `📈 <b>Jami kirishlar soni:</b> ${stats.totalVisits || 0} marta\n` +
-                    `📅 <b>Oylik faol foydalanuvchilar (MAU):</b> ${monthlyActive} ta\n`;
+                    `📅 <b>Oylik faol foydalanuvchilar (MAU):</b> ${monthlyActive} ta\n` +
+                    `⏱️ <b>Jami foydalanish vaqti:</b> ${formatDuration(totalUsageTimeAll)}\n` +
+                    `🎵 <b>Eshitilgan treklar soni:</b> ${totalTracksCountAll} ta\n` +
+                    `⏳ <b>Treklar jami eshitilgan vaqti:</b> ${formatDuration(totalTrackDurationAll)}\n`;
 
     statsText += `\n🕒 <b>Oxirgi yangilanish:</b> ${new Date().toLocaleString()}`;
     statsText += `\n\n<!--STATS_DATA:${JSON.stringify(stats)}-->`;

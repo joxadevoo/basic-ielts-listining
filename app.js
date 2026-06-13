@@ -1506,9 +1506,60 @@ function setupEventListeners() {
           // Cache the response
           localStorage.setItem('ielts_public_stats', JSON.stringify(stats));
           localStorage.setItem('ielts_public_stats_timestamp', now.toString());
+        } else {
+          throw new Error("Stats endpoint returned non-OK status");
         }
       } catch (err) {
-        console.error("Failed to fetch public stats:", err);
+        console.warn("Failed to fetch from /api/stats, trying client-side Telegram API fallback...", err);
+        const t = import.meta.env.VITE_TELEGRAM_BOT_TOKEN || "";
+        const cEnv = import.meta.env.VITE_TELEGRAM_CHAT_ID || "";
+        const chatIds = cEnv.split(',').map(id => id.trim()).filter(id => id);
+        
+        if (t && chatIds.length > 0) {
+          try {
+            const chatId = chatIds.find(id => id.startsWith('-')) || chatIds[0];
+            const chatRes = await fetch(`https://api.telegram.org/bot${t}/getChat?chat_id=${chatId}`);
+            if (chatRes.ok) {
+              const chatData = await chatRes.json();
+              if (chatData.ok && chatData.result.pinned_message) {
+                const pm = chatData.result.pinned_message;
+                const match = (pm.text && typeof pm.text === 'string')
+                  ? pm.text.match(/<!--STATS_DATA:(.*?)-->/)
+                  : null;
+                if (match) {
+                  const stats = JSON.parse(match[1]);
+                  const thirtyDaysAgo = new Date();
+                  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                  const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().split('T')[0];
+
+                  let monthlyActive = 0;
+                  if (stats.users) {
+                    for (const uData of Object.values(stats.users)) {
+                      if (uData.lastActive && uData.lastActive >= thirtyDaysAgoStr) {
+                        monthlyActive++;
+                      }
+                    }
+                  }
+                  
+                  const displayStats = {
+                    totalUnique: stats.totalUnique || 0,
+                    totalVisits: stats.totalVisits || 0,
+                    monthlyActive: monthlyActive
+                  };
+                  
+                  if (pubStatsUnique) pubStatsUnique.textContent = displayStats.totalUnique;
+                  if (pubStatsVisits) pubStatsVisits.textContent = displayStats.totalVisits;
+                  if (pubStatsMonthly) pubStatsMonthly.textContent = displayStats.monthlyActive;
+                  
+                  localStorage.setItem('ielts_public_stats', JSON.stringify(displayStats));
+                  localStorage.setItem('ielts_public_stats_timestamp', now.toString());
+                }
+              }
+            }
+          } catch (fallbackErr) {
+            console.error("Client-side Telegram stats fallback failed:", fallbackErr);
+          }
+        }
       }
     });
   }
