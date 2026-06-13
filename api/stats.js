@@ -39,30 +39,54 @@ export default async function handler(req, res) {
     let stats = { totalUnique: 0, totalVisits: 0, monthlyActive: 0 };
 
     if (pinnedMessage) {
-      const match = pinnedMessage.text.match(/(?:<!--STATS_DATA:|STATS_DATA_START:)(.*?)(?:-->|:STATS_DATA_END)/);
-      if (match) {
-        try {
-          const fullStats = JSON.parse(match[1]);
-          stats.totalUnique = fullStats.totalUnique || 0;
-          stats.totalVisits = fullStats.totalVisits || 0;
-          
-          // Calculate active users in the last 30 days (Monthly Active Users)
-          const thirtyDaysAgo = new Date();
-          thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-          const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().split('T')[0];
+      let parsedStats = null;
+      
+      // Try extracting from text_link entities first
+      if (pinnedMessage.entities) {
+        const linkEntity = pinnedMessage.entities.find(e => e.type === 'text_link' && e.url && e.url.includes('?stats='));
+        if (linkEntity) {
+          try {
+            const urlObj = new URL(linkEntity.url);
+            const statsStr = decodeURIComponent(urlObj.searchParams.get('stats'));
+            parsedStats = JSON.parse(statsStr);
+          } catch (e) {
+            console.error("Failed to parse stats from text_link entity URL:", e);
+          }
+        }
+      }
+      
+      // Fallback to text matching
+      if (!parsedStats) {
+        const match = (pinnedMessage.text && typeof pinnedMessage.text === 'string')
+          ? pinnedMessage.text.match(/(?:<!--STATS_DATA:|STATS_DATA_START:)(.*?)(?:-->|:STATS_DATA_END)/)
+          : null;
+        if (match) {
+          try {
+            parsedStats = JSON.parse(match[1]);
+          } catch (e) {
+            console.error("Failed to parse stats from text match:", e);
+          }
+        }
+      }
 
-          let monthlyActive = 0;
-          if (fullStats.users) {
-            for (const uData of Object.values(fullStats.users)) {
-              if (uData.lastActive && uData.lastActive >= thirtyDaysAgoStr) {
-                monthlyActive++;
-              }
+      if (parsedStats) {
+        stats.totalUnique = parsedStats.totalUnique || 0;
+        stats.totalVisits = parsedStats.totalVisits || 0;
+        
+        // Calculate active users in the last 30 days (Monthly Active Users)
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().split('T')[0];
+
+        let monthlyActive = 0;
+        if (parsedStats.users) {
+          for (const uData of Object.values(parsedStats.users)) {
+            if (uData.lastActive && uData.lastActive >= thirtyDaysAgoStr) {
+              monthlyActive++;
             }
           }
-          stats.monthlyActive = monthlyActive;
-        } catch (e) {
-          console.error("JSON parse failure in stats endpoint:", e);
         }
+        stats.monthlyActive = monthlyActive;
       }
     }
 
