@@ -85,16 +85,39 @@ async function updatePinnedStats(token, chatId, nickname, device, deviceType, to
     let pinnedMessageId = null;
 
     if (pinnedMessage) {
-      const match = (pinnedMessage.text && typeof pinnedMessage.text === 'string')
-        ? pinnedMessage.text.match(/(?:<!--STATS_DATA:|STATS_DATA_START:)(.*?)(?:-->|:STATS_DATA_END)/)
-        : null;
-      if (match) {
-        pinnedMessageId = pinnedMessage.message_id;
-        try {
-          stats = JSON.parse(match[1]);
-        } catch (e) {
-          console.error("JSON parse failure for pinned stats:", e);
+      pinnedMessageId = pinnedMessage.message_id;
+      let parsedStats = null;
+      
+      // Try extracting from text_link entities first
+      if (pinnedMessage.entities) {
+        const linkEntity = pinnedMessage.entities.find(e => e.type === 'text_link' && e.url && e.url.includes('?stats='));
+        if (linkEntity) {
+          try {
+            const urlObj = new URL(linkEntity.url);
+            const statsStr = decodeURIComponent(urlObj.searchParams.get('stats'));
+            parsedStats = JSON.parse(statsStr);
+          } catch (e) {
+            console.error("Failed to parse stats from text_link entity URL:", e);
+          }
         }
+      }
+      
+      // Fallback to text matching
+      if (!parsedStats) {
+        const match = (pinnedMessage.text && typeof pinnedMessage.text === 'string')
+          ? pinnedMessage.text.match(/(?:<!--STATS_DATA:|STATS_DATA_START:)(.*?)(?:-->|:STATS_DATA_END)/)
+          : null;
+        if (match) {
+          try {
+            parsedStats = JSON.parse(match[1]);
+          } catch (e) {
+            console.error("Failed to parse stats from text match:", e);
+          }
+        }
+      }
+      
+      if (parsedStats) {
+        stats = parsedStats;
       }
     }
 
@@ -163,7 +186,8 @@ async function updatePinnedStats(token, chatId, nickname, device, deviceType, to
     }
 
     // Format the pinned summary message text
-    let statsText = `📌 <b>TinglangApp Foydalanish Statistikasi</b>\n\n` +
+    let statsText = `<a href="https://tinglash.vercel.app/?stats=${encodeURIComponent(JSON.stringify(stats))}">&#8203;</a>` +
+                    `📌 <b>TinglangApp Foydalanish Statistikasi</b>\n\n` +
                     `👥 <b>Jami unikal qurilmalar:</b> ${stats.totalUnique || 0} ta\n` +
                     `📈 <b>Jami kirishlar soni:</b> ${stats.totalVisits || 0} marta\n` +
                     `📅 <b>Oylik faol foydalanuvchilar (MAU):</b> ${monthlyActive} ta\n` +
@@ -172,7 +196,6 @@ async function updatePinnedStats(token, chatId, nickname, device, deviceType, to
                     `⏳ <b>Treklar jami eshitilgan vaqti:</b> ${formatDuration(totalTrackDurationAll)}\n`;
 
     statsText += `\n🕒 <b>Oxirgi yangilanish:</b> ${new Date().toLocaleString()}`;
-    statsText += `\n\nSTATS_DATA_START:${JSON.stringify(stats)}:STATS_DATA_END`;
 
     const inlineKeyboard = {
       inline_keyboard: [

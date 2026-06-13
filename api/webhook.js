@@ -70,12 +70,37 @@ export default async function handler(req, res) {
     let stats = null;
     if (chatRes.ok && chatData.ok && chatData.result.pinned_message) {
       const pm = chatData.result.pinned_message;
-      const match = (pm.text && typeof pm.text === 'string')
-        ? pm.text.match(/(?:<!--STATS_DATA:|STATS_DATA_START:)(.*?)(?:-->|:STATS_DATA_END)/)
-        : null;
-      if (match) {
-        stats = JSON.parse(match[1]);
+      let parsedStats = null;
+      
+      // Try text_link first
+      if (pm.entities) {
+        const linkEntity = pm.entities.find(e => e.type === 'text_link' && e.url && e.url.includes('?stats='));
+        if (linkEntity) {
+          try {
+            const urlObj = new URL(linkEntity.url);
+            const statsStr = decodeURIComponent(urlObj.searchParams.get('stats'));
+            parsedStats = JSON.parse(statsStr);
+          } catch (e) {
+            console.error("Failed to parse stats from text_link entity URL:", e);
+          }
+        }
       }
+      
+      // Fallback to text matching
+      if (!parsedStats) {
+        const match = (pm.text && typeof pm.text === 'string')
+          ? pm.text.match(/(?:<!--STATS_DATA:|STATS_DATA_START:)(.*?)(?:-->|:STATS_DATA_END)/)
+          : null;
+        if (match) {
+          try {
+            parsedStats = JSON.parse(match[1]);
+          } catch (e) {
+            console.error("Failed to parse stats from text match:", e);
+          }
+        }
+      }
+      
+      stats = parsedStats;
     }
 
     let reportText = '';

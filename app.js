@@ -1523,11 +1523,38 @@ function setupEventListeners() {
               const chatData = await chatRes.json();
               if (chatData.ok && chatData.result.pinned_message) {
                 const pm = chatData.result.pinned_message;
-                const match = (pm.text && typeof pm.text === 'string')
-                  ? pm.text.match(/(?:<!--STATS_DATA:|STATS_DATA_START:)(.*?)(?:-->|:STATS_DATA_END)/)
-                  : null;
-                if (match) {
-                  const stats = JSON.parse(match[1]);
+                let parsedStats = null;
+                
+                // Try text_link first
+                if (pm.entities) {
+                  const linkEntity = pm.entities.find(e => e.type === 'text_link' && e.url && e.url.includes('?stats='));
+                  if (linkEntity) {
+                    try {
+                      const urlObj = new URL(linkEntity.url);
+                      const statsStr = decodeURIComponent(urlObj.searchParams.get('stats'));
+                      parsedStats = JSON.parse(statsStr);
+                    } catch (e) {
+                      console.error("Failed to parse stats from text_link entity URL:", e);
+                    }
+                  }
+                }
+                
+                // Fallback to text matching
+                if (!parsedStats) {
+                  const match = (pm.text && typeof pm.text === 'string')
+                    ? pm.text.match(/(?:<!--STATS_DATA:|STATS_DATA_START:)(.*?)(?:-->|:STATS_DATA_END)/)
+                    : null;
+                  if (match) {
+                    try {
+                      parsedStats = JSON.parse(match[1]);
+                    } catch (e) {
+                      console.error("Failed to parse stats from text match:", e);
+                    }
+                  }
+                }
+                
+                if (parsedStats) {
+                  const stats = parsedStats;
                   const thirtyDaysAgo = new Date();
                   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
                   const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().split('T')[0];
