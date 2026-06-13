@@ -76,7 +76,7 @@ async function updatePinnedStats(token, chatId, nickname, device, deviceType, to
     const chatData = await chatRes.json();
     
     if (!chatRes.ok || !chatData.ok) {
-      console.error("Failed to fetch getChat details:", chatData);
+      console.error(`Failed to fetch getChat details for chatId ${chatId}:`, chatData);
       return;
     }
 
