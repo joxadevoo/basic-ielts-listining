@@ -27,29 +27,33 @@ export default async function handler(req, res) {
   try {
     const { text, replyMarkup, type, nickname, device, deviceType, totalUsageTime, listenedTracksCount, totalTracksDuration } = req.body;
 
-    // 1. Post the notification message to the Telegram Chats
+    // 1. Post the notification message to the Telegram Chats for session starts
+    // Other events (track plays, saves) will update the pinned stats silently to prevent spam
     const url = `https://api.telegram.org/bot${token}/sendMessage`;
+    const shouldSendMessage = (type === 'session_start' || !type);
     
-    const sendPromises = chatIds.map(async (cid) => {
-      try {
-        await fetch(url, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            chat_id: cid,
-            text: text,
-            parse_mode: 'HTML',
-            reply_markup: replyMarkup
-          })
-        });
-      } catch (e) {
-        console.error(`Failed to send message to chat ${cid}:`, e);
-      }
-    });
+    if (shouldSendMessage) {
+      const sendPromises = chatIds.map(async (cid) => {
+        try {
+          await fetch(url, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              chat_id: cid,
+              text: text,
+              parse_mode: 'HTML',
+              reply_markup: replyMarkup
+            })
+          });
+        } catch (e) {
+          console.error(`Failed to send message to chat ${cid}:`, e);
+        }
+      });
 
-    await Promise.all(sendPromises);
+      await Promise.all(sendPromises);
+    }
 
     // 2. Update the pinned statistics summary message in all configured chats if nickname is provided
     if (nickname) {
