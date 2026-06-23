@@ -78,15 +78,21 @@ export default async function handler(req, res) {
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
         const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().split('T')[0];
 
-        let monthlyActive = 0;
+        const activeFingerprints = new Set();
+        let legacyActive = 0;
+
         if (parsedStats.users) {
           for (const uData of Object.values(parsedStats.users)) {
             if (uData.lastActive && uData.lastActive >= thirtyDaysAgoStr) {
-              monthlyActive++;
+              if (uData.fingerprint) {
+                activeFingerprints.add(uData.fingerprint);
+              } else {
+                legacyActive++;
+              }
             }
           }
         }
-        stats.monthlyActive = monthlyActive;
+        stats.monthlyActive = activeFingerprints.size + legacyActive;
       }
     }
 

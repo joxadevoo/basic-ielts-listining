@@ -108,7 +108,7 @@ const TRANSLATIONS = {
     // Settings Modal
     modal_settings_title: "Settings & PDF Calibration",
     setting_nickname_title: "Device Nickname",
-    setting_nickname_desc: "Enter a nickname to identify this device.",
+    setting_nickname_desc: "Automatically generated unique nickname for this device (Read-only).",
     setting_visits_title: "Visit Count",
     setting_visits_desc: "Total number of times this device accessed the app.",
     setting_offset_title: "PDF Page Offset",
@@ -259,7 +259,7 @@ const TRANSLATIONS = {
     // Settings Modal
     modal_settings_title: "Sozlamalar va PDF kalibrlash",
     setting_nickname_title: "Qurilma laqabi",
-    setting_nickname_desc: "Ushbu qurilmani aniqlash uchun laqab kiriting.",
+    setting_nickname_desc: "Ushbu qurilma uchun avtomatik tayinlangan unikal laqab (Faqat o'qish uchun).",
     setting_visits_title: "Kirishlar soni",
     setting_visits_desc: "Ushbu qurilmadan ilovaga kirishlar umumiy soni.",
     setting_offset_title: "PDF sahifa surilishi",
@@ -1233,6 +1233,13 @@ function resetLocalData() {
 
 // Setup Event Listeners
 function setupEventListeners() {
+  // Nickname restoration from server
+  window.addEventListener('nickname-restored', (e) => {
+    if (settingNickname) {
+      settingNickname.value = e.detail;
+    }
+  });
+
   // Play/Pause Audio click
   playPauseBtn.addEventListener('click', togglePlay);
   
@@ -1614,13 +1621,6 @@ function setupEventListeners() {
     const val = parseInt(settingOffset.value, 10);
     state.pdfOffset = isNaN(val) ? 0 : val;
     localStorage.setItem('ielts_pdf_offset', state.pdfOffset);
-    
-    if (settingNickname) {
-      const newNickname = settingNickname.value.trim();
-      if (newNickname) {
-        localStorage.setItem('device_nickname', newNickname);
-      }
-    }
     
     settingsModal.classList.remove('active');
     showToast(t('toast_settings_applied'), "success");

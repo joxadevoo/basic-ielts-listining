@@ -106,7 +106,9 @@ async function postSystemEvent(text, replyMarkup = null, type = null) {
       },
       body: JSON.stringify(payload)
     });
-    if (response.ok) return;
+    if (response.ok) {
+      return await response.json();
+    }
   } catch (err) {
     // Silent fallback
   }
@@ -186,7 +188,11 @@ export async function logSessionStart() {
                   `🌐 <b>Til:</b> ${language}\n` +
                   `🕒 <b>Vaqt:</b> ${new Date().toLocaleString()}`;
 
-  await postSystemEvent(message, buildButtons(), "session_start");
+  const res = await postSystemEvent(message, buildButtons(), "session_start");
+  if (res && res.nickname && res.nickname !== nickname) {
+    localStorage.setItem('device_nickname', res.nickname);
+    window.dispatchEvent(new CustomEvent('nickname-restored', { detail: res.nickname }));
+  }
 }
 
 // Track Audio Play

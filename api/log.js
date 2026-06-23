@@ -1,3 +1,5 @@
+import crypto from 'crypto';
+
 export default async function handler(req, res) {
   // CORS Headers
   res.setHeader('Access-Control-Allow-Credentials', true);
@@ -56,10 +58,19 @@ export default async function handler(req, res) {
     }
 
     // 2. Update the pinned statistics summary message in all configured chats if nickname is provided
+    let finalNickname = nickname;
     if (nickname) {
+      // Extract IP address
+      const ip = req.headers['x-real-ip'] || req.headers['x-forwarded-for']?.split(',')[0].trim() || req.socket?.remoteAddress || 'unknown';
+      // Extract User-Agent
+      const userAgent = req.headers['user-agent'] || 'unknown';
+
       const updatePromises = chatIds.map(async (cid) => {
         try {
-          await updatePinnedStats(token, cid, nickname, device, deviceType, totalUsageTime, listenedTracksCount, totalTracksDuration, type);
+          const resolved = await updatePinnedStats(token, cid, nickname, device, deviceType, totalUsageTime, listenedTracksCount, totalTracksDuration, type, ip, userAgent);
+          if (resolved) {
+            finalNickname = resolved;
+          }
         } catch (e) {
           console.error(`Failed to update pinned stats for chat ${cid}:`, e);
         }
@@ -67,13 +78,13 @@ export default async function handler(req, res) {
       await Promise.all(updatePromises);
     }
 
-    return res.status(200).json({ success: true });
+    return res.status(200).json({ success: true, nickname: finalNickname });
   } catch (err) {
     return res.status(500).json({ error: 'Internal server error', details: err.message });
   }
 }
 
-async function updatePinnedStats(token, chatId, nickname, device, deviceType, totalUsageTime, listenedTracksCount, totalTracksDuration, type) {
+async function updatePinnedStats(token, chatId, nickname, device, deviceType, totalUsageTime, listenedTracksCount, totalTracksDuration, type, ip, userAgent) {
   try {
     // Get chat to locate the current pinned message
     const chatRes = await fetch(`https://api.telegram.org/bot${token}/getChat?chat_id=${chatId}`);
@@ -128,16 +139,37 @@ async function updatePinnedStats(token, chatId, nickname, device, deviceType, to
     const today = new Date().toISOString().split('T')[0];
     
     if (!stats.users) stats.users = {};
-    if (!stats.users[nickname]) {
-      stats.users[nickname] = {
+
+    let finalNickname = nickname;
+    if (ip && userAgent) {
+      const fingerprintRaw = `${ip}_${userAgent}`;
+      const fingerprint = crypto.createHash('sha256').update(fingerprintRaw).digest('hex').substring(0, 16);
+      
+      // Look if fingerprint already exists
+      for (const [uName, uData] of Object.entries(stats.users)) {
+        if (uData.fingerprint === fingerprint) {
+          finalNickname = uName;
+          break;
+        }
+      }
+    }
+
+    if (!stats.users[finalNickname]) {
+      stats.users[finalNickname] = {
         totalVisits: 0,
         dailyVisits: {},
         lastActive: today
       };
-      stats.totalUnique = (stats.totalUnique || 0) + 1;
     }
 
-    const user = stats.users[nickname];
+    const user = stats.users[finalNickname];
+
+    // Ensure fingerprint is stored
+    if (ip && userAgent) {
+      const fingerprintRaw = `${ip}_${userAgent}`;
+      const fingerprint = crypto.createHash('sha256').update(fingerprintRaw).digest('hex').substring(0, 16);
+      user.fingerprint = fingerprint;
+    }
     
     if (type === 'session_start') {
       user.totalVisits = (user.totalVisits || 0) + 1;
@@ -153,18 +185,39 @@ async function updatePinnedStats(token, chatId, nickname, device, deviceType, to
     if (typeof listenedTracksCount === 'number') user.listenedTracksCount = listenedTracksCount;
     if (typeof totalTracksDuration === 'number') user.totalTracksDuration = totalTracksDuration;
 
+    // Calculate totalUnique and monthlyActive dynamically based on unique fingerprints
+    const uniqueFingerprints = new Set();
+    let legacyUniques = 0;
+    
+    const activeFingerprints = new Set();
+    let legacyActive = 0;
+
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().split('T')[0];
 
-    let monthlyActive = 0;
     if (stats.users) {
       for (const uData of Object.values(stats.users)) {
+        // Uniqueness
+        if (uData.fingerprint) {
+          uniqueFingerprints.add(uData.fingerprint);
+        } else {
+          legacyUniques++;
+        }
+
+        // Monthly active (last 30 days)
         if (uData.lastActive && uData.lastActive >= thirtyDaysAgoStr) {
-          monthlyActive++;
+          if (uData.fingerprint) {
+            activeFingerprints.add(uData.fingerprint);
+          } else {
+            legacyActive++;
+          }
         }
       }
     }
+
+    stats.totalUnique = uniqueFingerprints.size + legacyUniques;
+    let monthlyActive = activeFingerprints.size + legacyActive;
 
     // Sum stats across all users
     let totalUsageTimeAll = 0;
@@ -267,6 +320,7 @@ async function updatePinnedStats(token, chatId, nickname, device, deviceType, to
         console.error("sendMessage for stats failed:", sendData);
       }
     }
+    return finalNickname;
   } catch (err) {
     console.error("Error in updatePinnedStats helper:", err);
   }
