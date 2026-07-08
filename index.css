@@ -2581,5 +2581,115 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+/* Menu Dropdown Styles */
+.menu-dropdown-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.menu-dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 48px;
+  background: var(--bg-card);
+  backdrop-filter: blur(var(--blur-amount));
+  -webkit-backdrop-filter: blur(var(--blur-amount));
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  min-width: 260px;
+  box-shadow: var(--shadow-lg);
+  z-index: 110;
+  padding: 12px;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.menu-dropdown-content.active {
+  display: flex;
+}
+
+.menu-item-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.menu-item-btn svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+.menu-item-btn:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+  transform: translateX(4px);
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+}
+
+.menu-item-label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.lang-select-inline {
+  display: flex;
+  background: var(--bg-base);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 2px;
+  gap: 2px;
+}
+
+.lang-btn-inline {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.lang-btn-inline:hover {
+  color: var(--text-primary);
+}
+
+.lang-btn-inline.active {
+  background: var(--color-primary);
+  color: var(--text-on-accent);
+  box-shadow: var(--shadow-sm);
+}
+
+.menu-divider {
+  border: 0;
+  border-top: 1px solid var(--border-color);
+  margin: 6px 0;
+}
+
+
 
 

@@ -513,10 +513,9 @@ const playlistContainer = document.getElementById('playlist-container');
 const trackSearch = document.getElementById('track-search');
 const trackFilter = document.getElementById('track-filter');
 
-// Language Selector Elements
-const langToggle = document.getElementById('lang-toggle');
-const langCurrentLabel = document.getElementById('lang-current-label');
-const langDropdown = document.getElementById('lang-dropdown');
+// Menu Dropdown Elements
+const menuToggle = document.getElementById('menu-toggle');
+const menuDropdownContent = document.getElementById('menu-dropdown-content');
 
 
 
@@ -652,9 +651,7 @@ function switchBook(bookId) {
 }
 
 function updateLanguageUI() {
-  langCurrentLabel.textContent = state.language.toUpperCase();
-  
-  document.querySelectorAll('.lang-option').forEach(opt => {
+  document.querySelectorAll('.lang-btn-inline').forEach(opt => {
     if (opt.dataset.lang === state.language) {
       opt.classList.add('active');
     } else {
@@ -1636,29 +1633,44 @@ function setupEventListeners() {
     });
   });
 
-  // Language switcher dropdown toggle
-  langToggle.addEventListener('click', (e) => {
-    e.stopPropagation();
-    langDropdown.classList.toggle('active');
-  });
+  // Menu dropdown toggle
+  if (menuToggle) {
+    menuToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      menuDropdownContent.classList.toggle('active');
+    });
+  }
 
-  document.querySelectorAll('.lang-option').forEach(opt => {
-    opt.addEventListener('click', () => {
-      const lang = opt.dataset.lang;
+  // Inline Language Selector inside menu
+  document.querySelectorAll('.lang-btn-inline').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation(); // Prevent closing the menu immediately when selecting language
+      const lang = btn.dataset.lang;
       state.language = lang;
       localStorage.setItem('ielts_lang', lang);
       updateLanguageUI();
       renderPlaylist();
       updateStatsDashboard();
-      langDropdown.classList.remove('active');
       
       const langChangeText = state.language === 'en' ? "Language changed to English!" : "Til o'zbekchaga o'zgartirildi!";
       showToast(langChangeText, "cyan");
     });
   });
 
-  document.addEventListener('click', () => {
-    langDropdown.classList.remove('active');
+  // Close menu when clicking outside
+  document.addEventListener('click', (e) => {
+    if (menuDropdownContent && !menuDropdownContent.contains(e.target) && e.target !== menuToggle && (menuToggle && !menuToggle.contains(e.target))) {
+      menuDropdownContent.classList.remove('active');
+    }
+  });
+
+  // Close menu when an action button inside the menu is clicked
+  document.querySelectorAll('.menu-item-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (menuDropdownContent) {
+        menuDropdownContent.classList.remove('active');
+      }
+    });
   });
 
   // Settings Panel Toggles

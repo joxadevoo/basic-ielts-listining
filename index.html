@@ -60,57 +60,64 @@
       </div>
       
       <div class="header-controls">
-
-        
-        <!-- Language Selector -->
-        <div class="lang-select-wrapper">
-          <button id="lang-toggle" class="btn-icon" title="Switch Language" aria-label="Switch Language">
-            <span id="lang-current-label">EN</span>
-          </button>
-          <div class="lang-dropdown" id="lang-dropdown">
-            <div class="lang-option active" data-lang="en">English</div>
-            <div class="lang-option" data-lang="uz">O'zbekcha</div>
-          </div>
-        </div>
-
-        <!-- Global Stats Button -->
-        <button id="btn-stats-toggle" class="btn-icon" title="Usage Statistics" aria-label="Usage Statistics">
-          <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: currentColor;">
-            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
-          </svg>
-        </button>
-
-        <!-- Tutorial Button -->
-        <button id="tutorial-toggle" class="btn-icon" title="How to use" aria-label="How to use">
-          <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: currentColor;">
-            <path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/>
-          </svg>
-        </button>
-
-        <!-- Install PWA Button -->
-        <button id="install-toggle" class="btn-icon" title="Install App" aria-label="Install App">
-          <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: currentColor;">
-            <path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/>
-          </svg>
-        </button>
-
-        <!-- Support Developer Button -->
-        <button id="btn-coffee-header" class="btn-icon" title="Support Developer" aria-label="Support Developer">
-          <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: currentColor;">
-            <path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
-          </svg>
-        </button>
-
+        <!-- Theme toggle (always visible) -->
         <button id="theme-toggle" class="btn-icon" title="Toggle Light/Dark Theme" aria-label="Toggle Theme">
           <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: currentColor;">
             <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/>
           </svg>
         </button>
-        <button id="settings-toggle" class="btn-icon" title="Settings & Calibration" aria-label="Settings">
-          <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: currentColor;">
-            <path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.5.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.5.42h4c.25 0 .46-.18.5-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/>
-          </svg>
-        </button>
+
+        <!-- Menu Dropdown Wrapper (containing all other controls) -->
+        <div class="menu-dropdown-wrapper" id="menu-dropdown-wrapper">
+          <button id="menu-toggle" class="btn-icon" title="Menu" aria-label="Menu">
+            <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: currentColor;">
+              <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/>
+            </svg>
+          </button>
+          
+          <div class="menu-dropdown-content" id="menu-dropdown-content">
+            <!-- Language Selector inside menu -->
+            <div class="menu-item lang-selector-item">
+              <span class="menu-item-label" data-i18n="menu_language">Language / Til</span>
+              <div class="lang-select-inline">
+                <button class="lang-btn-inline active" data-lang="en">EN</button>
+                <button class="lang-btn-inline" data-lang="uz">UZ</button>
+              </div>
+            </div>
+            
+            <hr class="menu-divider" />
+            
+            <!-- Global Stats -->
+            <button id="btn-stats-toggle" class="menu-item-btn" title="Usage Statistics">
+              <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+              <span data-i18n="menu_stats">Usage Statistics</span>
+            </button>
+            
+            <!-- Tutorial -->
+            <button id="tutorial-toggle" class="menu-item-btn" title="How to use">
+              <svg viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg>
+              <span data-i18n="menu_tutorial">Guide</span>
+            </button>
+            
+            <!-- Install PWA -->
+            <button id="install-toggle" class="menu-item-btn" title="Install App">
+              <svg viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/></svg>
+              <span data-i18n="menu_install">Install App</span>
+            </button>
+            
+            <!-- Support Developer -->
+            <button id="btn-coffee-header" class="menu-item-btn" title="Support Developer">
+              <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+              <span data-i18n="menu_support">Support Developer</span>
+            </button>
+            
+            <!-- Settings -->
+            <button id="settings-toggle" class="menu-item-btn" title="Settings & Calibration">
+              <svg viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.5.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.5.42h4c.25 0 .46-.18.5-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>
+              <span data-i18n="menu_settings">Settings & Calibration</span>
+            </button>
+          </div>
+        </div>
       </div>
     </header>
 
