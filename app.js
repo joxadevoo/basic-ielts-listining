@@ -1521,7 +1521,9 @@ function setupEventListeners() {
   });
 
   // Seek bar scrubber
-  progressSlider.addEventListener('mousedown', (e) => {
+  progressSlider.addEventListener('pointerdown', (e) => {
+    progressSlider.setPointerCapture(e.pointerId);
+    
     const rect = progressSlider.getBoundingClientRect();
     const seekHandler = (moveEvent) => {
       const x = Math.max(0, Math.min(rect.width, moveEvent.clientX - rect.left));
@@ -1531,10 +1533,20 @@ function setupEventListeners() {
     
     seekHandler(e);
     
-    document.addEventListener('mousemove', seekHandler);
-    document.addEventListener('mouseup', () => {
-      document.removeEventListener('mousemove', seekHandler);
-    }, { once: true });
+    const onPointerMove = (moveEvent) => {
+      seekHandler(moveEvent);
+    };
+    
+    const onPointerUp = () => {
+      progressSlider.releasePointerCapture(e.pointerId);
+      progressSlider.removeEventListener('pointermove', onPointerMove);
+      progressSlider.removeEventListener('pointerup', onPointerUp);
+      progressSlider.removeEventListener('pointercancel', onPointerUp);
+    };
+    
+    progressSlider.addEventListener('pointermove', onPointerMove);
+    progressSlider.addEventListener('pointerup', onPointerUp);
+    progressSlider.addEventListener('pointercancel', onPointerUp);
   });
 
   // Volume Scrubber
