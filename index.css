@@ -2045,9 +2045,7 @@ h1, h2, h3, h4, h5, h6 {
   .header-controls {
     gap: 6px;
     max-width: 62vw;
-    overflow-x: auto;
-    overscroll-behavior-inline: contain;
-    scrollbar-width: none;
+    overflow: visible;
   }
 
   .header-controls::-webkit-scrollbar {
