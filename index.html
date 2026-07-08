@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <!-- SEO & Brand Metadata -->
-  <title>Tinglang - Basic IELTS Listening</title>
-  <meta name="description" content="Basic IELTS Listening uchun Uzbekcha qulay mashq ilovasi: audio treklar, PDF kitob, diktant, eslatmalar va progress saqlash bir joyda.">
-  <meta name="author" content="Jakhongir Toshpulatov">
+  <title>FluentEar - IELTS Listening Practice</title>
+  <meta name="description" content="FluentEar — IELTS Listening uchun qulay mashq ilovasi: audio treklar, PDF kitob, audiokitoblar, diktant va progress saqlash bir joyda.">
+  <meta name="author" content="Joxa">
   <meta name="robots" content="index, follow">
 
   <!-- Open Graph / Social Media Preview -->
-  <meta property="og:title" content="Tinglang - Basic IELTS Listening">
+  <meta property="og:title" content="FluentEar - IELTS Listening Practice">
   <meta property="og:description" content="Audio treklar, PDF kitob, diktant va eslatmalar bilan IELTS Listening'ni qulay mashq qiling.">
   <meta property="og:image" content="https://tinglash.vercel.app/og-preview.svg">
   <meta property="og:image:width" content="1200">
@@ -21,7 +21,7 @@
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Tinglang - Basic IELTS Listening">
+  <meta name="twitter:title" content="FluentEar - IELTS Listening Practice">
   <meta name="twitter:description" content="Audio treklar, PDF kitob, diktant va eslatmalar bilan IELTS Listening'ni qulay mashq qiling.">
   <meta name="twitter:image" content="https://tinglash.vercel.app/og-preview.svg">
 
@@ -29,7 +29,7 @@
   <meta name="theme-color" content="#040815">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="TinglangApp">
+  <meta name="apple-mobile-web-app-title" content="FluentEar">
   <link rel="apple-touch-icon" href="./favicon.svg">
   <link rel="icon" type="image/svg+xml" href="./favicon.svg">
   <link rel="manifest" href="./manifest.json">
@@ -48,16 +48,29 @@
           </svg>
         </div>
         <div class="logo-text-group">
-          <h1 class="logo-text" data-i18n="logo_title">TinglangApp</h1>
+          <h1 class="logo-text" data-i18n="logo_title">FluentEar</h1>
           <span class="logo-subtitle" data-i18n="logo_subtitle">IELTS listening practice</span>
         </div>
-        <div class="book-select-wrapper">
-          <select id="book-select" class="book-select">
-            <option value="basic-ielts" data-i18n="book_basic_ielts">Basic IELTS Listening</option>
-            <option value="listening-strategies" data-i18n="book_listening_strategies">Listening Strategies</option>
-            <option value="dracula" data-i18n="book_dracula">Dracula (Audiobook)</option>
-          </select>
-        </div>
+      </div>
+
+      <!-- Workspace switcher -->
+      <div class="workspace-switcher" id="workspace-switcher">
+        <button class="switcher-btn active" data-workspace="ielts" data-i18n="workspace_ielts">IELTS Practice</button>
+        <button class="switcher-btn" data-workspace="audiobooks" data-i18n="workspace_audiobooks">Audiobooks</button>
+      </div>
+
+      <div class="book-select-wrapper" id="ielts-book-select-wrapper">
+        <select id="book-select" class="book-select">
+          <option value="basic-ielts" data-i18n="book_basic_ielts">Basic IELTS Listening</option>
+          <option value="listening-strategies" data-i18n="book_listening_strategies">Listening Strategies</option>
+        </select>
+      </div>
+
+      <!-- Audiobook selector (shown when in audiobooks workspace) -->
+      <div class="book-select-wrapper" id="audiobook-select-wrapper" style="display:none;">
+        <select id="audiobook-select" class="book-select">
+          <option value="dracula">🧛 Dracula — Bram Stoker</option>
+        </select>
       </div>
       
       <div class="header-controls">
@@ -156,7 +169,7 @@
         </div>
       </div>
 
-      <div class="landing-product" aria-hidden="true">
+      <div class="landing-product ielts-only" aria-hidden="true">
         <div class="landing-book">
           <div class="landing-book-bar">
             <span></span>
@@ -203,6 +216,51 @@
           </div>
         </div>
       </div>
+
+      <div class="landing-product audiobooks-only" aria-hidden="true" style="display: none;">
+        <div class="ab-landing-widget">
+          <!-- Book body -->
+          <div class="ab-book-body">
+            <div class="ab-book-spine"></div>
+            <div class="ab-book-cover">
+              <!-- Decorative lines on cover -->
+              <div class="ab-cover-lines">
+                <span></span><span></span><span></span><span></span>
+              </div>
+              <div class="ab-cover-title">
+                <span class="ab-cover-t1">AUDIO</span>
+                <span class="ab-cover-t2">BOOK</span>
+              </div>
+            </div>
+            <!-- Sound waves bursting out from book -->
+            <div class="ab-waves-right">
+              <span class="ab-wave" style="--i:1"></span>
+              <span class="ab-wave" style="--i:2"></span>
+              <span class="ab-wave" style="--i:3"></span>
+              <span class="ab-wave" style="--i:4"></span>
+            </div>
+          </div>
+          <!-- Equalizer bars floating below -->
+          <div class="ab-equalizer">
+            <span style="--d:0s;--h:60%"></span>
+            <span style="--d:0.1s;--h:100%"></span>
+            <span style="--d:0.2s;--h:45%"></span>
+            <span style="--d:0.05s;--h:80%"></span>
+            <span style="--d:0.15s;--h:55%"></span>
+            <span style="--d:0.25s;--h:90%"></span>
+            <span style="--d:0s;--h:40%"></span>
+            <span style="--d:0.3s;--h:70%"></span>
+          </div>
+          <!-- Floating particles -->
+          <div class="ab-particles">
+            <span style="--px:20%;--py:15%;--pd:0s"></span>
+            <span style="--px:80%;--py:25%;--pd:0.6s"></span>
+            <span style="--px:55%;--py:80%;--pd:1.2s"></span>
+            <span style="--px:10%;--py:65%;--pd:0.3s"></span>
+            <span style="--px:90%;--py:70%;--pd:0.9s"></span>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- Main Workspace Split -->
@@ -228,30 +286,7 @@
         </div>
       </section>
 
-      <!-- Left Pane: Audiobook Dashboard (hidden by default) -->
-      <section class="audiobook-pane" id="audiobook-pane" style="display: none;">
-        <div class="audiobook-header">
-          <div class="audiobook-cover-art" id="audiobook-cover-art">
-            <div class="book-cover-inner">
-              <span class="cover-genre">Gothic Horror</span>
-              <h2 class="cover-title">DRACULA</h2>
-              <span class="cover-author">Bram Stoker</span>
-            </div>
-          </div>
-          <div class="audiobook-meta">
-            <h1 class="audiobook-title">Dracula</h1>
-            <h2 class="audiobook-author">by Bram Stoker</h2>
-            <div class="audiobook-badge">Audiobook Mode / Audiokitob rejimi</div>
-          </div>
-        </div>
-        
-        <div class="audiobook-chapters-section">
-          <h3 class="section-title">Chapters / Boblar</h3>
-          <div class="audiobook-chapters-grid" id="audiobook-chapters-grid">
-            <!-- Populated dynamically in JavaScript -->
-          </div>
-        </div>
-      </section>
+
 
       <!-- Right Pane: Controls, Interactive Worksheets -->
       <section class="control-pane">
@@ -447,6 +482,148 @@
 
     </main>
 
+    <!-- Dedicated Audiobook Workspace -->
+    <main class="audiobook-workspace" id="audiobook-workspace" style="display: none;">
+      <!-- Left Panel: Audiobook Dashboard -->
+      <section class="audiobook-left-pane">
+        <div class="audiobook-dashboard-card">
+          <div class="audiobook-dashboard-header">
+            <div class="audiobook-cover-large">
+              <img src="/dracula_cover.jpg" alt="Dracula Cover" class="audiobook-cover-img-large">
+            </div>
+            <div class="audiobook-details-large">
+              <h1 class="ab-title-large">Dracula</h1>
+              <h2 class="ab-author-large">by Bram Stoker</h2>
+              <p class="ab-desc-large">A gothic horror novel by Irish author Bram Stoker, featuring the legendary Count Dracula. Study the vocabulary, notes, and listen unit-by-unit with our optimized audiobook player.</p>
+              <div class="audiobook-mode-badge">Advanced Audiobook Workspace</div>
+            </div>
+          </div>
+          
+          <div class="audiobook-chapters-container">
+            <h3 class="chapters-title-large">Chapters & Timestamps</h3>
+            <div class="audiobook-chapters-list" id="audiobook-chapters-list">
+              <!-- Populated dynamically in JavaScript -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Panel: Audiobook Player & Study Tools (Dictation & Notebook) -->
+      <section class="audiobook-right-pane">
+        <!-- Advanced Audiobook Player Card -->
+        <div class="ab-player-card">
+          <h3 class="ab-player-header-title">Audiobook Player</h3>
+          
+          <!-- Audio element for Audiobook workspace -->
+          <audio id="audiobook-audio" style="display:none;"></audio>
+          
+          <!-- Progress bar & Jumps -->
+          <div class="ab-player-progress-area">
+            <div class="ab-progress-row">
+              <span class="ab-time" id="ab-time-current">0:00</span>
+              <div class="ab-progress-slider-wrapper" id="ab-progress-slider">
+                <div class="ab-progress-bar-bg">
+                  <div class="ab-progress-bar-fill" id="ab-progress-fill"></div>
+                  <div class="ab-loop-indicator" id="ab-loop-indicator"></div>
+                </div>
+                <div class="ab-progress-thumb" id="ab-progress-thumb"></div>
+              </div>
+              <span class="ab-time" id="ab-time-total">0:00</span>
+            </div>
+            
+            <!-- Dynamic Minute Suggestions -->
+            <div class="ab-minute-jumps-row" id="ab-minute-jumps-row">
+              <!-- Dynamically populated minute jump buttons -->
+            </div>
+          </div>
+
+          <!-- Controls panel -->
+          <div class="ab-player-controls-row">
+            <div class="ab-player-buttons">
+              <button id="ab-btn-backward-5s" class="ab-control-btn" title="Back 5s">
+                <svg viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05 1.05-6.9 2.75L3.5 8V14H9.5L7.35 11.85c1.4-1.25 3.25-2 5.15-2 3.6 0 6.6 2.6 7.25 6H21.8c-.7-4.35-4.45-7.5-9.3-7.5z"/></svg>
+                <span>-5s</span>
+              </button>
+              <button id="ab-btn-backward-30s" class="ab-control-btn" title="Back 30s">
+                <svg viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05 1.05-6.9 2.75L3.5 8V14H9.5L7.35 11.85c1.4-1.25 3.25-2 5.15-2 3.6 0 6.6 2.6 7.25 6H21.8c-.7-4.35-4.45-7.5-9.3-7.5z"/></svg>
+                <span>-30s</span>
+              </button>
+              
+              <button id="ab-btn-play-pause" class="ab-play-btn" title="Play / Pause">
+                <svg id="ab-play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                <svg id="ab-pause-icon" viewBox="0 0 24 24" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+              </button>
+              
+              <button id="ab-btn-forward-30s" class="ab-control-btn" title="Forward 30s">
+                <svg viewBox="0 0 24 24"><path d="M11.5 8.01v-2.3L6.81 10.4 11.5 15.1v-2.3c3.85 0 6.95 2.8 7.45 6.4h2.1c-.5-4.8-4.65-8.6-9.55-8.6z" transform="scale(-1, 1) translate(-24, 0)"/></svg>
+                <span>+30s</span>
+              </button>
+              <button id="ab-btn-forward-5s" class="ab-control-btn" title="Forward 5s">
+                <svg viewBox="0 0 24 24"><path d="M11.5 8.01v-2.3L6.81 10.4 11.5 15.1v-2.3c3.85 0 6.95 2.8 7.45 6.4h2.1c-.5-4.8-4.65-8.6-9.55-8.6z" transform="scale(-1, 1) translate(-24, 0)"/></svg>
+                <span>+5s</span>
+              </button>
+            </div>
+            
+            <div class="ab-player-settings">
+              <!-- A-B Repeat Loop -->
+              <button id="ab-btn-loop" class="ab-settings-btn" title="A-B Repeat">
+                <svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
+                <span id="ab-loop-label">A-B Loop</span>
+              </button>
+              
+              <!-- Speed selection -->
+              <div class="ab-speed-selector">
+                <button id="ab-btn-speed" class="ab-speed-btn">1.0x</button>
+                <div class="ab-speed-dropdown" id="ab-speed-dropdown">
+                  <div class="ab-speed-opt" data-speed="0.5">0.5x</div>
+                  <div class="ab-speed-opt" data-speed="0.75">0.75x</div>
+                  <div class="ab-speed-opt active" data-speed="1.0">1.0x</div>
+                  <div class="ab-speed-opt" data-speed="1.25">1.25x</div>
+                  <div class="ab-speed-opt" data-speed="1.5">1.5x</div>
+                  <div class="ab-speed-opt" data-speed="2.0">2.0x</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Audiobook study tools (Dictation & Notebook tabs) -->
+        <div class="ab-study-tools-card">
+          <nav class="ab-tools-nav">
+            <button class="ab-tool-btn active" data-ab-tab="dictation">Dictation Pad / Diktant</button>
+            <button class="ab-tool-btn" data-ab-tab="notes">Notebook / Daftar</button>
+          </nav>
+          
+          <div class="ab-tools-content">
+            <!-- Dictation -->
+            <div id="ab-panel-dictation" class="ab-tool-panel active">
+              <p class="ab-tool-desc">Listen to the audiobook and type what you hear. Save progress to record your entries.</p>
+              <textarea id="ab-dictation-text" class="ab-textarea" placeholder="Start typing the audiobook transcript here..."></textarea>
+              <div class="ab-tool-actions">
+                <div class="ab-textarea-stats">
+                  <span>Words: <strong id="ab-dict-words">0</strong></span>
+                  <span>Chars: <strong id="ab-dict-chars">0</strong></span>
+                </div>
+                <button id="ab-btn-save-dictation" class="ab-save-btn">Save Dictation</button>
+              </div>
+            </div>
+            
+            <!-- Notes -->
+            <div id="ab-panel-notes" class="ab-tool-panel">
+              <p class="ab-tool-desc">Save spelling notes, vocabulary words, or general thoughts from this chapter.</p>
+              <textarea id="ab-notes-text" class="ab-textarea" placeholder="Write down chapter vocabulary, notes, or tips..."></textarea>
+              <div class="ab-tool-actions">
+                <button id="ab-btn-save-notes" class="ab-save-btn">Save Notes</button>
+                <button id="ab-btn-export-notes" class="ab-export-btn">Export Notes (.txt)</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+
+
     <!-- Calibration / Settings Modal -->
     <div class="modal-overlay" id="settings-modal">
       <div class="modal-box">
@@ -492,7 +669,7 @@
         <!-- Developer Credit & Contacts -->
         <div class="setting-row" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-color); flex-direction: column; text-align: center; gap: 8px;">
           <div>
-            <div class="setting-lbl" data-i18n="dev_credit">Developed by Jakhongir Toshpulatov</div>
+            <div class="setting-lbl" data-i18n="dev_credit">Designed by Joxa</div>
           </div>
           
           <!-- Social Contacts Grid -->
@@ -583,10 +760,10 @@
     <!-- About App Modal -->
     <div class="modal-overlay" id="about-app-modal">
       <div class="modal-box about-app-modal-box">
-        <h3 class="modal-title" data-i18n="about_app_title">About TinglangApp</h3>
+        <h3 class="modal-title" data-i18n="about_app_title">About FluentEar</h3>
         <div class="about-app-content">
           <div class="about-app-badge">&lt;/&gt;</div>
-          <p data-i18n="about_app_desc">TinglangApp is a focused practice tool for Basic IELTS Listening. It combines the PDF book, public audio tracks, dictation, notes, progress saving, and a guided tour in one browser app.</p>
+          <p data-i18n="about_app_desc">FluentEar is a focused practice tool for IELTS Listening. It combines the PDF book, audio tracks, audiobooks, dictation, notes, progress saving, and a guided tour in one browser app.</p>
           <div class="about-app-meta">
             <div>
               <span data-i18n="about_app_book_label">Book</span>

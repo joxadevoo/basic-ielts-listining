@@ -73,7 +73,7 @@ const BOOKS = [
 
 const TRANSLATIONS = {
   en: {
-    logo_title: "TinglangApp",
+    logo_title: "FluentEar",
     logo_subtitle: "IELTS listening practice",
     landing_kicker: "IELTS listening practice suite",
     landing_title: "Basic IELTS Listening",
@@ -83,9 +83,9 @@ const TRANSLATIONS = {
     landing_start: "Start practice",
     landing_preview: "View workspace",
     install_app: "Install app",
-    install_ready: "TinglangApp is ready to install on this device.",
+    install_ready: "FluentEar is ready to install on this device.",
     install_unavailable: "Use your browser menu and choose Install or Add to Home Screen.",
-    install_done: "TinglangApp installed.",
+    install_done: "FluentEar installed.",
     install_dismissed: "Install was cancelled.",
     landing_stat_tracks: "audio tracks",
     landing_stat_units: "study units",
@@ -109,6 +109,14 @@ const TRANSLATIONS = {
     tab_dictation: "Dictation",
     tab_notes: "Notebook",
     tab_analytics: "Analytics",
+    workspace_ielts: "IELTS Practice",
+    workspace_audiobooks: "Audiobooks",
+    menu_language: "Language",
+    menu_stats: "Usage Statistics",
+    menu_tutorial: "Guide",
+    menu_install: "Install App",
+    menu_support: "Support Developer",
+    menu_settings: "Settings & Calibration",
     
     // PDF shortcuts
     shortcut_unit_1: "Unit 1",
@@ -200,7 +208,7 @@ const TRANSLATIONS = {
     setting_reset_desc: "Permanently delete all saved notes, scores, and track progress history.",
     btn_reset_data: "Reset Data",
     btn_save_close: "Save & Close",
-    dev_credit: "Developed by Jakhongir Toshpulatov",
+    dev_credit: "Designed by Joxa · Jakhongir Toshpulatov",
     coffee_desc: "If you find this application helpful, consider supporting the developer!",
     support_modal_title: "Support Developer",
     support_desc: "If you find this application helpful, you can support the developer.",
@@ -209,8 +217,8 @@ const TRANSLATIONS = {
     stats_unique_devices: "Unique Devices",
     stats_total_visits: "Total Visits",
     stats_monthly_active: "Monthly Active Users",
-    about_app_title: "About TinglangApp",
-    about_app_desc: "TinglangApp is a focused practice tool for Basic IELTS Listening. It combines the PDF book, public audio tracks, dictation, notes, progress saving, and a guided tour in one browser app.",
+    about_app_title: "About FluentEar",
+    about_app_desc: "FluentEar is a focused practice tool for IELTS Listening. It combines the PDF book, audio tracks, audiobooks, dictation, notes, progress saving, and a guided tour in one browser app.",
     about_app_book_label: "Book",
     about_app_dev_label: "Developer",
     btn_copy_card: "Copy Card Number",
@@ -237,7 +245,7 @@ const TRANSLATIONS = {
     confirm_reset_data: "Are you absolutely sure you want to delete all practice history? This will delete all your written answers, dictation transcriptions, notes, and scores forever."
   },
   uz: {
-    logo_title: "TinglangApp",
+    logo_title: "FluentEar",
     logo_subtitle: "IELTS listening mashq ilovasi",
     landing_kicker: "IELTS listening mashq to'plami",
     landing_title: "Basic IELTS Listening",
@@ -248,9 +256,9 @@ const TRANSLATIONS = {
     landing_preview: "Ish oynasini ko'rish",
     landing_install: "Ilovani o'rnatish",
     install_app: "Ilovani o'rnatish",
-    install_ready: "TinglangApp'ni qurilmangizga o'rnatishingiz mumkin.",
+    install_ready: "FluentEar'ni qurilmangizga o'rnatishingiz mumkin.",
     install_unavailable: "Brauzer menyusidan Install yoki Add to Home Screen ni tanlang.",
-    install_done: "TinglangApp o'rnatildi.",
+    install_done: "FluentEar o'rnatildi.",
     install_dismissed: "O'rnatish bekor qilindi.",
     landing_stat_tracks: "audio trek",
     landing_stat_units: "o'quv bo'lim",
@@ -274,6 +282,14 @@ const TRANSLATIONS = {
     tab_dictation: "Diktant",
     tab_notes: "Daftar",
     tab_analytics: "Analitika",
+    workspace_ielts: "IELTS Amaliyot",
+    workspace_audiobooks: "Audiokitoblar",
+    menu_language: "Til",
+    menu_stats: "Foydalanish statistikasi",
+    menu_tutorial: "Qo'llanma",
+    menu_install: "Ilovani o'rnatish",
+    menu_support: "Dasturchi qo'llab-quvvatlash",
+    menu_settings: "Sozlamalar va kalibrlash",
     
     // PDF shortcuts
     shortcut_unit_1: "1-Bo'lim",
@@ -365,7 +381,7 @@ const TRANSLATIONS = {
     setting_reset_desc: "Barcha saqlangan eslatmalar, diktantlar va o'zlashtirish tarixini butunlay o'chirib yuborish.",
     btn_reset_data: "Ma'lumotlarni tozalash",
     btn_save_close: "Saqlash va yopish",
-    dev_credit: "Jakhongir Toshpulatov tomonidan ishlab chiqilgan",
+    dev_credit: "Joxa · Jakhongir Toshpulatov tomonidan dizayn qilingan",
     coffee_desc: "Agar ushbu ilova sizga yoqqan bo'lsa, dasturchini qo'llab-quvvatlashni o'ylab ko'ring!",
     support_modal_title: "Dasturchini qo'llab-quvvatlash",
     support_desc: "Agar ushbu ilova sizga yoqqan bo'lsa, dasturchini qo'llab-quvvatlashingiz mumkin.",
@@ -374,8 +390,8 @@ const TRANSLATIONS = {
     stats_unique_devices: "Unikal qurilmalar",
     stats_total_visits: "Umumiy kirishlar",
     stats_monthly_active: "Oylik faol foydalanuvchilar",
-    about_app_title: "TinglangApp haqida",
-    about_app_desc: "TinglangApp Basic IELTS Listening uchun yaratilgan qulay mashq vositasi. Unda PDF kitob, ochiq audio treklar, diktant, eslatmalar, progress saqlash va guided tour bitta brauzer ilovasida jamlangan.",
+    about_app_title: "FluentEar haqida",
+    about_app_desc: "FluentEar IELTS Listening uchun yaratilgan qulay mashq vositasi. Unda PDF kitob, audio treklar, audiokitoblar, diktant, eslatmalar va progress saqlash bir brauzer ilovasida jamlangan.",
     about_app_book_label: "Kitob",
     about_app_dev_label: "Dasturchi",
     btn_copy_card: "Karta raqamini nusxalash",
@@ -420,7 +436,20 @@ let state = {
   progress: {}, // trackNum: { status, score, maxScore, answers: [], dictation: "", notes: "" }
   activeTab: 'tracks',
   volume: 0.8,
-  language: 'uz'
+  language: 'uz',
+  
+  // Dedicated Audiobook Workspace State
+  activeWorkspace: "ielts", // "ielts" or "audiobooks"
+  audiobookState: {
+    isPlaying: false,
+    playbackSpeed: 1.0,
+    abLoop: {
+      start: null,
+      end: null,
+      active: false
+    },
+    progress: {} // chapterProgress: { 'chapter_1': { status, dictation, notes } }
+  }
 };
 
 let activeTourStep = 0;
@@ -483,9 +512,45 @@ const abLoopText = document.getElementById('ab-loop-text');
 const volumeSlider = document.getElementById('volume-slider');
 const pdfFrame = document.getElementById('pdf-frame');
 const pdfPane = document.getElementById('pdf-pane');
-const audiobookPane = document.getElementById('audiobook-pane');
-const nearbyJumpsRow = document.getElementById('nearby-jumps-row');
-const audiobookChaptersGrid = document.getElementById('audiobook-chapters-grid');
+const controlPane = document.querySelector('.control-pane');
+// Workspace Switching selectors
+const workspaceSwitcher = document.getElementById('workspace-switcher');
+const mainWorkspace = document.querySelector('.main-workspace');
+const audiobookWorkspace = document.getElementById('audiobook-workspace');
+const ieltsBookSelectWrapper = document.getElementById('ielts-book-select-wrapper');
+const audiobookSelectWrapper = document.getElementById('audiobook-select-wrapper');
+
+// Dedicated Audiobook player elements
+const abAudio = document.getElementById('audiobook-audio');
+const abTimeCurrent = document.getElementById('ab-time-current');
+const abTimeTotal = document.getElementById('ab-time-total');
+const abProgressSlider = document.getElementById('ab-progress-slider');
+const abProgressFill = document.getElementById('ab-progress-fill');
+const abProgressThumb = document.getElementById('ab-progress-thumb');
+const abLoopIndicator = document.getElementById('ab-loop-indicator');
+const abMinuteJumpsRow = document.getElementById('ab-minute-jumps-row');
+const abBtnPlayPause = document.getElementById('ab-btn-play-pause');
+const abPlayIcon = document.getElementById('ab-play-icon');
+const abPauseIcon = document.getElementById('ab-pause-icon');
+const abBtnBackward5s = document.getElementById('ab-btn-backward-5s');
+const abBtnBackward30s = document.getElementById('ab-btn-backward-30s');
+const abBtnForward5s = document.getElementById('ab-btn-forward-5s');
+const abBtnForward30s = document.getElementById('ab-btn-forward-30s');
+const abBtnLoop = document.getElementById('ab-btn-loop');
+const abLoopLabel = document.getElementById('ab-loop-label');
+const abBtnSpeed = document.getElementById('ab-btn-speed');
+const abSpeedDropdown = document.getElementById('ab-speed-dropdown');
+const abChaptersList = document.getElementById('audiobook-chapters-list');
+
+// Audiobook study tool elements
+const abDictationText = document.getElementById('ab-dictation-text');
+const abNotesText = document.getElementById('ab-notes-text');
+const abDictWords = document.getElementById('ab-dict-words');
+const abDictChars = document.getElementById('ab-dict-chars');
+const abBtnSaveDictation = document.getElementById('ab-btn-save-dictation');
+const abBtnSaveNotes = document.getElementById('ab-btn-save-notes');
+const abBtnExportNotes = document.getElementById('ab-btn-export-notes');
+
 const toastElement = document.getElementById('toast-message');
 const toastText = document.getElementById('toast-text');
 const appContainer = document.querySelector('.app-container');
@@ -604,26 +669,70 @@ function renderPdfShortcuts() {
 }
 
 function updateLandingScreenUI() {
-  if (!state.activeBook) return;
+  const landingKicker = document.querySelector('.landing-kicker');
   const landingTitle = document.getElementById('landing-title');
   const landingAuthor = document.querySelector('.landing-author');
+  const landingSubtitle = document.querySelector('.landing-subtitle');
+  const landingStats = document.querySelector('.landing-stats');
+  const ieltsProductPreview = document.querySelector('.landing-product.ielts-only');
+  const abProductPreview = document.querySelector('.landing-product.audiobooks-only');
   const landingBookTitle = document.querySelector('.landing-book-title');
-  
-  if (landingTitle) {
-    landingTitle.textContent = state.activeBook.title;
-  }
-  if (landingAuthor) {
-    landingAuthor.textContent = state.language === 'uz' && state.activeBook.id === 'basic-ielts' ? "Kitob muallifi: Li Ya Bin" : state.activeBook.author;
-  }
-  if (landingBookTitle) {
-    landingBookTitle.textContent = state.activeBook.title;
-  }
-  
-  // Update landing stats
-  const statElements = document.querySelectorAll('.landing-stat strong');
-  if (statElements.length >= 2) {
-    statElements[0].textContent = state.tracks.length;
-    statElements[1].textContent = Object.keys(state.activeBook.units).length;
+
+  if (state.activeWorkspace === 'ielts') {
+    if (landingKicker) landingKicker.textContent = state.language === 'en' ? "IELTS listening practice suite" : "IELTS listening mashq to'plami";
+    if (landingTitle) landingTitle.textContent = state.activeBook ? state.activeBook.title : "Basic IELTS Listening";
+    if (landingAuthor) landingAuthor.textContent = state.language === 'uz' && state.activeBookId === 'basic-ielts' ? "Kitob muallifi: Li Ya Bin" : (state.activeBook ? state.activeBook.author : "Book by Li Ya Bin");
+    if (landingSubtitle) landingSubtitle.textContent = state.language === 'en' ? "Study with the book, stream every track, write dictation, and save your progress in one focused workspace." : "Kitob bilan ishlab, barcha treklarni tinglang, diktant yozing va natijangizni bitta qulay oynada saqlang.";
+    
+    if (landingBookTitle && state.activeBook) {
+      landingBookTitle.textContent = state.activeBook.title;
+    }
+
+    if (landingStats) {
+      landingStats.innerHTML = `
+        <div class="landing-stat">
+          <strong>97</strong>
+          <span>${state.language === 'en' ? 'audio tracks' : 'audio treklar'}</span>
+        </div>
+        <div class="landing-stat">
+          <strong>5</strong>
+          <span>${state.language === 'en' ? 'study units' : 'o\'quv bo\'limlari'}</span>
+        </div>
+        <div class="landing-stat">
+          <strong>A-B</strong>
+          <span>${state.language === 'en' ? 'repeat loop' : 'takrorlash tsikli'}</span>
+        </div>
+      `;
+    }
+
+    if (ieltsProductPreview) ieltsProductPreview.style.display = '';
+    if (abProductPreview) abProductPreview.style.display = 'none';
+  } else {
+    // Audiobook Workspace Landing Page Content
+    if (landingKicker) landingKicker.textContent = state.language === 'en' ? "Classic Literature Study Suite" : "Mumtoz adabiyotlar to'plami";
+    if (landingTitle) landingTitle.textContent = "Dracula";
+    if (landingAuthor) landingAuthor.textContent = state.language === 'en' ? "by Bram Stoker" : "Bram Stoker qalamiga mansub";
+    if (landingSubtitle) landingSubtitle.textContent = state.language === 'en' ? "Listen to Bram Stoker's gothic masterpiece, transcribe chapters, log vocabulary, and learn dynamically." : "Bram Stokerning mashhur gotik asarini tinglang, boblar bo'yicha diktant yozing va o'zlashtirish qaydlarini yuriting.";
+    
+    if (landingStats) {
+      landingStats.innerHTML = `
+        <div class="landing-stat">
+          <strong>5</strong>
+          <span>${state.language === 'en' ? 'chapters' : 'boblar'}</span>
+        </div>
+        <div class="landing-stat">
+          <strong>73</strong>
+          <span>${state.language === 'en' ? 'minutes audio' : 'daqiqa tinglash'}</span>
+        </div>
+        <div class="landing-stat">
+          <strong>A-B</strong>
+          <span>${state.language === 'en' ? 'repeat loop' : 'takrorlash tsikli'}</span>
+        </div>
+      `;
+    }
+
+    if (ieltsProductPreview) ieltsProductPreview.style.display = 'none';
+    if (abProductPreview) abProductPreview.style.display = 'block';
   }
 }
 
@@ -641,6 +750,9 @@ function switchBook(bookId) {
   state.activeBookId = bookId;
   state.activeBook = BOOKS.find(b => b.id === bookId);
   localStorage.setItem('ielts_active_book_id', bookId);
+  if (bookId !== 'dracula') {
+    localStorage.setItem('ielts_last_active_book_id', bookId);
+  }
   
   // Load progress & offset of new book
   const savedOffset = localStorage.getItem(`ielts_pdf_offset_${bookId}`) || (bookId === 'basic-ielts' ? localStorage.getItem('ielts_pdf_offset') : null);
@@ -657,16 +769,9 @@ function switchBook(bookId) {
   // Update tracks list for active book
   state.tracks = TRACKS.filter(t => t.bookId === bookId);
   
-  // Toggle between PDF and Audiobook view panels
-  if (state.activeBook.type === 'audiobook') {
-    if (pdfPane) pdfPane.style.display = 'none';
-    if (audiobookPane) audiobookPane.style.display = 'flex';
-    if (nearbyJumpsRow) nearbyJumpsRow.style.display = 'flex';
-    renderAudiobookChapters();
-  } else {
-    if (pdfPane) pdfPane.style.display = 'flex';
-    if (audiobookPane) audiobookPane.style.display = 'none';
-    if (nearbyJumpsRow) nearbyJumpsRow.style.display = 'none';
+  // Sync PDF view page
+  if (state.activeBook.shortcuts && state.activeBook.shortcuts.length > 0) {
+    syncPdfViewer(state.activeBook.shortcuts[0].page);
   }
 
   // Update UI components
@@ -743,6 +848,27 @@ function updateLanguageUI() {
 function openPracticeWorkspace() {
   appContainer.classList.add('landing-dismissed');
   window.location.hash = 'app';
+
+  // After dismissing landing, show the correct workspace
+  if (state.activeWorkspace === 'audiobooks') {
+    if (mainWorkspace) mainWorkspace.style.display = 'none';
+    if (ieltsBookSelectWrapper) ieltsBookSelectWrapper.style.display = 'none';
+    if (audiobookSelectWrapper) audiobookSelectWrapper.style.display = '';
+    if (audiobookWorkspace) audiobookWorkspace.style.display = 'grid';
+    renderAudiobookWorkspaceChapters();
+    loadAbChapterWorkspaceData();
+  } else {
+    if (mainWorkspace) mainWorkspace.style.display = 'flex';
+    if (pdfPane) pdfPane.style.display = 'flex';
+    if (controlPane) controlPane.style.display = 'flex';
+    if (ieltsBookSelectWrapper) ieltsBookSelectWrapper.style.display = 'flex';
+    if (audiobookSelectWrapper) audiobookSelectWrapper.style.display = 'none';
+    if (audiobookWorkspace) audiobookWorkspace.style.display = 'none';
+    // Reload PDF for active book
+    if (state.activeBook && state.activeBook.shortcuts && state.activeBook.shortcuts.length > 0) {
+      syncPdfViewer(state.activeBook.shortcuts[0].page);
+    }
+  }
 }
 
 function getTourSteps() {
@@ -932,19 +1058,7 @@ function init() {
     selectTrack(state.tracks[0], false); // Load first track but don't autoplay
   }
   
-  if (state.activeBook.type === 'audiobook') {
-    if (pdfPane) pdfPane.style.display = 'none';
-    if (audiobookPane) audiobookPane.style.display = 'flex';
-    if (nearbyJumpsRow) nearbyJumpsRow.style.display = 'flex';
-    renderAudiobookChapters();
-  } else {
-    if (pdfPane) pdfPane.style.display = 'flex';
-    if (audiobookPane) audiobookPane.style.display = 'none';
-    if (nearbyJumpsRow) nearbyJumpsRow.style.display = 'none';
-    if (state.activeBook.shortcuts && state.activeBook.shortcuts.length > 0) {
-      syncPdfViewer(state.activeBook.shortcuts[0].page);
-    }
-  }
+  setupAudiobookEventListeners();
   applyTheme();
   
   // Set header PDF title text
@@ -955,6 +1069,19 @@ function init() {
   
   updateLandingScreenUI();
   
+  // Ensure correct workspace visibility at startup (landing page is open at this point)
+  // Always show/hide the correct book selector in header
+  if (state.activeWorkspace === 'audiobooks') {
+    if (ieltsBookSelectWrapper) ieltsBookSelectWrapper.style.display = 'none';
+    if (audiobookSelectWrapper) audiobookSelectWrapper.style.display = '';
+  } else {
+    if (ieltsBookSelectWrapper) ieltsBookSelectWrapper.style.display = '';
+    if (audiobookSelectWrapper) audiobookSelectWrapper.style.display = 'none';
+  }
+
+  // Workspace switcher active state
+  switchWorkspace(state.activeWorkspace);
+
   if (window.location.hash === '#app') {
     openPracticeWorkspace();
   }
@@ -966,7 +1093,7 @@ function init() {
 function loadLocalStorage() {
   // Load active book first
   const savedBookId = localStorage.getItem('ielts_active_book_id');
-  if (savedBookId && BOOKS.some(b => b.id === savedBookId)) {
+  if (savedBookId && savedBookId !== 'dracula' && BOOKS.some(b => b.id === savedBookId)) {
     state.activeBookId = savedBookId;
   } else {
     state.activeBookId = 'basic-ielts';
@@ -1023,6 +1150,26 @@ function loadLocalStorage() {
     } catch (e) {
       // Ignore
     }
+  }
+
+  // Load active workspace
+  const savedWorkspace = localStorage.getItem('ielts_active_workspace');
+  if (savedWorkspace) {
+    state.activeWorkspace = savedWorkspace;
+  } else {
+    state.activeWorkspace = 'ielts';
+  }
+
+  // Load audiobook progress
+  const savedAbProgress = localStorage.getItem('ielts_audiobook_progress');
+  if (savedAbProgress) {
+    state.audiobookState.progress = JSON.parse(savedAbProgress);
+  } else {
+    state.audiobookState.progress = {};
+  }
+  
+  if (abAudio) {
+    abAudio.volume = state.volume;
   }
 }
 
@@ -1179,11 +1326,102 @@ function renderPlaylist() {
   });
 }
 
-// Render Audiobook Chapters
-function renderAudiobookChapters() {
-  if (!audiobookChaptersGrid || !state.activeBook.chapters) return;
+// Workspace switching engine
+function switchWorkspace(workspace) {
+
+  state.activeWorkspace = workspace;
+  localStorage.setItem('ielts_active_workspace', workspace);
+
+  if (workspaceSwitcher) {
+    const btns = workspaceSwitcher.querySelectorAll('.switcher-btn');
+    btns.forEach(btn => {
+      if (btn.dataset.workspace === workspace) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+  }
+
+  const landingDismissed = appContainer && appContainer.classList.contains('landing-dismissed');
+
+  if (workspace === 'ielts') {
+    if (audiobookSelectWrapper) audiobookSelectWrapper.style.display = 'none';
+    if (ieltsBookSelectWrapper) ieltsBookSelectWrapper.style.display = '';
+    if (landingDismissed) {
+      if (mainWorkspace) mainWorkspace.style.display = '';
+      if (pdfPane) pdfPane.style.display = '';
+      if (controlPane) controlPane.style.display = '';
+      if (audiobookWorkspace) audiobookWorkspace.style.display = 'none';
+    }
+    
+    // Pause audiobook player
+    if (abAudio && !abAudio.paused) {
+      abAudio.pause();
+    }
+
+    // Force switch back to an IELTS book if currently set to dracula
+    if (state.activeBookId === 'dracula') {
+      const bookSelect = document.getElementById('book-select');
+      const lastIeltsBookId = localStorage.getItem('ielts_last_active_book_id') || 'basic-ielts';
+      state.activeBookId = lastIeltsBookId;
+      state.activeBook = BOOKS.find(b => b.id === lastIeltsBookId);
+      localStorage.setItem('ielts_active_book_id', lastIeltsBookId);
+      if (bookSelect) bookSelect.value = lastIeltsBookId;
+      
+      // Reload tracks and progress
+      state.tracks = TRACKS.filter(t => t.bookId === lastIeltsBookId);
+      const savedProgress = localStorage.getItem(`ielts_listening_progress_${lastIeltsBookId}`) || (lastIeltsBookId === 'basic-ielts' ? localStorage.getItem('ielts_listening_progress') : null);
+      state.progress = savedProgress ? JSON.parse(savedProgress) : {};
+      
+      renderPlaylist();
+      updateStatsDashboard();
+      if (state.tracks.length > 0) {
+        selectTrack(state.tracks[0], false);
+      }
+      
+      // Sync PDF
+      if (state.activeBook.shortcuts && state.activeBook.shortcuts.length > 0) {
+        syncPdfViewer(state.activeBook.shortcuts[0].page);
+      }
+    }
+  } else {
+    if (ieltsBookSelectWrapper) ieltsBookSelectWrapper.style.display = 'none';
+    if (audiobookSelectWrapper) audiobookSelectWrapper.style.display = '';
+    if (landingDismissed) {
+      if (mainWorkspace) mainWorkspace.style.display = 'none';
+      if (audiobookWorkspace) audiobookWorkspace.style.display = 'grid';
+    }
+    
+    // Pause IELTS player
+    pauseAudio();
+
+    // Initialize audiobook source
+    if (abAudio && !abAudio.src) {
+      const draculaTrack = TRACKS.find(t => t.id === 3001);
+      if (draculaTrack) {
+        abAudio.src = getMediaUrl(draculaTrack.path);
+        abAudio.load();
+      }
+    }
+    
+    if (landingDismissed) {
+      renderAudiobookWorkspaceChapters();
+      loadAbChapterWorkspaceData();
+    }
+  }
+
+  // Always update landing page content to reflect active workspace
+  updateLandingScreenUI();
+}
+
+// Render Audiobook Chapters in the left panel of Audiobook Workspace
+function renderAudiobookWorkspaceChapters() {
+  if (!abChaptersList) return;
+  abChaptersList.innerHTML = '';
   
-  audiobookChaptersGrid.innerHTML = '';
+  const dracula = BOOKS.find(b => b.id === 'dracula');
+  if (!dracula || !dracula.chapters) return;
   
   const formatTimeFull = (seconds) => {
     const h = Math.floor(seconds / 3600);
@@ -1195,148 +1433,494 @@ function renderAudiobookChapters() {
     return `${m}:${s < 10 ? '0' : ''}${s}`;
   };
 
-  state.activeBook.chapters.forEach(ch => {
-    const chProgressKey = `chapter_${ch.chapterNum}`;
-    const progress = state.progress[chProgressKey] || { status: 'unattempted' };
+  dracula.chapters.forEach(ch => {
+    const progressKey = `chapter_${ch.chapterNum}`;
+    const progress = state.audiobookState.progress[progressKey] || { status: 'unattempted' };
     
     const card = document.createElement('div');
-    card.className = `audiobook-chapter-card ${progress.status}`;
+    card.className = 'ab-chapter-row-card';
     card.setAttribute('data-chapter-num', ch.chapterNum);
     
-    // Check if this chapter is currently playing
-    const isPlaying = isChapterActive(ch);
+    const isPlaying = abAudio.currentTime >= ch.start && abAudio.currentTime < ch.end;
     if (isPlaying) {
       card.classList.add('active');
     }
     
     const statusText = progress.status === 'completed' ? (state.language === 'en' ? 'Completed' : 'Tugallangan')
-                     : progress.status === 'in-progress' ? (state.language === 'en' ? 'In Progress' : 'Tinglanmoqda')
+                     : progress.status === 'in-progress' ? (state.language === 'en' ? 'In Progress' : 'Eshitilmoqda')
                      : (state.language === 'en' ? 'Unattempted' : 'Boshlanmagan');
-
+                     
     card.innerHTML = `
-      <div class="chapter-card-header">
-        <span class="chapter-number">${state.language === 'en' ? 'Chapter' : 'Bob'} ${ch.chapterNum}</span>
-        <span class="chapter-status-badge ${progress.status}">${statusText}</span>
+      <div class="ab-chapter-left">
+        <button class="ab-chapter-play-btn">
+          <svg viewBox="0 0 24 24" style="width:14px; height:14px; fill:currentColor;"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <div class="ab-chapter-meta">
+          <span class="ab-chapter-title">${state.language === 'en' ? 'Chapter' : 'Bob'} ${ch.chapterNum}: ${ch.title.split(': ')[1] || ch.title}</span>
+          <span class="ab-chapter-time-range">${formatTimeFull(ch.start)} - ${formatTimeFull(ch.end)}</span>
+        </div>
       </div>
-      <div class="chapter-card-title">${ch.title}</div>
-      <div class="chapter-card-time">
-        <svg viewBox="0 0 24 24" style="width:14px; height:14px; fill:currentColor;"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>
-        <span>${formatTimeFull(ch.start)} - ${formatTimeFull(ch.end)}</span>
+      <div class="ab-chapter-right">
+        <span class="chapter-status-badge ${progress.status}">${statusText}</span>
       </div>
     `;
     
     card.addEventListener('click', () => {
-      audio.currentTime = ch.start;
-      if (!state.isPlaying) {
-        playAudio();
+      abAudio.currentTime = ch.start;
+      if (abAudio.paused) {
+        abAudio.play().catch(err => console.log(err));
       }
-      showToast(`${state.language === 'en' ? 'Jumped to' : ''} Chapter ${ch.chapterNum}`, "success");
+      showToast(`${state.language === 'en' ? 'Playing' : 'Eshitilmoqda:'} Chapter ${ch.chapterNum}`, "success");
+      loadAbChapterWorkspaceData();
     });
     
-    audiobookChaptersGrid.appendChild(card);
+    abChaptersList.appendChild(card);
   });
 }
 
-// Helper to check if a chapter is active based on audio currentTime
-function isChapterActive(ch) {
-  if (state.activeBookId !== 'dracula') return false;
-  const t = audio.currentTime;
-  return t >= ch.start && t < ch.end;
+// Load chapter dictation & notes workspace data
+let currentLoadedAbChapter = null;
+
+function loadAbChapterWorkspaceData() {
+  const dracula = BOOKS.find(b => b.id === 'dracula');
+  if (!dracula || !dracula.chapters) return;
+  
+  const t = abAudio.currentTime;
+  const activeCh = dracula.chapters.find(ch => t >= ch.start && t < ch.end) || dracula.chapters[0];
+  
+  if (currentLoadedAbChapter === activeCh.chapterNum) return;
+  
+  // Save previous chapter content first
+  if (currentLoadedAbChapter !== null) {
+    const prevKey = `chapter_${currentLoadedAbChapter}`;
+    if (!state.audiobookState.progress[prevKey]) {
+      state.audiobookState.progress[prevKey] = { status: 'unattempted' };
+    }
+    state.audiobookState.progress[prevKey].dictation = abDictationText ? abDictationText.value : "";
+    state.audiobookState.progress[prevKey].notes = abNotesText ? abNotesText.value : "";
+    
+    localStorage.setItem('ielts_audiobook_progress', JSON.stringify(state.audiobookState.progress));
+  }
+  
+  currentLoadedAbChapter = activeCh.chapterNum;
+  
+  const progressKey = `chapter_${activeCh.chapterNum}`;
+  const chProgress = state.audiobookState.progress[progressKey] || {};
+  
+  if (abDictationText) {
+    abDictationText.value = chProgress.dictation || "";
+    updateAbDictStats();
+  }
+  if (abNotesText) {
+    abNotesText.value = chProgress.notes || "";
+  }
 }
 
-// Update Active Chapter and Progress Statuses
-function updateAudiobookProgress() {
-  if (state.activeBookId !== 'dracula' || !state.activeBook.chapters) return;
+// Save audiobook chapter-level dictation
+function saveAbDictation() {
+  if (currentLoadedAbChapter === null) return;
+  const key = `chapter_${currentLoadedAbChapter}`;
+  if (!state.audiobookState.progress[key]) {
+    state.audiobookState.progress[key] = { status: 'unattempted' };
+  }
+  state.audiobookState.progress[key].dictation = abDictationText ? abDictationText.value : "";
   
-  const t = audio.currentTime;
+  if (state.audiobookState.progress[key].status === 'unattempted') {
+    state.audiobookState.progress[key].status = 'in-progress';
+  }
   
-  state.activeBook.chapters.forEach(ch => {
-    const card = document.querySelector(`.audiobook-chapter-card[data-chapter-num="${ch.chapterNum}"]`);
-    const chProgressKey = `chapter_${ch.chapterNum}`;
+  localStorage.setItem('ielts_audiobook_progress', JSON.stringify(state.audiobookState.progress));
+  renderAudiobookWorkspaceChapters();
+  showToast(state.language === 'en' ? "Chapter dictation saved!" : "Bob diktanti saqlandi!", "success");
+}
+
+// Save audiobook chapter-level notes
+function saveAbNotes() {
+  if (currentLoadedAbChapter === null) return;
+  const key = `chapter_${currentLoadedAbChapter}`;
+  if (!state.audiobookState.progress[key]) {
+    state.audiobookState.progress[key] = { status: 'unattempted' };
+  }
+  state.audiobookState.progress[key].notes = abNotesText ? abNotesText.value : "";
+  
+  localStorage.setItem('ielts_audiobook_progress', JSON.stringify(state.audiobookState.progress));
+  showToast(state.language === 'en' ? "Chapter notes saved!" : "Bob eslatmalari saqlandi!", "success");
+}
+
+// Export all notes to a text file
+function exportAbNotes() {
+  let output = `FLUENTEAR AUDIOBOOK NOTES: DRACULA\n`;
+  output += `========================================\n\n`;
+  
+  const dracula = BOOKS.find(b => b.id === 'dracula');
+  if (dracula && dracula.chapters) {
+    dracula.chapters.forEach(ch => {
+      const key = `chapter_${ch.chapterNum}`;
+      const progress = state.audiobookState.progress[key] || {};
+      output += `[Chapter ${ch.chapterNum}: ${ch.title}]\n`;
+      output += `Dictation written: ${progress.dictation ? progress.dictation.length : 0} chars\n`;
+      output += `Notes:\n${progress.notes || "(empty)"}\n`;
+      output += `----------------------------------------\n\n`;
+    });
+  }
+  
+  const blob = new Blob([output], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "dracula_audiobook_notes.txt";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast(state.language === 'en' ? "Notes exported!" : "Eslatmalar eksport qilindi!", "success");
+}
+
+// Update dictation stats
+function updateAbDictStats() {
+  if (!abDictationText) return;
+  const text = abDictationText.value.trim();
+  const chars = text.length;
+  const words = text ? text.split(/\s+/).length : 0;
+  
+  if (abDictWords) abDictWords.textContent = words;
+  if (abDictChars) abDictChars.textContent = chars;
+}
+
+// Toggle Play/Pause on audiobook player
+function toggleAbPlay() {
+  if (!abAudio) return;
+  if (abAudio.paused) {
+    abAudio.play().catch(err => console.log("Play failed: ", err));
+  } else {
+    abAudio.pause();
+  }
+}
+
+// Seek relative seconds on audiobook player
+function seekAbAudio(secs) {
+  if (!abAudio) return;
+  abAudio.currentTime = Math.max(0, Math.min(abAudio.duration || 0, abAudio.currentTime + secs));
+}
+
+// Set playback speed
+function setAbSpeed(speed) {
+  if (!abAudio) return;
+  abAudio.playbackRate = speed;
+  state.audiobookState.playbackSpeed = speed;
+  if (abBtnSpeed) abBtnSpeed.textContent = `${speed.toFixed(2)}x`;
+}
+
+// Drag & Seek progress bar
+function seekAbToPosition(e) {
+  if (!abProgressSlider || !abAudio) return;
+  const rect = abProgressSlider.getBoundingClientRect();
+  const pct = (e.clientX - rect.left) / rect.width;
+  abAudio.currentTime = Math.max(0, Math.min(1, pct)) * (abAudio.duration || 0);
+}
+
+// Update Audiobook Player GUI
+function updateAbPlayerProgress() {
+  const cur = abAudio.currentTime;
+  const dur = abAudio.duration || 0;
+  
+  const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  };
+
+  if (abTimeCurrent) abTimeCurrent.textContent = formatTime(cur);
+  if (abTimeTotal) abTimeTotal.textContent = formatTime(dur);
+  
+  if (dur > 0) {
+    const pct = (cur / dur) * 100;
+    if (abProgressFill) abProgressFill.style.width = `${pct}%`;
+    if (abProgressThumb) abProgressThumb.style.left = `${pct}%`;
+  }
+  
+  // A-B loop boundary enforcement
+  if (state.audiobookState.abLoop.active && cur >= state.audiobookState.abLoop.end) {
+    abAudio.currentTime = state.audiobookState.abLoop.start;
+  }
+  
+  // Chapter progress update
+  updateAbWorkspaceChaptersState();
+  
+  // Minute recommendations / suggestions jumps (e.g. -3m, -2m, -1m, +1m, +2m, +3m)
+  updateAbMinuteJumps();
+}
+
+// Highlight and update chapters status
+function updateAbWorkspaceChaptersState() {
+  const dracula = BOOKS.find(b => b.id === 'dracula');
+  if (!dracula || !dracula.chapters) return;
+  
+  const t = abAudio.currentTime;
+  
+  dracula.chapters.forEach(ch => {
+    const card = document.querySelector(`.ab-chapter-row-card[data-chapter-num="${ch.chapterNum}"]`);
+    const progressKey = `chapter_${ch.chapterNum}`;
     
-    // Check active
     const isActive = t >= ch.start && t < ch.end;
     if (isActive) {
-      if (card) {
-        if (!card.classList.contains('active')) {
-          card.classList.add('active');
-        }
+      if (card && !card.classList.contains('active')) {
+        card.classList.add('active');
+        loadAbChapterWorkspaceData();
       }
       
-      // Update progress to in-progress if unattempted
-      if (!state.progress[chProgressKey] || state.progress[chProgressKey].status === 'unattempted') {
-        state.progress[chProgressKey] = { status: 'in-progress' };
-        saveProgress(false);
-        renderAudiobookChapters();
+      // Mark as in-progress if currently unattempted
+      if (!state.audiobookState.progress[progressKey] || state.audiobookState.progress[progressKey].status === 'unattempted') {
+        state.audiobookState.progress[progressKey] = state.audiobookState.progress[progressKey] || {};
+        state.audiobookState.progress[progressKey].status = 'in-progress';
+        localStorage.setItem('ielts_audiobook_progress', JSON.stringify(state.audiobookState.progress));
+        renderAudiobookWorkspaceChapters();
       }
     } else {
-      if (card) {
-        if (card.classList.contains('active')) {
-          card.classList.remove('active');
-        }
-      }
+      if (card) card.classList.remove('active');
       
-      // Mark as completed if the user has listened beyond 95% of this chapter
+      // Mark as completed if they've listened to more than 98% of this chapter
       const chDuration = ch.end - ch.start;
-      if (t >= ch.end - (chDuration * 0.05)) {
-        if (!state.progress[chProgressKey] || state.progress[chProgressKey].status !== 'completed') {
-          state.progress[chProgressKey] = { status: 'completed' };
-          saveProgress(false);
-          renderAudiobookChapters();
+      if (t >= ch.end - (chDuration * 0.02)) {
+        if (!state.audiobookState.progress[progressKey] || state.audiobookState.progress[progressKey].status !== 'completed') {
+          state.audiobookState.progress[progressKey] = state.audiobookState.progress[progressKey] || {};
+          state.audiobookState.progress[progressKey].status = 'completed';
+          localStorage.setItem('ielts_audiobook_progress', JSON.stringify(state.audiobookState.progress));
+          renderAudiobookWorkspaceChapters();
         }
       }
     }
   });
 }
 
-// Update Dynamic Nearby Jumps
-function updateNearbyJumps() {
-  if (!nearbyJumpsRow || state.activeBookId !== 'dracula') return;
+// Dynamic minute jump pills
+function updateAbMinuteJumps() {
+  if (!abMinuteJumpsRow) return;
   
-  const t = audio.currentTime;
-  const duration = audio.duration || 0;
+  const t = abAudio.currentTime;
+  const duration = abAudio.duration || 0;
   if (duration === 0) return;
   
-  // Calculate current whole minute
-  const currentMin = Math.floor(t / 60);
+  abMinuteJumpsRow.innerHTML = '';
   
-  // Build a list of candidate timestamps around current time
-  const candidateSecs = [
-    (currentMin - 1) * 60,
-    currentMin * 60,
-    currentMin * 60 + 15,
-    currentMin * 60 + 30,
-    currentMin * 60 + 45,
-    (currentMin + 1) * 60,
-    (currentMin + 2) * 60
-  ];
-  
-  // Filter candidates
-  const validCandidates = candidateSecs.filter(s => s >= 0 && s <= duration && Math.abs(s - t) > 4);
-  
-  // Sort by proximity to current time and take top 4
-  validCandidates.sort((a, b) => Math.abs(a - t) - Math.abs(b - t));
-  const topCandidates = validCandidates.slice(0, 4).sort((a, b) => a - b);
-  
-  // Render
-  const formatMinSec = (seconds) => {
+  const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
     const s = Math.floor(seconds % 60);
     return `${m}:${s < 10 ? '0' : ''}${s}`;
   };
-  
-  nearbyJumpsRow.innerHTML = `<span class="nearby-jump-label">${state.language === 'en' ? 'Quick Jump' : 'Tezkor o\'tish'}:</span>`;
-  
-  topCandidates.forEach(s => {
-    const btn = document.createElement('button');
-    btn.className = 'btn-jump-pill';
-    btn.textContent = formatMinSec(s);
-    btn.addEventListener('click', () => {
-      audio.currentTime = s;
-      showToast(`${state.language === 'en' ? 'Jumped to' : 'O\'tildi:'} ${formatMinSec(s)}`, "cyan");
-    });
-    nearbyJumpsRow.appendChild(btn);
+
+  const jumpConfigs = [
+    { label: '-3m', diff: -180 },
+    { label: '-2m', diff: -120 },
+    { label: '-1m', diff: -60 },
+    { label: '+1m', diff: 60 },
+    { label: '+2m', diff: 120 },
+    { label: '+3m', diff: 180 }
+  ];
+
+  jumpConfigs.forEach(cfg => {
+    const targetTime = t + cfg.diff;
+    if (targetTime >= 0 && targetTime <= duration) {
+      const btn = document.createElement('button');
+      btn.className = 'ab-jump-pill-btn';
+      btn.textContent = `${cfg.label} (${formatTime(targetTime)})`;
+      btn.addEventListener('click', () => {
+        abAudio.currentTime = targetTime;
+        showToast(`${state.language === 'en' ? 'Jumped' : 'O\'tildi'} ${cfg.label} (${formatTime(targetTime)})`, "cyan");
+      });
+      abMinuteJumpsRow.appendChild(btn);
+    }
   });
+}
+
+// Toggle A-B Repeat Loop on audiobook player
+function toggleAbLoop() {
+  const loopState = state.audiobookState.abLoop;
+  const t = abAudio.currentTime;
+  
+  const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  };
+
+  if (!loopState.start && !loopState.end) {
+    // Stage A: Set start boundary
+    loopState.start = t;
+    if (abLoopLabel) abLoopLabel.textContent = `Loop: A (${formatTime(t)})`;
+    if (abBtnLoop) abBtnLoop.classList.add('active-set');
+    showToast(state.language === 'en' ? "Point A set! Play to end point and press loop button again." : "A nuqta belgilandi! Oxirgi nuqtada tugmani qayta bosing.", "info");
+  } else if (loopState.start && !loopState.end) {
+    // Stage B: Set end boundary and activate
+    if (t <= loopState.start) {
+      showToast(state.language === 'en' ? "End point must be after start point!" : "Oxirgi nuqta boshlang'ich nuqtadan keyin bo'lishi kerak!", "warning");
+      return;
+    }
+    loopState.end = t;
+    loopState.active = true;
+    if (abLoopLabel) abLoopLabel.textContent = `Loop: ${formatTime(loopState.start)} - ${formatTime(t)}`;
+    
+    // Draw visual loop segment on progress bar
+    if (abLoopIndicator) {
+      const pctStart = (loopState.start / abAudio.duration) * 100;
+      const pctEnd = (loopState.end / abAudio.duration) * 100;
+      abLoopIndicator.style.left = `${pctStart}%`;
+      abLoopIndicator.style.width = `${pctEnd - pctStart}%`;
+      abLoopIndicator.style.display = 'block';
+    }
+    
+    abAudio.currentTime = loopState.start;
+    showToast(state.language === 'en' ? "A-B Loop activated!" : "A-B takrorlash yoqildi!", "success");
+  } else {
+    // Stage C: Clear loop
+    loopState.start = null;
+    loopState.end = null;
+    loopState.active = false;
+    if (abLoopLabel) abLoopLabel.textContent = "A-B Loop";
+    if (abBtnLoop) abBtnLoop.classList.remove('active-set');
+    if (abLoopIndicator) abLoopIndicator.style.display = 'none';
+    showToast(state.language === 'en' ? "A-B Loop cleared." : "A-B takrorlash o'chirildi.", "info");
+  }
+}
+
+// Bind all Audiobook workspace event listeners
+function setupAudiobookEventListeners() {
+  // Workspace Switcher tabs
+  if (workspaceSwitcher) {
+    workspaceSwitcher.querySelectorAll('.switcher-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const workspace = btn.dataset.workspace;
+        switchWorkspace(workspace);
+      });
+    });
+  }
+
+  // Play/Pause button
+  if (abBtnPlayPause) {
+    abBtnPlayPause.addEventListener('click', toggleAbPlay);
+  }
+
+  // Audio events
+  if (abAudio) {
+    abAudio.addEventListener('timeupdate', updateAbPlayerProgress);
+    abAudio.addEventListener('play', () => {
+      state.audiobookState.isPlaying = true;
+      if (abPlayIcon) abPlayIcon.style.display = 'none';
+      if (abPauseIcon) abPauseIcon.style.display = 'block';
+    });
+    abAudio.addEventListener('pause', () => {
+      state.audiobookState.isPlaying = false;
+      if (abPlayIcon) abPlayIcon.style.display = 'block';
+      if (abPauseIcon) abPauseIcon.style.display = 'none';
+    });
+    abAudio.addEventListener('ended', () => {
+      state.audiobookState.isPlaying = false;
+      if (abPlayIcon) abPlayIcon.style.display = 'block';
+      if (abPauseIcon) abPauseIcon.style.display = 'none';
+      showToast(state.language === 'en' ? "Audiobook finished." : "Audiokitob yakunlandi.", "info");
+    });
+  }
+
+  // Seek buttons
+  if (abBtnBackward5s) {
+    abBtnBackward5s.addEventListener('click', () => seekAbAudio(-5));
+  }
+  if (abBtnBackward30s) {
+    abBtnBackward30s.addEventListener('click', () => seekAbAudio(-30));
+  }
+  if (abBtnForward5s) {
+    abBtnForward5s.addEventListener('click', () => seekAbAudio(5));
+  }
+  if (abBtnForward30s) {
+    abBtnForward30s.addEventListener('click', () => seekAbAudio(30));
+  }
+
+  // A-B Repeat Loop button
+  if (abBtnLoop) {
+    abBtnLoop.addEventListener('click', toggleAbLoop);
+  }
+
+  // Playback Speed button & options
+  if (abBtnSpeed) {
+    abBtnSpeed.addEventListener('click', (e) => {
+      e.stopPropagation();
+      abSpeedDropdown.classList.toggle('active');
+    });
+  }
+  
+  // Close speed dropdown on outside click
+  document.addEventListener('click', () => {
+    if (abSpeedDropdown) abSpeedDropdown.classList.remove('active');
+  });
+
+  const abSpeedOpts = document.querySelectorAll('.ab-speed-opt');
+  abSpeedOpts.forEach(opt => {
+    opt.addEventListener('click', () => {
+      const speed = parseFloat(opt.dataset.speed);
+      setAbSpeed(speed);
+      abSpeedOpts.forEach(o => o.classList.remove('active'));
+      opt.classList.add('active');
+    });
+  });
+
+  // Pointer drag events for advanced Audiobook seek slider
+  if (abProgressSlider) {
+    abProgressSlider.addEventListener('pointerdown', (e) => {
+      abProgressSlider.setPointerCapture(e.pointerId);
+      seekAbToPosition(e);
+      
+      const onPointerMove = (moveEvent) => {
+        seekAbToPosition(moveEvent);
+      };
+      
+      const onPointerUp = () => {
+        abProgressSlider.releasePointerCapture(e.pointerId);
+        abProgressSlider.removeEventListener('pointermove', onPointerMove);
+        abProgressSlider.removeEventListener('pointerup', onPointerUp);
+        abProgressSlider.removeEventListener('pointercancel', onPointerUp);
+      };
+      
+      abProgressSlider.addEventListener('pointermove', onPointerMove);
+      abProgressSlider.addEventListener('pointerup', onPointerUp);
+      abProgressSlider.addEventListener('pointercancel', onPointerUp);
+    });
+  }
+
+  // Study Tools switcher tabs (Dictation vs Notes)
+  const abToolBtns = document.querySelectorAll('.ab-tool-btn');
+  abToolBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      abToolBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      const tab = btn.dataset.abTab;
+      document.querySelectorAll('.ab-tool-panel').forEach(panel => {
+        panel.classList.remove('active');
+      });
+      const targetPanel = document.getElementById(`ab-panel-${tab}`);
+      if (targetPanel) targetPanel.classList.add('active');
+    });
+  });
+
+  // Save Dictation Pad
+  if (abBtnSaveDictation) {
+    abBtnSaveDictation.addEventListener('click', saveAbDictation);
+  }
+
+  // Save Notebook Notes
+  if (abBtnSaveNotes) {
+    abBtnSaveNotes.addEventListener('click', saveAbNotes);
+  }
+
+  // Export Notebook Notes
+  if (abBtnExportNotes) {
+    abBtnExportNotes.addEventListener('click', exportAbNotes);
+  }
+
+  // Live count words/chars in dictation
+  if (abDictationText) {
+    abDictationText.addEventListener('input', updateAbDictStats);
+  }
 }
 
 // Select Audio Track
@@ -1539,11 +2123,6 @@ function updatePlayerProgress() {
   // A-B loop boundary enforcement
   if (state.abLoop.active && cur >= state.abLoop.end) {
     audio.currentTime = state.abLoop.start;
-  }
-  
-  if (state.activeBookId === 'dracula') {
-    updateAudiobookProgress();
-    updateNearbyJumps();
   }
 }
 
