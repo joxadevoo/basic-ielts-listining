@@ -701,6 +701,7 @@ const trackFilter = document.getElementById('track-filter');
 const menuToggle = document.getElementById('menu-toggle');
 const menuDropdownContent = document.getElementById('menu-dropdown-content');
 const menuBackdrop = document.getElementById('menu-backdrop');
+const speedMenuBackdrop = document.getElementById('speed-menu-backdrop');
 
 
 
@@ -1520,6 +1521,7 @@ function switchWorkspace(workspace) {
 }
 
 function setMenuOpen(isOpen) {
+  if (isOpen) setSpeedMenuOpen(false);
   if (menuDropdownContent) menuDropdownContent.classList.toggle('active', isOpen);
   if (menuBackdrop) {
     menuBackdrop.classList.toggle('active', isOpen);
@@ -1528,11 +1530,35 @@ function setMenuOpen(isOpen) {
   document.body.classList.toggle('menu-open', isOpen);
 }
 
+function setSpeedMenuOpen(isOpen, target = null) {
+  if (!isOpen) {
+    if (speedDropdown) speedDropdown.classList.remove('active');
+    if (abSpeedDropdown) abSpeedDropdown.classList.remove('active');
+  } else if (target === 'ielts') {
+    if (abSpeedDropdown) abSpeedDropdown.classList.remove('active');
+    if (speedDropdown) speedDropdown.classList.add('active');
+  } else if (target === 'ab') {
+    if (speedDropdown) speedDropdown.classList.remove('active');
+    if (abSpeedDropdown) abSpeedDropdown.classList.add('active');
+  }
+
+  const anyOpen = Boolean(
+    speedDropdown?.classList.contains('active') || abSpeedDropdown?.classList.contains('active')
+  );
+
+  if (speedMenuBackdrop) {
+    speedMenuBackdrop.classList.toggle('active', anyOpen);
+    speedMenuBackdrop.setAttribute('aria-hidden', anyOpen ? 'false' : 'true');
+  }
+  document.body.classList.toggle('speed-menu-open', anyOpen);
+}
+
 function ensureAbAudioSource() {
   if (!abAudio) return false;
   if (abAudio.getAttribute('src') !== AB_AUDIO_URL) {
     abAudio.src = AB_AUDIO_URL;
     abAudio.load();
+    resetAbMinuteJumps();
   }
   return true;
 }
@@ -1884,16 +1910,27 @@ function updateAbWorkspaceChaptersState() {
   });
 }
 
-// Dynamic minute jump pills
-function updateAbMinuteJumps() {
-  if (!abMinuteJumpsRow) return;
-  
+let lastAbMinuteJumpSec = -1;
+let lastAbMinuteJumpDuration = 0;
+
+function resetAbMinuteJumps() {
+  lastAbMinuteJumpSec = -1;
+  lastAbMinuteJumpDuration = 0;
+}
+
+// Dynamic minute jump pills — doim 5 ta: -2m, -1m, hozir, +1m, +2m
+function updateAbMinuteJumps(force = false) {
+  if (!abMinuteJumpsRow || !abAudio) return;
+
   const t = abAudio.currentTime;
   const duration = abAudio.duration || 0;
   if (duration === 0) return;
-  
-  abMinuteJumpsRow.innerHTML = '';
-  
+
+  const sec = Math.floor(t);
+  if (!force && sec === lastAbMinuteJumpSec && duration === lastAbMinuteJumpDuration) return;
+  lastAbMinuteJumpSec = sec;
+  lastAbMinuteJumpDuration = duration;
+
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
     const s = Math.floor(seconds % 60);
@@ -1901,25 +1938,40 @@ function updateAbMinuteJumps() {
   };
 
   const jumpConfigs = [
-    { label: '-3m', diff: -180 },
     { label: '-2m', diff: -120 },
     { label: '-1m', diff: -60 },
+    { label: formatTime(t), diff: 0, isNow: true },
     { label: '+1m', diff: 60 },
     { label: '+2m', diff: 120 },
-    { label: '+3m', diff: 180 }
   ];
 
-  jumpConfigs.forEach(cfg => {
-    const targetTime = t + cfg.diff;
-    if (targetTime >= 0 && targetTime <= duration) {
-      const btn = document.createElement('button');
-      btn.className = 'ab-jump-pill-btn';
-      btn.textContent = `${cfg.label} (${formatTime(targetTime)})`;
-      btn.addEventListener('click', () => {
-        abAudio.currentTime = targetTime;
-      });
-      abMinuteJumpsRow.appendChild(btn);
+  abMinuteJumpsRow.innerHTML = '';
+
+  jumpConfigs.forEach((cfg) => {
+    const targetTime = cfg.isNow ? t : Math.max(0, Math.min(duration, t + cfg.diff));
+    const btn = document.createElement('button');
+    btn.className = `ab-jump-pill-btn${cfg.isNow ? ' ab-jump-pill-now' : ''}`;
+    btn.type = 'button';
+    btn.textContent = cfg.isNow ? cfg.label : `${cfg.label} (${formatTime(targetTime)})`;
+    btn.disabled = cfg.isNow;
+
+    if (!cfg.isNow) {
+      const outOfRange = t + cfg.diff < 0 || t + cfg.diff > duration;
+      const clamped = Math.max(0, Math.min(duration, t + cfg.diff));
+      if (outOfRange) {
+        btn.disabled = true;
+        btn.classList.add('disabled');
+        btn.textContent = cfg.label;
+      } else {
+        btn.addEventListener('click', () => {
+          abAudio.currentTime = clamped;
+          resetAbMinuteJumps();
+          updateAbMinuteJumps(true);
+        });
+      }
     }
+
+    abMinuteJumpsRow.appendChild(btn);
   });
 }
 
@@ -1999,6 +2051,14 @@ function setupAudiobookEventListeners() {
       if (!abAudio.error) return;
       ensureAbAudioSource();
     });
+    abAudio.addEventListener('loadedmetadata', () => {
+      resetAbMinuteJumps();
+      updateAbMinuteJumps(true);
+    });
+    abAudio.addEventListener('seeked', () => {
+      resetAbMinuteJumps();
+      updateAbMinuteJumps(true);
+    });
     abAudio.addEventListener('timeupdate', updateAbPlayerProgress);
     abAudio.addEventListener('play', () => {
       state.audiobookState.isPlaying = true;
@@ -2055,22 +2115,24 @@ function setupAudiobookEventListeners() {
   if (abBtnSpeed) {
     abBtnSpeed.addEventListener('click', (e) => {
       e.stopPropagation();
-      abSpeedDropdown.classList.toggle('active');
+      const willOpen = !abSpeedDropdown?.classList.contains('active');
+      setSpeedMenuOpen(willOpen, 'ab');
     });
   }
-  
-  // Close speed dropdown on outside click
-  document.addEventListener('click', () => {
-    if (abSpeedDropdown) abSpeedDropdown.classList.remove('active');
-  });
+
+  if (speedMenuBackdrop) {
+    speedMenuBackdrop.addEventListener('click', () => setSpeedMenuOpen(false));
+  }
 
   const abSpeedOpts = document.querySelectorAll('.ab-speed-opt');
   abSpeedOpts.forEach(opt => {
-    opt.addEventListener('click', () => {
+    opt.addEventListener('click', (e) => {
+      e.stopPropagation();
       const speed = parseFloat(opt.dataset.speed);
       setAbSpeed(speed);
       abSpeedOpts.forEach(o => o.classList.remove('active'));
       opt.classList.add('active');
+      setSpeedMenuOpen(false);
     });
   });
 
@@ -2098,7 +2160,7 @@ function setupAudiobookEventListeners() {
   }
 
   if (abStudyFab) {
-    abStudyFab.addEventListener('click', toggleAbStudyOverlay);
+    abStudyFab.addEventListener('click', openAbStudyOverlay);
   }
   if (abStudyClose) {
     abStudyClose.addEventListener('click', closeAbStudyOverlay);
@@ -2591,11 +2653,13 @@ function setupEventListeners() {
   // Playback Speed Selector
   btnSpeedSelect.addEventListener('click', (e) => {
     e.stopPropagation();
-    speedDropdown.classList.toggle('active');
+    const willOpen = !speedDropdown?.classList.contains('active');
+    setSpeedMenuOpen(willOpen, 'ielts');
   });
 
   document.querySelectorAll('.speed-option').forEach(opt => {
-    opt.addEventListener('click', () => {
+    opt.addEventListener('click', (e) => {
+      e.stopPropagation();
       const speed = parseFloat(opt.dataset.speed);
       state.playbackSpeed = speed;
       audio.playbackRate = speed;
@@ -2603,7 +2667,7 @@ function setupEventListeners() {
       
       document.querySelectorAll('.speed-option').forEach(o => o.classList.remove('active'));
       opt.classList.add('active');
-      speedDropdown.classList.remove('active');
+      setSpeedMenuOpen(false);
       
       const speedText = state.language === 'en' ? `Playback speed: ${speed}x` : `Ijro tezligi: ${speed}x`;
       showToast(speedText, "violet");
@@ -2611,7 +2675,7 @@ function setupEventListeners() {
   });
 
   document.addEventListener('click', () => {
-    speedDropdown.classList.remove('active');
+    setSpeedMenuOpen(false);
   });
 
   // A-B repeat toggle
@@ -2671,6 +2735,7 @@ function setupEventListeners() {
   if (menuToggle) {
     menuToggle.addEventListener('click', (e) => {
       e.stopPropagation();
+      setSpeedMenuOpen(false);
       const willOpen = !menuDropdownContent?.classList.contains('active');
       setMenuOpen(willOpen);
     });
