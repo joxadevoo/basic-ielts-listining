@@ -51,6 +51,12 @@
           <h1 class="logo-text" data-i18n="logo_title">TinglangApp</h1>
           <span class="logo-subtitle" data-i18n="logo_subtitle">IELTS listening practice</span>
         </div>
+        <div class="book-select-wrapper">
+          <select id="book-select" class="book-select">
+            <option value="basic-ielts" data-i18n="book_basic_ielts">Basic IELTS Listening</option>
+            <option value="listening-strategies" data-i18n="book_listening_strategies">Listening Strategies</option>
+          </select>
+        </div>
       </div>
       
       <div class="header-controls">
@@ -204,14 +210,8 @@
             <span>basic-ielts-listening.pdf</span>
           </div>
           
-          <div class="pdf-shortcuts">
-            <button class="pdf-shortcut-btn" data-page="5" data-i18n="shortcut_unit_1">Unit 1</button>
-            <button class="pdf-shortcut-btn" data-page="21" data-i18n="shortcut_unit_2">Unit 2</button>
-            <button class="pdf-shortcut-btn" data-page="47" data-i18n="shortcut_unit_3">Unit 3</button>
-            <button class="pdf-shortcut-btn" data-page="67" data-i18n="shortcut_unit_4">Unit 4</button>
-            <button class="pdf-shortcut-btn" data-page="87" data-i18n="shortcut_unit_5">Unit 5</button>
-            <button class="pdf-shortcut-btn" data-page="115" data-i18n="shortcut_tapescripts">Tapescripts</button>
-            <button class="pdf-shortcut-btn" data-page="175" data-i18n="shortcut_answers">Answers</button>
+          <div class="pdf-shortcuts" id="pdf-shortcuts">
+            <!-- Populated dynamically in JavaScript -->
           </div>
         </div>
         

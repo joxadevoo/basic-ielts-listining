@@ -1,6 +1,58 @@
 import { TRACKS } from './tracks.js';
 import { logSessionStart, logTrackPlay, logNoteSave, logDictationSave } from './system.js';
 
+const BOOKS = [
+  {
+    id: "basic-ielts",
+    title: "Basic IELTS Listening",
+    author: "Book by Li Ya Bin",
+    pdfFile: "basic-ielts-listening.pdf",
+    units: {
+      1: "Names and Places",
+      2: "Numbers",
+      3: "Survival English",
+      4: "Popular Science",
+      5: "Academic English"
+    },
+    shortcuts: [
+      { name: "Unit 1", page: 5 },
+      { name: "Unit 2", page: 21 },
+      { name: "Unit 3", page: 47 },
+      { name: "Unit 4", page: 67 },
+      { name: "Unit 5", page: 87 },
+      { name: "Tapescripts", page: 115 },
+      { name: "Answers", page: 175 }
+    ]
+  },
+  {
+    id: "listening-strategies",
+    title: "Listening Strategies for the IELTS Test",
+    author: "Book by Wang Chao Zhou & Li Ya Bin",
+    pdfFile: "Listening Strategies for the IELTS Test.pdf",
+    units: {
+      1: "Letters and Numbers",
+      2: "Form Filling & Table Completion",
+      3: "Multiple Choice & Matching",
+      4: "Note Completion & Diagrams",
+      5: "Map & Flow Charts",
+      6: "Summary Completion",
+      7: "Practice Tests",
+      8: "Simulated Tests"
+    },
+    shortcuts: [
+      { name: "Unit 1", page: 11 },
+      { name: "Unit 2", page: 29 },
+      { name: "Unit 3", page: 43 },
+      { name: "Unit 4", page: 63 },
+      { name: "Unit 5", page: 85 },
+      { name: "Unit 6", page: 101 },
+      { name: "Unit 7", page: 115 },
+      { name: "Tapescripts", page: 136 },
+      { name: "Answers", page: 268 }
+    ]
+  }
+];
+
 const TRANSLATIONS = {
   en: {
     logo_title: "TinglangApp",
@@ -66,6 +118,18 @@ const TRANSLATIONS = {
     unit_5_name: "Academic English",
     track_label: "Track",
     score_label: "Score",
+
+    // Book translations
+    book_basic_ielts: "Basic IELTS Listening",
+    book_listening_strategies: "Listening Strategies",
+    strategies_unit_1_name: "Letters and Numbers",
+    strategies_unit_2_name: "Form Filling & Table Completion",
+    strategies_unit_3_name: "Multiple Choice & Matching",
+    strategies_unit_4_name: "Note Completion & Diagrams",
+    strategies_unit_5_name: "Map & Flow Charts",
+    strategies_unit_6_name: "Summary Completion",
+    strategies_unit_7_name: "Practice Tests",
+    strategies_unit_8_name: "Simulated Tests",
     
     // Dictation
     dictation_pad_title: "Dictation Pad:",
@@ -163,6 +227,7 @@ const TRANSLATIONS = {
     landing_disclaimer: "Diqqat: Statistik tahlil maqsadida sizning kirish ma'lumotlaringiz yig'iladi (shu jumladan qurilma nomi va turi).",
     landing_start: "Mashqni boshlash",
     landing_preview: "Ish oynasini ko'rish",
+    landing_install: "Ilovani o'rnatish",
     install_app: "Ilovani o'rnatish",
     install_ready: "TinglangApp'ni qurilmangizga o'rnatishingiz mumkin.",
     install_unavailable: "Brauzer menyusidan Install yoki Add to Home Screen ni tanlang.",
@@ -217,6 +282,18 @@ const TRANSLATIONS = {
     unit_5_name: "Akademik ingliz tili",
     track_label: "Trek",
     score_label: "Natija",
+
+    // Book translations
+    book_basic_ielts: "Basic IELTS Listening",
+    book_listening_strategies: "Listening Strategies",
+    strategies_unit_1_name: "Harflar va sonlar",
+    strategies_unit_2_name: "Shakllarni to'ldirish va jadval to'ldirish",
+    strategies_unit_3_name: "Ko'p tanlovli savollar va moslashtirish",
+    strategies_unit_4_name: "Konspekt to'ldirish va diagrammalar",
+    strategies_unit_5_name: "Xarita va jarayon sxemalari",
+    strategies_unit_6_name: "Xulosa to'ldirish",
+    strategies_unit_7_name: "Amaliy testlar",
+    strategies_unit_8_name: "Imtihon simulyatsiyasi",
     
     // Dictation
     dictation_pad_title: "Diktant maydoni:",
@@ -309,6 +386,8 @@ const TRANSLATIONS = {
 // Application State
 let state = {
   tracks: TRACKS,
+  activeBookId: "basic-ielts",
+  activeBook: null,
   currentTrack: null,
   isPlaying: false,
   playbackSpeed: 1.0,
@@ -342,17 +421,13 @@ function getMediaUrl(localPath) {
     return `./${cleanPath}`;
   }
 
-  if (cleanPath.endsWith('.mp3')) {
-    const filename = cleanPath.split('/').pop();
-    return `${MEDIA_BASE_URL}/audio/${filename}`;
+  const filename = cleanPath.split('/').pop();
+  
+  if (cleanPath.includes('audio-strategies') || (state.activeBookId === 'listening-strategies')) {
+    return `${MEDIA_BASE_URL}/audio-strategies/${filename}`;
   }
 
-  if (cleanPath.endsWith('.pdf')) {
-    const filename = cleanPath.split('/').pop();
-    return `${MEDIA_BASE_URL}/audio/${filename}`;
-  }
-
-  return `${MEDIA_BASE_URL}/${cleanPath}`;
+  return `${MEDIA_BASE_URL}/audio/${filename}`;
 }
 
 function withQueryParam(url, key, value) {
@@ -464,7 +539,116 @@ function t(key) {
 }
 
 function getLocalizedUnitName(unitNum) {
+  if (state.activeBookId === 'listening-strategies') {
+    return t(`strategies_unit_${unitNum}_name`);
+  }
   return t(`unit_${unitNum}_name`);
+}
+
+const pdfShortcutsContainer = document.getElementById('pdf-shortcuts');
+
+function renderPdfShortcuts() {
+  if (!pdfShortcutsContainer || !state.activeBook) return;
+  pdfShortcutsContainer.innerHTML = '';
+  
+  state.activeBook.shortcuts.forEach(shortcut => {
+    const btn = document.createElement('button');
+    btn.className = 'pdf-shortcut-btn';
+    btn.dataset.page = shortcut.page;
+    
+    let localizedName = shortcut.name;
+    if (state.language === 'uz') {
+      if (shortcut.name.startsWith('Unit ')) {
+        localizedName = `${shortcut.name.replace('Unit ', '')}-Bo'lim`;
+      } else if (shortcut.name === 'Tapescripts') {
+        localizedName = 'Matnlar';
+      } else if (shortcut.name === 'Answers') {
+        localizedName = 'Javoblar';
+      }
+    }
+    
+    btn.textContent = localizedName;
+    btn.addEventListener('click', () => {
+      syncPdfViewer(shortcut.page);
+      showToast(t('toast_pdf_scrolled') + (shortcut.page + state.pdfOffset), "cyan");
+    });
+    pdfShortcutsContainer.appendChild(btn);
+  });
+}
+
+function updateLandingScreenUI() {
+  if (!state.activeBook) return;
+  const landingTitle = document.getElementById('landing-title');
+  const landingAuthor = document.querySelector('.landing-author');
+  const landingBookTitle = document.querySelector('.landing-book-title');
+  
+  if (landingTitle) {
+    landingTitle.textContent = state.activeBook.title;
+  }
+  if (landingAuthor) {
+    landingAuthor.textContent = state.language === 'uz' && state.activeBook.id === 'basic-ielts' ? "Kitob muallifi: Li Ya Bin" : state.activeBook.author;
+  }
+  if (landingBookTitle) {
+    landingBookTitle.textContent = state.activeBook.title;
+  }
+  
+  // Update landing stats
+  const statElements = document.querySelectorAll('.landing-stat strong');
+  if (statElements.length >= 2) {
+    statElements[0].textContent = state.tracks.length;
+    statElements[1].textContent = Object.keys(state.activeBook.units).length;
+  }
+}
+
+function switchBook(bookId) {
+  if (state.activeBookId === bookId) return;
+  
+  // Pause current audio
+  pauseAudio();
+  
+  // Save progress & offset of current book
+  localStorage.setItem(`ielts_listening_progress_${state.activeBookId}`, JSON.stringify(state.progress));
+  localStorage.setItem(`ielts_pdf_offset_${state.activeBookId}`, state.pdfOffset);
+  
+  // Update active book in state
+  state.activeBookId = bookId;
+  state.activeBook = BOOKS.find(b => b.id === bookId);
+  localStorage.setItem('ielts_active_book_id', bookId);
+  
+  // Load progress & offset of new book
+  const savedOffset = localStorage.getItem(`ielts_pdf_offset_${bookId}`) || (bookId === 'basic-ielts' ? localStorage.getItem('ielts_pdf_offset') : null);
+  state.pdfOffset = savedOffset ? parseInt(savedOffset, 10) : 0;
+  settingOffset.value = state.pdfOffset;
+  
+  const savedProgress = localStorage.getItem(`ielts_listening_progress_${bookId}`) || (bookId === 'basic-ielts' ? localStorage.getItem('ielts_listening_progress') : null);
+  if (savedProgress) {
+    state.progress = JSON.parse(savedProgress);
+  } else {
+    state.progress = {};
+  }
+  
+  // Update tracks list for active book
+  state.tracks = TRACKS.filter(t => t.bookId === bookId);
+  
+  // Update UI components
+  updateLandingScreenUI();
+  renderPdfShortcuts();
+  renderPlaylist();
+  updateStatsDashboard();
+  
+  // Select first track and sync PDF
+  if (state.tracks.length > 0) {
+    selectTrack(state.tracks[0], false);
+    syncPdfViewer(state.activeBook.shortcuts[0].page);
+  }
+  
+  // Update header PDF title filename display
+  const pdfTitleSpan = document.querySelector('.pdf-title span');
+  if (pdfTitleSpan) {
+    pdfTitleSpan.textContent = state.activeBook.pdfFile;
+  }
+  
+  showToast(state.language === 'en' ? "Switched book successfully!" : "Kitob muvaffaqiyatli almashtirildi!", "success");
 }
 
 function updateLanguageUI() {
@@ -512,6 +696,9 @@ function updateLanguageUI() {
       abLoopText.textContent = "A-B";
     }
   }
+  
+  updateLandingScreenUI();
+  renderPdfShortcuts();
 }
 
 function openPracticeWorkspace() {
@@ -699,11 +886,23 @@ function initDeviceTracking() {
 function init() {
   loadLocalStorage();
   setupEventListeners();
+  renderPdfShortcuts();
   renderPlaylist();
   updateStatsDashboard();
-  selectTrack(state.tracks[0], false); // Load first track but don't autoplay
-  syncPdfViewer(5);
+  if (state.tracks.length > 0) {
+    selectTrack(state.tracks[0], false); // Load first track but don't autoplay
+  }
+  syncPdfViewer(state.activeBook.shortcuts[0].page);
   applyTheme();
+  
+  // Set header PDF title text
+  const pdfTitleSpan = document.querySelector('.pdf-title span');
+  if (pdfTitleSpan) {
+    pdfTitleSpan.textContent = state.activeBook.pdfFile;
+  }
+  
+  updateLandingScreenUI();
+  
   if (window.location.hash === '#app') {
     openPracticeWorkspace();
   }
@@ -713,15 +912,32 @@ function init() {
 
 // Local Storage Handlers
 function loadLocalStorage() {
-  const savedProgress = localStorage.getItem('ielts_listening_progress');
+  // Load active book first
+  const savedBookId = localStorage.getItem('ielts_active_book_id');
+  if (savedBookId && BOOKS.some(b => b.id === savedBookId)) {
+    state.activeBookId = savedBookId;
+  } else {
+    state.activeBookId = 'basic-ielts';
+  }
+  state.activeBook = BOOKS.find(b => b.id === state.activeBookId);
+
+  // Filter tracks
+  state.tracks = TRACKS.filter(t => t.bookId === state.activeBookId);
+
+  const savedProgress = localStorage.getItem(`ielts_listening_progress_${state.activeBookId}`) || (state.activeBookId === 'basic-ielts' ? localStorage.getItem('ielts_listening_progress') : null);
   if (savedProgress) {
     state.progress = JSON.parse(savedProgress);
+  } else {
+    state.progress = {};
   }
   
-  const savedOffset = localStorage.getItem('ielts_pdf_offset');
+  const savedOffset = localStorage.getItem(`ielts_pdf_offset_${state.activeBookId}`) || (state.activeBookId === 'basic-ielts' ? localStorage.getItem('ielts_pdf_offset') : null);
   if (savedOffset) {
     state.pdfOffset = parseInt(savedOffset, 10);
     settingOffset.value = state.pdfOffset;
+  } else {
+    state.pdfOffset = 0;
+    settingOffset.value = 0;
   }
 
   const savedTheme = localStorage.getItem('ielts_theme');
@@ -759,7 +975,7 @@ function loadLocalStorage() {
 }
 
 function saveProgress(reRenderPlaylist = true) {
-  localStorage.setItem('ielts_listening_progress', JSON.stringify(state.progress));
+  localStorage.setItem(`ielts_listening_progress_${state.activeBookId}`, JSON.stringify(state.progress));
   updateStatsDashboard();
   if (reRenderPlaylist) {
     renderPlaylist();
@@ -960,7 +1176,7 @@ function selectTrack(track, autoplay = true) {
       dictation: "",
       notes: ""
     };
-    localStorage.setItem('ielts_listening_progress', JSON.stringify(state.progress));
+    localStorage.setItem(`ielts_listening_progress_${state.activeBookId}`, JSON.stringify(state.progress));
     updateStatsDashboard();
     
     const card = document.querySelector(`.track-item-card[data-track-id="${track.id}"]`);
@@ -981,7 +1197,7 @@ function selectTrack(track, autoplay = true) {
 function syncPdfViewer(pageNum) {
   const adjustedPage = pageNum + state.pdfOffset;
   // Append a query param ?p=N to force the iframe to reload and scroll to #page=N
-  pdfFrame.src = `${withQueryParam(getMediaUrl('basic-ielts-listening.pdf'), 'p', adjustedPage)}#page=${adjustedPage}`;
+  pdfFrame.src = `${withQueryParam(getMediaUrl(state.activeBook.pdfFile), 'p', adjustedPage)}#page=${adjustedPage}`;
 }
 
 // Update Play/Pause Icons in Playlist
@@ -1221,11 +1437,15 @@ function updateStatsDashboard() {
 // Reset Local data
 function resetLocalData() {
   if (confirm(t('confirm_reset_data'))) {
-    localStorage.removeItem('ielts_listening_progress');
-    localStorage.removeItem('ielts_weekly_sessions');
+    localStorage.removeItem(`ielts_listening_progress_${state.activeBookId}`);
+    if (state.activeBookId === 'basic-ielts') {
+      localStorage.removeItem('ielts_listening_progress');
+    }
     state.progress = {};
     saveProgress();
-    selectTrack(state.tracks[0], false);
+    if (state.tracks.length > 0) {
+      selectTrack(state.tracks[0], false);
+    }
     showToast(t('toast_progress_reset'), "danger");
     settingsModal.classList.remove('active');
   }
@@ -1620,7 +1840,10 @@ function setupEventListeners() {
   btnCloseSettings.addEventListener('click', () => {
     const val = parseInt(settingOffset.value, 10);
     state.pdfOffset = isNaN(val) ? 0 : val;
-    localStorage.setItem('ielts_pdf_offset', state.pdfOffset);
+    localStorage.setItem(`ielts_pdf_offset_${state.activeBookId}`, state.pdfOffset);
+    if (state.activeBookId === 'basic-ielts') {
+      localStorage.setItem('ielts_pdf_offset', state.pdfOffset);
+    }
     
     settingsModal.classList.remove('active');
     showToast(t('toast_settings_applied'), "success");
@@ -1628,14 +1851,14 @@ function setupEventListeners() {
 
   btnResetData.addEventListener('click', resetLocalData);
 
-  // PDF page shortcuts
-  document.querySelectorAll('.pdf-shortcut-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const pg = parseInt(btn.dataset.page, 10);
-      syncPdfViewer(pg);
-      showToast(t('toast_pdf_scrolled') + (pg + state.pdfOffset), "cyan");
+  // Book Selection dropdown event listener
+  const bookSelect = document.getElementById('book-select');
+  if (bookSelect) {
+    bookSelect.value = state.activeBookId;
+    bookSelect.addEventListener('change', (e) => {
+      switchBook(e.target.value);
     });
-  });
+  }
 
   // Dictation logic
   dictationText.addEventListener('input', () => {
@@ -1643,7 +1866,7 @@ function setupEventListeners() {
     // Auto save text to state
     if (state.currentTrack) {
       state.progress[state.currentTrack.trackNum].dictation = dictationText.value;
-      localStorage.setItem('ielts_listening_progress', JSON.stringify(state.progress));
+      localStorage.setItem(`ielts_listening_progress_${state.activeBookId}`, JSON.stringify(state.progress));
     }
   });
 
