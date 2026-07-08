@@ -55,6 +55,7 @@
           <select id="book-select" class="book-select">
             <option value="basic-ielts" data-i18n="book_basic_ielts">Basic IELTS Listening</option>
             <option value="listening-strategies" data-i18n="book_listening_strategies">Listening Strategies</option>
+            <option value="dracula" data-i18n="book_dracula">Dracula (Audiobook)</option>
           </select>
         </div>
       </div>
@@ -208,7 +209,7 @@
     <main class="main-workspace">
       
       <!-- Left Pane: PDF Book Viewer -->
-      <section class="pdf-pane">
+      <section class="pdf-pane" id="pdf-pane">
         <div class="pdf-header-bar">
           <div class="pdf-title">
             <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: currentColor;">
@@ -224,6 +225,31 @@
         
         <div class="pdf-viewer-container">
           <iframe src="about:blank" class="pdf-viewer-frame" id="pdf-frame"></iframe>
+        </div>
+      </section>
+
+      <!-- Left Pane: Audiobook Dashboard (hidden by default) -->
+      <section class="audiobook-pane" id="audiobook-pane" style="display: none;">
+        <div class="audiobook-header">
+          <div class="audiobook-cover-art" id="audiobook-cover-art">
+            <div class="book-cover-inner">
+              <span class="cover-genre">Gothic Horror</span>
+              <h2 class="cover-title">DRACULA</h2>
+              <span class="cover-author">Bram Stoker</span>
+            </div>
+          </div>
+          <div class="audiobook-meta">
+            <h1 class="audiobook-title">Dracula</h1>
+            <h2 class="audiobook-author">by Bram Stoker</h2>
+            <div class="audiobook-badge">Audiobook Mode / Audiokitob rejimi</div>
+          </div>
+        </div>
+        
+        <div class="audiobook-chapters-section">
+          <h3 class="section-title">Chapters / Boblar</h3>
+          <div class="audiobook-chapters-grid" id="audiobook-chapters-grid">
+            <!-- Populated dynamically in JavaScript -->
+          </div>
         </div>
       </section>
 
@@ -377,6 +403,11 @@
                 <div class="progress-thumb" id="progress-thumb"></div>
               </div>
               <span class="time-display" id="player-time-total">0:00</span>
+            </div>
+            
+            <!-- Dynamic Nearby Jump Points Row -->
+            <div class="nearby-jumps-row" id="nearby-jumps-row" style="display: none;">
+              <!-- Dynamic buttons will be populated here -->
             </div>
           </div>
 

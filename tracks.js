@@ -1595,5 +1595,19 @@ export const TRACKS = [
     "tapescriptPage": 262,
     "answerPage": 292,
     "bookId": "listening-strategies"
+  },
+  {
+    "id": 3001,
+    "trackNum": 1,
+    "filename": "Dracula - Bram Stoker.mp3",
+    "path": "./audio-books/Dracula - Bram Stoker.mp3",
+    "title": "Dracula (Full Audiobook)",
+    "duration": 4399,
+    "unit": 1,
+    "unitName": "Dracula",
+    "bookPage": 1,
+    "tapescriptPage": 1,
+    "answerPage": 1,
+    "bookId": "dracula"
   }
 ];

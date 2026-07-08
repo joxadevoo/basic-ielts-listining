@@ -50,6 +50,24 @@ const BOOKS = [
       { name: "Tapescripts", page: 136 },
       { name: "Answers", page: 268 }
     ]
+  },
+  {
+    id: "dracula",
+    type: "audiobook",
+    title: "Dracula",
+    author: "Book by Bram Stoker",
+    pdfFile: "",
+    units: {
+      1: "Dracula"
+    },
+    shortcuts: [],
+    chapters: [
+      { chapterNum: 1, title: "Chapter 1: Jonathan Harker's Journal", start: 0.0, end: 761.85 },
+      { chapterNum: 2, title: "Chapter 2: Castle Dracula", start: 761.85, end: 1691.98 },
+      { chapterNum: 3, title: "Chapter 3: The Three Sisters", start: 1691.98, end: 2294.74 },
+      { chapterNum: 4, title: "Chapter 4: The Escape Attempt", start: 2294.74, end: 3328.85 },
+      { chapterNum: 5, title: "Chapter 5: Mina Murray's Journal", start: 3328.85, end: 4399.36 }
+    ]
   }
 ];
 
@@ -122,6 +140,7 @@ const TRANSLATIONS = {
     // Book translations
     book_basic_ielts: "Basic IELTS Listening",
     book_listening_strategies: "Listening Strategies",
+    book_dracula: "Dracula (Audiobook)",
     strategies_unit_1_name: "Letters and Numbers",
     strategies_unit_2_name: "Form Filling & Table Completion",
     strategies_unit_3_name: "Multiple Choice & Matching",
@@ -286,6 +305,7 @@ const TRANSLATIONS = {
     // Book translations
     book_basic_ielts: "Basic IELTS Listening",
     book_listening_strategies: "Listening Strategies",
+    book_dracula: "Dracula (Audiokitob)",
     strategies_unit_1_name: "Harflar va sonlar",
     strategies_unit_2_name: "Shakllarni to'ldirish va jadval to'ldirish",
     strategies_unit_3_name: "Ko'p tanlovli savollar va moslashtirish",
@@ -427,6 +447,10 @@ function getMediaUrl(localPath) {
     return `${MEDIA_BASE_URL}/audio-strategies/${filename}`;
   }
 
+  if (cleanPath.includes('audio-books') || (state.activeBookId === 'dracula')) {
+    return `${MEDIA_BASE_URL}/audio-books/${filename}`;
+  }
+
   return `${MEDIA_BASE_URL}/audio/${filename}`;
 }
 
@@ -458,6 +482,10 @@ const btnAbLoop = document.getElementById('btn-ab-loop');
 const abLoopText = document.getElementById('ab-loop-text');
 const volumeSlider = document.getElementById('volume-slider');
 const pdfFrame = document.getElementById('pdf-frame');
+const pdfPane = document.getElementById('pdf-pane');
+const audiobookPane = document.getElementById('audiobook-pane');
+const nearbyJumpsRow = document.getElementById('nearby-jumps-row');
+const audiobookChaptersGrid = document.getElementById('audiobook-chapters-grid');
 const toastElement = document.getElementById('toast-message');
 const toastText = document.getElementById('toast-text');
 const appContainer = document.querySelector('.app-container');
@@ -629,6 +657,18 @@ function switchBook(bookId) {
   // Update tracks list for active book
   state.tracks = TRACKS.filter(t => t.bookId === bookId);
   
+  // Toggle between PDF and Audiobook view panels
+  if (state.activeBook.type === 'audiobook') {
+    if (pdfPane) pdfPane.style.display = 'none';
+    if (audiobookPane) audiobookPane.style.display = 'flex';
+    if (nearbyJumpsRow) nearbyJumpsRow.style.display = 'flex';
+    renderAudiobookChapters();
+  } else {
+    if (pdfPane) pdfPane.style.display = 'flex';
+    if (audiobookPane) audiobookPane.style.display = 'none';
+    if (nearbyJumpsRow) nearbyJumpsRow.style.display = 'none';
+  }
+
   // Update UI components
   updateLandingScreenUI();
   renderPdfShortcuts();
@@ -638,13 +678,15 @@ function switchBook(bookId) {
   // Select first track and sync PDF
   if (state.tracks.length > 0) {
     selectTrack(state.tracks[0], false);
-    syncPdfViewer(state.activeBook.shortcuts[0].page);
+    if (state.activeBook.type !== 'audiobook' && state.activeBook.shortcuts.length > 0) {
+      syncPdfViewer(state.activeBook.shortcuts[0].page);
+    }
   }
   
   // Update header PDF title filename display
   const pdfTitleSpan = document.querySelector('.pdf-title span');
   if (pdfTitleSpan) {
-    pdfTitleSpan.textContent = state.activeBook.pdfFile;
+    pdfTitleSpan.textContent = state.activeBook.type === 'audiobook' ? (state.language === 'en' ? "Audiobook Mode" : "Audiokitob rejimi") : state.activeBook.pdfFile;
   }
   
   showToast(state.language === 'en' ? "Switched book successfully!" : "Kitob muvaffaqiyatli almashtirildi!", "success");
@@ -889,13 +931,26 @@ function init() {
   if (state.tracks.length > 0) {
     selectTrack(state.tracks[0], false); // Load first track but don't autoplay
   }
-  syncPdfViewer(state.activeBook.shortcuts[0].page);
+  
+  if (state.activeBook.type === 'audiobook') {
+    if (pdfPane) pdfPane.style.display = 'none';
+    if (audiobookPane) audiobookPane.style.display = 'flex';
+    if (nearbyJumpsRow) nearbyJumpsRow.style.display = 'flex';
+    renderAudiobookChapters();
+  } else {
+    if (pdfPane) pdfPane.style.display = 'flex';
+    if (audiobookPane) audiobookPane.style.display = 'none';
+    if (nearbyJumpsRow) nearbyJumpsRow.style.display = 'none';
+    if (state.activeBook.shortcuts && state.activeBook.shortcuts.length > 0) {
+      syncPdfViewer(state.activeBook.shortcuts[0].page);
+    }
+  }
   applyTheme();
   
   // Set header PDF title text
   const pdfTitleSpan = document.querySelector('.pdf-title span');
   if (pdfTitleSpan) {
-    pdfTitleSpan.textContent = state.activeBook.pdfFile;
+    pdfTitleSpan.textContent = state.activeBook.type === 'audiobook' ? (state.language === 'en' ? "Audiobook Mode" : "Audiokitob rejimi") : state.activeBook.pdfFile;
   }
   
   updateLandingScreenUI();
@@ -1124,6 +1179,166 @@ function renderPlaylist() {
   });
 }
 
+// Render Audiobook Chapters
+function renderAudiobookChapters() {
+  if (!audiobookChaptersGrid || !state.activeBook.chapters) return;
+  
+  audiobookChaptersGrid.innerHTML = '';
+  
+  const formatTimeFull = (seconds) => {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = Math.floor(seconds % 60);
+    if (h > 0) {
+      return `${h}:${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+    }
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  };
+
+  state.activeBook.chapters.forEach(ch => {
+    const chProgressKey = `chapter_${ch.chapterNum}`;
+    const progress = state.progress[chProgressKey] || { status: 'unattempted' };
+    
+    const card = document.createElement('div');
+    card.className = `audiobook-chapter-card ${progress.status}`;
+    card.setAttribute('data-chapter-num', ch.chapterNum);
+    
+    // Check if this chapter is currently playing
+    const isPlaying = isChapterActive(ch);
+    if (isPlaying) {
+      card.classList.add('active');
+    }
+    
+    const statusText = progress.status === 'completed' ? (state.language === 'en' ? 'Completed' : 'Tugallangan')
+                     : progress.status === 'in-progress' ? (state.language === 'en' ? 'In Progress' : 'Tinglanmoqda')
+                     : (state.language === 'en' ? 'Unattempted' : 'Boshlanmagan');
+
+    card.innerHTML = `
+      <div class="chapter-card-header">
+        <span class="chapter-number">${state.language === 'en' ? 'Chapter' : 'Bob'} ${ch.chapterNum}</span>
+        <span class="chapter-status-badge ${progress.status}">${statusText}</span>
+      </div>
+      <div class="chapter-card-title">${ch.title}</div>
+      <div class="chapter-card-time">
+        <svg viewBox="0 0 24 24" style="width:14px; height:14px; fill:currentColor;"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>
+        <span>${formatTimeFull(ch.start)} - ${formatTimeFull(ch.end)}</span>
+      </div>
+    `;
+    
+    card.addEventListener('click', () => {
+      audio.currentTime = ch.start;
+      if (!state.isPlaying) {
+        playAudio();
+      }
+      showToast(`${state.language === 'en' ? 'Jumped to' : ''} Chapter ${ch.chapterNum}`, "success");
+    });
+    
+    audiobookChaptersGrid.appendChild(card);
+  });
+}
+
+// Helper to check if a chapter is active based on audio currentTime
+function isChapterActive(ch) {
+  if (state.activeBookId !== 'dracula') return false;
+  const t = audio.currentTime;
+  return t >= ch.start && t < ch.end;
+}
+
+// Update Active Chapter and Progress Statuses
+function updateAudiobookProgress() {
+  if (state.activeBookId !== 'dracula' || !state.activeBook.chapters) return;
+  
+  const t = audio.currentTime;
+  
+  state.activeBook.chapters.forEach(ch => {
+    const card = document.querySelector(`.audiobook-chapter-card[data-chapter-num="${ch.chapterNum}"]`);
+    const chProgressKey = `chapter_${ch.chapterNum}`;
+    
+    // Check active
+    const isActive = t >= ch.start && t < ch.end;
+    if (isActive) {
+      if (card) {
+        if (!card.classList.contains('active')) {
+          card.classList.add('active');
+        }
+      }
+      
+      // Update progress to in-progress if unattempted
+      if (!state.progress[chProgressKey] || state.progress[chProgressKey].status === 'unattempted') {
+        state.progress[chProgressKey] = { status: 'in-progress' };
+        saveProgress(false);
+        renderAudiobookChapters();
+      }
+    } else {
+      if (card) {
+        if (card.classList.contains('active')) {
+          card.classList.remove('active');
+        }
+      }
+      
+      // Mark as completed if the user has listened beyond 95% of this chapter
+      const chDuration = ch.end - ch.start;
+      if (t >= ch.end - (chDuration * 0.05)) {
+        if (!state.progress[chProgressKey] || state.progress[chProgressKey].status !== 'completed') {
+          state.progress[chProgressKey] = { status: 'completed' };
+          saveProgress(false);
+          renderAudiobookChapters();
+        }
+      }
+    }
+  });
+}
+
+// Update Dynamic Nearby Jumps
+function updateNearbyJumps() {
+  if (!nearbyJumpsRow || state.activeBookId !== 'dracula') return;
+  
+  const t = audio.currentTime;
+  const duration = audio.duration || 0;
+  if (duration === 0) return;
+  
+  // Calculate current whole minute
+  const currentMin = Math.floor(t / 60);
+  
+  // Build a list of candidate timestamps around current time
+  const candidateSecs = [
+    (currentMin - 1) * 60,
+    currentMin * 60,
+    currentMin * 60 + 15,
+    currentMin * 60 + 30,
+    currentMin * 60 + 45,
+    (currentMin + 1) * 60,
+    (currentMin + 2) * 60
+  ];
+  
+  // Filter candidates
+  const validCandidates = candidateSecs.filter(s => s >= 0 && s <= duration && Math.abs(s - t) > 4);
+  
+  // Sort by proximity to current time and take top 4
+  validCandidates.sort((a, b) => Math.abs(a - t) - Math.abs(b - t));
+  const topCandidates = validCandidates.slice(0, 4).sort((a, b) => a - b);
+  
+  // Render
+  const formatMinSec = (seconds) => {
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  };
+  
+  nearbyJumpsRow.innerHTML = `<span class="nearby-jump-label">${state.language === 'en' ? 'Quick Jump' : 'Tezkor o\'tish'}:</span>`;
+  
+  topCandidates.forEach(s => {
+    const btn = document.createElement('button');
+    btn.className = 'btn-jump-pill';
+    btn.textContent = formatMinSec(s);
+    btn.addEventListener('click', () => {
+      audio.currentTime = s;
+      showToast(`${state.language === 'en' ? 'Jumped to' : 'O\'tildi:'} ${formatMinSec(s)}`, "cyan");
+    });
+    nearbyJumpsRow.appendChild(btn);
+  });
+}
+
 // Select Audio Track
 function selectTrack(track, autoplay = true) {
   const isSameTrack = state.currentTrack && state.currentTrack.id === track.id;
@@ -1324,6 +1539,11 @@ function updatePlayerProgress() {
   // A-B loop boundary enforcement
   if (state.abLoop.active && cur >= state.abLoop.end) {
     audio.currentTime = state.abLoop.start;
+  }
+  
+  if (state.activeBookId === 'dracula') {
+    updateAudiobookProgress();
+    updateNearbyJumps();
   }
 }
 
