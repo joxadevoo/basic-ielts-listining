@@ -111,6 +111,9 @@ const TRANSLATIONS = {
     tab_analytics: "Analytics",
     workspace_ielts: "IELTS Practice",
     workspace_audiobooks: "Audiobooks",
+    ab_now_playing: "Now Playing",
+    ab_study_fab: "Dictation / Notes",
+    ab_chapters_title: "Chapters",
     menu_language: "Language",
     menu_stats: "Usage Statistics",
     menu_tutorial: "Guide",
@@ -284,6 +287,9 @@ const TRANSLATIONS = {
     tab_analytics: "Analitika",
     workspace_ielts: "IELTS Amaliyot",
     workspace_audiobooks: "Audiokitoblar",
+    ab_now_playing: "Hozir ijro etilmoqda",
+    ab_study_fab: "Diktant / Daftar",
+    ab_chapters_title: "Boblar",
     menu_language: "Til",
     menu_stats: "Foydalanish statistikasi",
     menu_tutorial: "Qo'llanma",
@@ -457,21 +463,30 @@ let highlightedTourElement = null;
 let deferredInstallPrompt = null;
 let lastLoggedTrackNum = null;
 
-// Media files are served from the public Vercel Blob store in production.
+// Media files are served from the public Vercel Blob store.
 const DEFAULT_MEDIA_BASE_URL = 'https://3rdqnprfkrc5djuh.public.blob.vercel-storage.com';
 const MEDIA_BASE_URL = (
-  import.meta.env.VITE_MEDIA_BASE_URL ||
-  (import.meta.env.PROD ? DEFAULT_MEDIA_BASE_URL : '')
+  import.meta.env.VITE_MEDIA_BASE_URL || DEFAULT_MEDIA_BASE_URL
 ).replace(/\/$/, '');
+const AB_AUDIO_URL = `${DEFAULT_MEDIA_BASE_URL}/audio-books/Dracula%20-%20Bram%20Stoker.mp3`;
+
+function encodeMediaFilename(localPath) {
+  const parts = localPath.split('/');
+  const file = parts.pop();
+  const folder = parts.join('/');
+  const encodedFile = encodeURIComponent(file);
+  return folder ? `${folder}/${encodedFile}` : encodedFile;
+}
 
 function getMediaUrl(localPath) {
   const cleanPath = localPath.replace(/^\.\//, '');
   if (!MEDIA_BASE_URL) {
-    return `./${cleanPath}`;
+    return `./${encodeMediaFilename(cleanPath)}`;
   }
 
-  const filename = cleanPath.split('/').pop();
-  
+  const encodedPath = encodeMediaFilename(cleanPath);
+  const filename = encodedPath.split('/').pop();
+
   if (cleanPath.includes('audio-strategies') || (state.activeBookId === 'listening-strategies')) {
     return `${MEDIA_BASE_URL}/audio-strategies/${filename}`;
   }
@@ -532,15 +547,25 @@ const abMinuteJumpsRow = document.getElementById('ab-minute-jumps-row');
 const abBtnPlayPause = document.getElementById('ab-btn-play-pause');
 const abPlayIcon = document.getElementById('ab-play-icon');
 const abPauseIcon = document.getElementById('ab-pause-icon');
-const abBtnBackward5s = document.getElementById('ab-btn-backward-5s');
-const abBtnBackward30s = document.getElementById('ab-btn-backward-30s');
-const abBtnForward5s = document.getElementById('ab-btn-forward-5s');
-const abBtnForward30s = document.getElementById('ab-btn-forward-30s');
+const abBtnBackward15s = document.getElementById('ab-btn-backward-15s');
+const abBtnForward15s = document.getElementById('ab-btn-forward-15s');
+const abBtnPrevChapter = document.getElementById('ab-btn-prev-chapter');
+const abBtnNextChapter = document.getElementById('ab-btn-next-chapter');
 const abBtnLoop = document.getElementById('ab-btn-loop');
 const abLoopLabel = document.getElementById('ab-loop-label');
 const abBtnSpeed = document.getElementById('ab-btn-speed');
 const abSpeedDropdown = document.getElementById('ab-speed-dropdown');
 const abChaptersList = document.getElementById('audiobook-chapters-list');
+const abNowTitle = document.getElementById('ab-now-title');
+const abNowChapter = document.getElementById('ab-now-chapter');
+const abNowAuthor = document.getElementById('ab-now-author');
+const abSegmentNav = document.getElementById('ab-segmented-nav');
+const abSegmentIndicator = document.getElementById('ab-segment-indicator');
+const abMusicShell = document.getElementById('ab-music-shell');
+const abStudyPanel = document.getElementById('ab-study-panel');
+const abPlayerStack = document.getElementById('ab-player-stack');
+const abStudyFab = document.getElementById('ab-study-fab');
+const abStudyClose = document.getElementById('ab-study-close');
 
 // Audiobook study tool elements
 const abDictationText = document.getElementById('ab-dictation-text');
@@ -550,6 +575,72 @@ const abDictChars = document.getElementById('ab-dict-chars');
 const abBtnSaveDictation = document.getElementById('ab-btn-save-dictation');
 const abBtnSaveNotes = document.getElementById('ab-btn-save-notes');
 const abBtnExportNotes = document.getElementById('ab-btn-export-notes');
+
+function isAbMobileStudyLayout() {
+  return window.matchMedia('(max-width: 768px)').matches;
+}
+
+function updateAbSegmentIndicator(activeBtn) {
+  if (!abSegmentIndicator || !activeBtn || !abSegmentNav) return;
+  const navRect = abSegmentNav.getBoundingClientRect();
+  const btnRect = activeBtn.getBoundingClientRect();
+  abSegmentIndicator.style.width = `${btnRect.width}px`;
+  abSegmentIndicator.style.transform = `translateX(${btnRect.left - navRect.left - 4}px)`;
+}
+
+function syncAbStudyOverlayBounds() {
+  if (!abMusicShell || !abPlayerStack || !isAbMobileStudyLayout()) return;
+  abMusicShell.style.setProperty('--ab-player-stack-h', `${abPlayerStack.offsetHeight}px`);
+}
+
+function openAbStudyOverlay() {
+  if (!isAbMobileStudyLayout() || !abStudyPanel || !abMusicShell) return;
+  syncAbStudyOverlayBounds();
+  abStudyPanel.classList.add('open');
+  abStudyPanel.setAttribute('aria-hidden', 'false');
+  abMusicShell.classList.add('study-open');
+  if (abStudyFab) abStudyFab.setAttribute('aria-expanded', 'true');
+  const activeSegment = document.querySelector('.ab-segment-btn.active');
+  requestAnimationFrame(() => {
+    if (activeSegment) updateAbSegmentIndicator(activeSegment);
+    const activePanel = document.querySelector('.ab-tool-panel.active textarea');
+    if (activePanel) activePanel.focus();
+  });
+}
+
+function closeAbStudyOverlay() {
+  if (!abStudyPanel || !abMusicShell) return;
+  abStudyPanel.classList.remove('open');
+  if (isAbMobileStudyLayout()) {
+    abStudyPanel.setAttribute('aria-hidden', 'true');
+  }
+  abMusicShell.classList.remove('study-open');
+  if (abStudyFab) abStudyFab.setAttribute('aria-expanded', 'false');
+}
+
+function toggleAbStudyOverlay() {
+  if (!isAbMobileStudyLayout()) return;
+  if (abStudyPanel && abStudyPanel.classList.contains('open')) {
+    closeAbStudyOverlay();
+  } else {
+    openAbStudyOverlay();
+  }
+}
+
+function resetAbStudyLayout() {
+  if (isAbMobileStudyLayout()) {
+    closeAbStudyOverlay();
+  } else if (abStudyPanel) {
+    abStudyPanel.classList.remove('open');
+    abStudyPanel.setAttribute('aria-hidden', 'false');
+    abMusicShell?.classList.remove('study-open');
+    if (abStudyFab) abStudyFab.setAttribute('aria-expanded', 'false');
+    requestAnimationFrame(() => {
+      const activeSegment = document.querySelector('.ab-segment-btn.active');
+      if (activeSegment) updateAbSegmentIndicator(activeSegment);
+    });
+  }
+}
 
 const toastElement = document.getElementById('toast-message');
 const toastText = document.getElementById('toast-text');
@@ -609,6 +700,7 @@ const trackFilter = document.getElementById('track-filter');
 // Menu Dropdown Elements
 const menuToggle = document.getElementById('menu-toggle');
 const menuDropdownContent = document.getElementById('menu-dropdown-content');
+const menuBackdrop = document.getElementById('menu-backdrop');
 
 
 
@@ -736,6 +828,13 @@ function updateLandingScreenUI() {
   }
 }
 
+function syncBookSelects(bookId) {
+  const bookSelect = document.getElementById('book-select');
+  const mobileBookSelect = document.getElementById('mobile-book-select');
+  if (bookSelect) bookSelect.value = bookId;
+  if (mobileBookSelect) mobileBookSelect.value = bookId;
+}
+
 function switchBook(bookId) {
   if (state.activeBookId === bookId) return;
   
@@ -749,6 +848,7 @@ function switchBook(bookId) {
   // Update active book in state
   state.activeBookId = bookId;
   state.activeBook = BOOKS.find(b => b.id === bookId);
+  syncBookSelects(bookId);
   localStorage.setItem('ielts_active_book_id', bookId);
   if (bookId !== 'dracula') {
     localStorage.setItem('ielts_last_active_book_id', bookId);
@@ -843,6 +943,11 @@ function updateLanguageUI() {
   
   updateLandingScreenUI();
   renderPdfShortcuts();
+
+  if (state.activeWorkspace === 'audiobooks') {
+    renderAudiobookWorkspaceChapters();
+    updateAbNowPlaying(getAbActiveChapter());
+  }
 }
 
 function openPracticeWorkspace() {
@@ -854,9 +959,12 @@ function openPracticeWorkspace() {
     if (mainWorkspace) mainWorkspace.style.display = 'none';
     if (ieltsBookSelectWrapper) ieltsBookSelectWrapper.style.display = 'none';
     if (audiobookSelectWrapper) audiobookSelectWrapper.style.display = '';
-    if (audiobookWorkspace) audiobookWorkspace.style.display = 'grid';
+    if (audiobookWorkspace) audiobookWorkspace.style.display = 'flex';
+    ensureAbAudioSource();
     renderAudiobookWorkspaceChapters();
     loadAbChapterWorkspaceData();
+    syncAbStudyOverlayBounds();
+    resetAbStudyLayout();
   } else {
     if (mainWorkspace) mainWorkspace.style.display = 'flex';
     if (pdfPane) pdfPane.style.display = 'flex';
@@ -1331,6 +1439,7 @@ function switchWorkspace(workspace) {
 
   state.activeWorkspace = workspace;
   localStorage.setItem('ielts_active_workspace', workspace);
+  if (appContainer) appContainer.dataset.workspace = workspace;
 
   if (workspaceSwitcher) {
     const btns = workspaceSwitcher.querySelectorAll('.switcher-btn');
@@ -1362,12 +1471,11 @@ function switchWorkspace(workspace) {
 
     // Force switch back to an IELTS book if currently set to dracula
     if (state.activeBookId === 'dracula') {
-      const bookSelect = document.getElementById('book-select');
       const lastIeltsBookId = localStorage.getItem('ielts_last_active_book_id') || 'basic-ielts';
       state.activeBookId = lastIeltsBookId;
       state.activeBook = BOOKS.find(b => b.id === lastIeltsBookId);
       localStorage.setItem('ielts_active_book_id', lastIeltsBookId);
-      if (bookSelect) bookSelect.value = lastIeltsBookId;
+      syncBookSelects(lastIeltsBookId);
       
       // Reload tracks and progress
       state.tracks = TRACKS.filter(t => t.bookId === lastIeltsBookId);
@@ -1390,105 +1498,171 @@ function switchWorkspace(workspace) {
     if (audiobookSelectWrapper) audiobookSelectWrapper.style.display = '';
     if (landingDismissed) {
       if (mainWorkspace) mainWorkspace.style.display = 'none';
-      if (audiobookWorkspace) audiobookWorkspace.style.display = 'grid';
+      if (audiobookWorkspace) audiobookWorkspace.style.display = 'flex';
     }
     
     // Pause IELTS player
     pauseAudio();
 
-    // Initialize audiobook source
-    if (abAudio && !abAudio.src) {
-      const draculaTrack = TRACKS.find(t => t.id === 3001);
-      if (draculaTrack) {
-        abAudio.src = getMediaUrl(draculaTrack.path);
-        abAudio.load();
-      }
-    }
-    
+    ensureAbAudioSource();
+
     if (landingDismissed) {
       renderAudiobookWorkspaceChapters();
       loadAbChapterWorkspaceData();
     }
+
+    syncAbStudyOverlayBounds();
+    resetAbStudyLayout();
   }
 
   // Always update landing page content to reflect active workspace
   updateLandingScreenUI();
 }
 
-// Render Audiobook Chapters in the left panel of Audiobook Workspace
+function setMenuOpen(isOpen) {
+  if (menuDropdownContent) menuDropdownContent.classList.toggle('active', isOpen);
+  if (menuBackdrop) {
+    menuBackdrop.classList.toggle('active', isOpen);
+    menuBackdrop.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+  }
+  document.body.classList.toggle('menu-open', isOpen);
+}
+
+function ensureAbAudioSource() {
+  if (!abAudio) return false;
+  if (abAudio.getAttribute('src') !== AB_AUDIO_URL) {
+    abAudio.src = AB_AUDIO_URL;
+    abAudio.load();
+  }
+  return true;
+}
+
+function getAbActiveChapter() {
+  const dracula = BOOKS.find(b => b.id === 'dracula');
+  if (!dracula || !dracula.chapters || !abAudio) return dracula?.chapters?.[0] || null;
+  const t = abAudio.currentTime;
+  return dracula.chapters.find(ch => t >= ch.start && t < ch.end) || dracula.chapters[0];
+}
+
+function getAbChapterShortTitle(ch) {
+  if (!ch) return '';
+  return ch.title.split(': ')[1] || ch.title;
+}
+
+function updateAbNowPlaying(chapter) {
+  const dracula = BOOKS.find(b => b.id === 'dracula');
+  if (!dracula) return;
+  const ch = chapter || getAbActiveChapter();
+  if (abNowTitle) abNowTitle.textContent = dracula.title;
+  if (abNowAuthor) abNowAuthor.textContent = dracula.author.replace(/^Book by /, '').replace(/^by /, '');
+  if (abNowChapter && ch) {
+    const label = state.language === 'en' ? 'Chapter' : 'Bob';
+    abNowChapter.textContent = `${label} ${ch.chapterNum}: ${getAbChapterShortTitle(ch)}`;
+  }
+}
+
+function jumpToAbChapter(chapterNum, autoplay = true) {
+  const dracula = BOOKS.find(b => b.id === 'dracula');
+  if (!dracula || !abAudio || !ensureAbAudioSource()) return;
+  const ch = dracula.chapters.find(c => c.chapterNum === chapterNum);
+  if (!ch) return;
+
+  abAudio.currentTime = ch.start;
+  if (autoplay && abAudio.paused) {
+    abAudio.play().catch(() => showAbPlayError());
+  }
+  updateAbNowPlaying(ch);
+  loadAbChapterWorkspaceData(true);
+  scrollAbChapterPillIntoView(chapterNum);
+}
+
+function formatAbChapterTime(seconds) {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = Math.floor(seconds % 60);
+  if (h > 0) {
+    return `${h}:${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+  }
+  return `${m}:${s < 10 ? '0' : ''}${s}`;
+}
+
+function scrollAbChapterPillIntoView(chapterNum) {
+  const card = document.querySelector(`.ab-chapter-card[data-chapter-num="${chapterNum}"]`);
+  if (!card) return;
+  const isMobile = isAbMobileStudyLayout();
+  card.scrollIntoView({
+    behavior: 'smooth',
+    inline: isMobile ? 'center' : 'nearest',
+    block: isMobile ? 'nearest' : 'center'
+  });
+}
+
 function renderAudiobookWorkspaceChapters() {
   if (!abChaptersList) return;
   abChaptersList.innerHTML = '';
-  
+
   const dracula = BOOKS.find(b => b.id === 'dracula');
   if (!dracula || !dracula.chapters) return;
-  
-  const formatTimeFull = (seconds) => {
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = Math.floor(seconds % 60);
-    if (h > 0) {
-      return `${h}:${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
-    }
-    return `${m}:${s < 10 ? '0' : ''}${s}`;
-  };
+
+  const activeCh = getAbActiveChapter();
+  const chLabel = state.language === 'en' ? 'Chapter' : 'Bob';
 
   dracula.chapters.forEach(ch => {
     const progressKey = `chapter_${ch.chapterNum}`;
     const progress = state.audiobookState.progress[progressKey] || { status: 'unattempted' };
-    
-    const card = document.createElement('div');
-    card.className = 'ab-chapter-row-card';
+
+    const statusText = progress.status === 'completed'
+      ? (state.language === 'en' ? 'Done' : 'Tugallangan')
+      : progress.status === 'in-progress'
+        ? (state.language === 'en' ? 'Listening' : 'Eshitilmoqda')
+        : (state.language === 'en' ? 'New' : 'Yangi');
+
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'ab-chapter-card';
     card.setAttribute('data-chapter-num', ch.chapterNum);
-    
-    const isPlaying = abAudio.currentTime >= ch.start && abAudio.currentTime < ch.end;
-    if (isPlaying) {
+    card.setAttribute('role', 'tab');
+    card.setAttribute('aria-selected', activeCh && activeCh.chapterNum === ch.chapterNum ? 'true' : 'false');
+
+    if (activeCh && activeCh.chapterNum === ch.chapterNum) {
       card.classList.add('active');
     }
-    
-    const statusText = progress.status === 'completed' ? (state.language === 'en' ? 'Completed' : 'Tugallangan')
-                     : progress.status === 'in-progress' ? (state.language === 'en' ? 'In Progress' : 'Eshitilmoqda')
-                     : (state.language === 'en' ? 'Unattempted' : 'Boshlanmagan');
-                     
+
+    const shortTitle = getAbChapterShortTitle(ch);
+
     card.innerHTML = `
-      <div class="ab-chapter-left">
-        <button class="ab-chapter-play-btn">
-          <svg viewBox="0 0 24 24" style="width:14px; height:14px; fill:currentColor;"><path d="M8 5v14l11-7z"/></svg>
-        </button>
-        <div class="ab-chapter-meta">
-          <span class="ab-chapter-title">${state.language === 'en' ? 'Chapter' : 'Bob'} ${ch.chapterNum}: ${ch.title.split(': ')[1] || ch.title}</span>
-          <span class="ab-chapter-time-range">${formatTimeFull(ch.start)} - ${formatTimeFull(ch.end)}</span>
-        </div>
-      </div>
-      <div class="ab-chapter-right">
-        <span class="chapter-status-badge ${progress.status}">${statusText}</span>
-      </div>
+      <span class="ab-chapter-card-num">${String(ch.chapterNum).padStart(2, '0')}</span>
+      <span class="ab-chapter-card-body">
+        <span class="ab-chapter-card-title">${chLabel} ${ch.chapterNum}: ${shortTitle}</span>
+        <span class="ab-chapter-card-time">${formatAbChapterTime(ch.start)} – ${formatAbChapterTime(ch.end)}</span>
+      </span>
+      <span class="ab-chapter-card-mobile-label">${state.language === 'en' ? 'Ch' : 'Bob'} ${ch.chapterNum}</span>
+      <span class="ab-chapter-card-dot ${progress.status}"></span>
+      <span class="chapter-status-badge ab-chapter-card-badge ${progress.status}">${statusText}</span>
     `;
-    
+    card.title = shortTitle;
+
     card.addEventListener('click', () => {
-      abAudio.currentTime = ch.start;
-      if (abAudio.paused) {
-        abAudio.play().catch(err => console.log(err));
-      }
-      showToast(`${state.language === 'en' ? 'Playing' : 'Eshitilmoqda:'} Chapter ${ch.chapterNum}`, "success");
-      loadAbChapterWorkspaceData();
+      jumpToAbChapter(ch.chapterNum);
     });
-    
+
     abChaptersList.appendChild(card);
   });
+
+  updateAbNowPlaying(activeCh);
 }
 
 // Load chapter dictation & notes workspace data
 let currentLoadedAbChapter = null;
 
-function loadAbChapterWorkspaceData() {
+function loadAbChapterWorkspaceData(force = false) {
   const dracula = BOOKS.find(b => b.id === 'dracula');
   if (!dracula || !dracula.chapters) return;
   
-  const t = abAudio.currentTime;
-  const activeCh = dracula.chapters.find(ch => t >= ch.start && t < ch.end) || dracula.chapters[0];
+  const activeCh = getAbActiveChapter();
+  if (!activeCh) return;
   
-  if (currentLoadedAbChapter === activeCh.chapterNum) return;
+  if (!force && currentLoadedAbChapter === activeCh.chapterNum) return;
   
   // Save previous chapter content first
   if (currentLoadedAbChapter !== null) {
@@ -1514,6 +1688,8 @@ function loadAbChapterWorkspaceData() {
   if (abNotesText) {
     abNotesText.value = chProgress.notes || "";
   }
+
+  updateAbNowPlaying(activeCh);
 }
 
 // Save audiobook chapter-level dictation
@@ -1587,11 +1763,20 @@ function updateAbDictStats() {
   if (abDictChars) abDictChars.textContent = chars;
 }
 
+function showAbPlayError() {
+  showToast(
+    state.language === 'en'
+      ? 'Could not play audiobook. Check your internet connection.'
+      : "Audiokitobni ijro etib bo'lmadi. Internet aloqasini tekshiring.",
+    'warning'
+  );
+}
+
 // Toggle Play/Pause on audiobook player
 function toggleAbPlay() {
-  if (!abAudio) return;
+  if (!abAudio || !ensureAbAudioSource()) return;
   if (abAudio.paused) {
-    abAudio.play().catch(err => console.log("Play failed: ", err));
+    abAudio.play().catch(() => showAbPlayError());
   } else {
     abAudio.pause();
   }
@@ -1659,14 +1844,17 @@ function updateAbWorkspaceChaptersState() {
   const t = abAudio.currentTime;
   
   dracula.chapters.forEach(ch => {
-    const card = document.querySelector(`.ab-chapter-row-card[data-chapter-num="${ch.chapterNum}"]`);
+    const card = document.querySelector(`.ab-chapter-card[data-chapter-num="${ch.chapterNum}"]`);
     const progressKey = `chapter_${ch.chapterNum}`;
     
     const isActive = t >= ch.start && t < ch.end;
     if (isActive) {
       if (card && !card.classList.contains('active')) {
         card.classList.add('active');
+        card.setAttribute('aria-selected', 'true');
+        scrollAbChapterPillIntoView(ch.chapterNum);
         loadAbChapterWorkspaceData();
+        updateAbNowPlaying(ch);
       }
       
       // Mark as in-progress if currently unattempted
@@ -1677,7 +1865,10 @@ function updateAbWorkspaceChaptersState() {
         renderAudiobookWorkspaceChapters();
       }
     } else {
-      if (card) card.classList.remove('active');
+      if (card) {
+        card.classList.remove('active');
+        card.setAttribute('aria-selected', 'false');
+      }
       
       // Mark as completed if they've listened to more than 98% of this chapter
       const chDuration = ch.end - ch.start;
@@ -1726,7 +1917,6 @@ function updateAbMinuteJumps() {
       btn.textContent = `${cfg.label} (${formatTime(targetTime)})`;
       btn.addEventListener('click', () => {
         abAudio.currentTime = targetTime;
-        showToast(`${state.language === 'en' ? 'Jumped' : 'O\'tildi'} ${cfg.label} (${formatTime(targetTime)})`, "cyan");
       });
       abMinuteJumpsRow.appendChild(btn);
     }
@@ -1745,20 +1935,23 @@ function toggleAbLoop() {
   };
 
   if (!loopState.start && !loopState.end) {
-    // Stage A: Set start boundary
     loopState.start = t;
-    if (abLoopLabel) abLoopLabel.textContent = `Loop: A (${formatTime(t)})`;
-    if (abBtnLoop) abBtnLoop.classList.add('active-set');
-    showToast(state.language === 'en' ? "Point A set! Play to end point and press loop button again." : "A nuqta belgilandi! Oxirgi nuqtada tugmani qayta bosing.", "info");
+    if (abLoopLabel) abLoopLabel.textContent = 'A•';
+    if (abBtnLoop) {
+      abBtnLoop.classList.add('active-set');
+      abBtnLoop.title = `${state.language === 'en' ? 'Point A set at' : 'A nuqta'} ${formatTime(t)}`;
+    }
   } else if (loopState.start && !loopState.end) {
-    // Stage B: Set end boundary and activate
     if (t <= loopState.start) {
       showToast(state.language === 'en' ? "End point must be after start point!" : "Oxirgi nuqta boshlang'ich nuqtadan keyin bo'lishi kerak!", "warning");
       return;
     }
     loopState.end = t;
     loopState.active = true;
-    if (abLoopLabel) abLoopLabel.textContent = `Loop: ${formatTime(loopState.start)} - ${formatTime(t)}`;
+    if (abLoopLabel) abLoopLabel.textContent = '⟳';
+    if (abBtnLoop) {
+      abBtnLoop.title = `${formatTime(loopState.start)} – ${formatTime(t)}`;
+    }
     
     // Draw visual loop segment on progress bar
     if (abLoopIndicator) {
@@ -1770,16 +1963,16 @@ function toggleAbLoop() {
     }
     
     abAudio.currentTime = loopState.start;
-    showToast(state.language === 'en' ? "A-B Loop activated!" : "A-B takrorlash yoqildi!", "success");
   } else {
-    // Stage C: Clear loop
     loopState.start = null;
     loopState.end = null;
     loopState.active = false;
-    if (abLoopLabel) abLoopLabel.textContent = "A-B Loop";
-    if (abBtnLoop) abBtnLoop.classList.remove('active-set');
+    if (abLoopLabel) abLoopLabel.textContent = "A-B";
+    if (abBtnLoop) {
+      abBtnLoop.classList.remove('active-set');
+      abBtnLoop.title = state.language === 'en' ? 'A-B Repeat' : 'A-B takrorlash';
+    }
     if (abLoopIndicator) abLoopIndicator.style.display = 'none';
-    showToast(state.language === 'en' ? "A-B Loop cleared." : "A-B takrorlash o'chirildi.", "info");
   }
 }
 
@@ -1802,6 +1995,10 @@ function setupAudiobookEventListeners() {
 
   // Audio events
   if (abAudio) {
+    abAudio.addEventListener('error', () => {
+      if (!abAudio.error) return;
+      ensureAbAudioSource();
+    });
     abAudio.addEventListener('timeupdate', updateAbPlayerProgress);
     abAudio.addEventListener('play', () => {
       state.audiobookState.isPlaying = true;
@@ -1821,18 +2018,32 @@ function setupAudiobookEventListeners() {
     });
   }
 
-  // Seek buttons
-  if (abBtnBackward5s) {
-    abBtnBackward5s.addEventListener('click', () => seekAbAudio(-5));
+  // Seek & chapter skip buttons
+  if (abBtnBackward15s) {
+    abBtnBackward15s.addEventListener('click', () => seekAbAudio(-15));
   }
-  if (abBtnBackward30s) {
-    abBtnBackward30s.addEventListener('click', () => seekAbAudio(-30));
+  if (abBtnForward15s) {
+    abBtnForward15s.addEventListener('click', () => seekAbAudio(15));
   }
-  if (abBtnForward5s) {
-    abBtnForward5s.addEventListener('click', () => seekAbAudio(5));
+  if (abBtnPrevChapter) {
+    abBtnPrevChapter.addEventListener('click', () => {
+      const dracula = BOOKS.find(b => b.id === 'dracula');
+      if (!dracula || !dracula.chapters) return;
+      const active = getAbActiveChapter();
+      if (!active) return;
+      const prev = dracula.chapters.find(ch => ch.chapterNum === active.chapterNum - 1);
+      if (prev) jumpToAbChapter(prev.chapterNum);
+    });
   }
-  if (abBtnForward30s) {
-    abBtnForward30s.addEventListener('click', () => seekAbAudio(30));
+  if (abBtnNextChapter) {
+    abBtnNextChapter.addEventListener('click', () => {
+      const dracula = BOOKS.find(b => b.id === 'dracula');
+      if (!dracula || !dracula.chapters) return;
+      const active = getAbActiveChapter();
+      if (!active) return;
+      const next = dracula.chapters.find(ch => ch.chapterNum === active.chapterNum + 1);
+      if (next) jumpToAbChapter(next.chapterNum);
+    });
   }
 
   // A-B Repeat Loop button
@@ -1886,13 +2097,27 @@ function setupAudiobookEventListeners() {
     });
   }
 
-  // Study Tools switcher tabs (Dictation vs Notes)
-  const abToolBtns = document.querySelectorAll('.ab-tool-btn');
-  abToolBtns.forEach(btn => {
+  if (abStudyFab) {
+    abStudyFab.addEventListener('click', toggleAbStudyOverlay);
+  }
+  if (abStudyClose) {
+    abStudyClose.addEventListener('click', closeAbStudyOverlay);
+  }
+
+  window.addEventListener('resize', () => {
+    syncAbStudyOverlayBounds();
+    resetAbStudyLayout();
+  });
+  syncAbStudyOverlayBounds();
+  resetAbStudyLayout();
+
+  const abSegmentBtns = document.querySelectorAll('.ab-segment-btn');
+  abSegmentBtns.forEach(btn => {
     btn.addEventListener('click', () => {
-      abToolBtns.forEach(b => b.classList.remove('active'));
+      abSegmentBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      
+      updateAbSegmentIndicator(btn);
+
       const tab = btn.dataset.abTab;
       document.querySelectorAll('.ab-tool-panel').forEach(panel => {
         panel.classList.remove('active');
@@ -1900,6 +2125,16 @@ function setupAudiobookEventListeners() {
       const targetPanel = document.getElementById(`ab-panel-${tab}`);
       if (targetPanel) targetPanel.classList.add('active');
     });
+  });
+
+  const initialSegment = document.querySelector('.ab-segment-btn.active');
+  if (initialSegment) {
+    requestAnimationFrame(() => updateAbSegmentIndicator(initialSegment));
+  }
+  window.addEventListener('resize', () => {
+    if (!abStudyPanel || !abStudyPanel.classList.contains('open')) return;
+    const activeSegment = document.querySelector('.ab-segment-btn.active');
+    if (activeSegment) updateAbSegmentIndicator(activeSegment);
   });
 
   // Save Dictation Pad
@@ -2436,8 +2671,13 @@ function setupEventListeners() {
   if (menuToggle) {
     menuToggle.addEventListener('click', (e) => {
       e.stopPropagation();
-      menuDropdownContent.classList.toggle('active');
+      const willOpen = !menuDropdownContent?.classList.contains('active');
+      setMenuOpen(willOpen);
     });
+  }
+
+  if (menuBackdrop) {
+    menuBackdrop.addEventListener('click', () => setMenuOpen(false));
   }
 
   // Inline Language Selector inside menu
@@ -2458,18 +2698,20 @@ function setupEventListeners() {
 
   // Close menu when clicking outside
   document.addEventListener('click', (e) => {
-    if (menuDropdownContent && !menuDropdownContent.contains(e.target) && e.target !== menuToggle && (menuToggle && !menuToggle.contains(e.target))) {
-      menuDropdownContent.classList.remove('active');
+    if (
+      menuDropdownContent?.classList.contains('active') &&
+      !menuDropdownContent.contains(e.target) &&
+      e.target !== menuBackdrop &&
+      e.target !== menuToggle &&
+      !menuToggle?.contains(e.target)
+    ) {
+      setMenuOpen(false);
     }
   });
 
   // Close menu when an action button inside the menu is clicked
   document.querySelectorAll('.menu-item-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      if (menuDropdownContent) {
-        menuDropdownContent.classList.remove('active');
-      }
-    });
+    btn.addEventListener('click', () => setMenuOpen(false));
   });
 
   // Settings Panel Toggles
@@ -2674,11 +2916,17 @@ function setupEventListeners() {
 
   btnResetData.addEventListener('click', resetLocalData);
 
-  // Book Selection dropdown event listener
+  // Book Selection dropdown event listeners (header + mobile)
+  syncBookSelects(state.activeBookId);
   const bookSelect = document.getElementById('book-select');
   if (bookSelect) {
-    bookSelect.value = state.activeBookId;
     bookSelect.addEventListener('change', (e) => {
+      switchBook(e.target.value);
+    });
+  }
+  const mobileBookSelect = document.getElementById('mobile-book-select');
+  if (mobileBookSelect) {
+    mobileBookSelect.addEventListener('change', (e) => {
       switchBook(e.target.value);
     });
   }

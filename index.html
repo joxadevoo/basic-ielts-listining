@@ -124,6 +124,12 @@
               <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
               <span data-i18n="menu_support">Support Developer</span>
             </button>
+
+            <!-- Feedback & Bug Report -->
+            <a href="https://t.me/jaxongirtoshpolatov" target="_blank" rel="noopener noreferrer" class="menu-item-btn menu-item-link" title="Feedback & Bug Report">
+              <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 12h-2v-2h2v2zm0-4h-2V6h2v4z"/></svg>
+              <span data-i18n="feedback_btn_text">Feedback & Bugs</span>
+            </a>
             
             <!-- Settings -->
             <button id="settings-toggle" class="menu-item-btn" title="Settings & Calibration">
@@ -134,6 +140,8 @@
         </div>
       </div>
     </header>
+
+    <div class="menu-backdrop" id="menu-backdrop" aria-hidden="true"></div>
 
     <!-- One-Screen Landing -->
     <section class="landing-screen" id="landing-screen" aria-labelledby="landing-title">
@@ -290,6 +298,15 @@
 
       <!-- Right Pane: Controls, Interactive Worksheets -->
       <section class="control-pane">
+
+        <!-- Mobile book switcher (IELTS Practice only) -->
+        <div class="mobile-book-bar" id="mobile-book-bar">
+          <span class="mobile-book-label" data-i18n="about_app_book_label">Book</span>
+          <select id="mobile-book-select" class="book-select mobile-book-select" aria-label="Select book">
+            <option value="basic-ielts" data-i18n="book_basic_ielts">Basic IELTS Listening</option>
+            <option value="listening-strategies" data-i18n="book_listening_strategies">Listening Strategies</option>
+          </select>
+        </div>
         
         <!-- Tab Navigation -->
         <nav class="pane-tabs-nav">
@@ -482,42 +499,47 @@
 
     </main>
 
-    <!-- Dedicated Audiobook Workspace -->
+    <!-- Dedicated Audiobook Workspace — Music Player Layout -->
     <main class="audiobook-workspace" id="audiobook-workspace" style="display: none;">
-      <!-- Left Panel: Audiobook Dashboard -->
-      <section class="audiobook-left-pane">
-        <div class="audiobook-dashboard-card">
-          <div class="audiobook-dashboard-header">
-            <div class="audiobook-cover-large">
-              <img src="/dracula_cover.jpg" alt="Dracula Cover" class="audiobook-cover-img-large">
-            </div>
-            <div class="audiobook-details-large">
-              <h1 class="ab-title-large">Dracula</h1>
-              <h2 class="ab-author-large">by Bram Stoker</h2>
-              <p class="ab-desc-large">A gothic horror novel by Irish author Bram Stoker, featuring the legendary Count Dracula. Study the vocabulary, notes, and listen unit-by-unit with our optimized audiobook player.</p>
-              <div class="audiobook-mode-badge">Advanced Audiobook Workspace</div>
-            </div>
-          </div>
-          
-          <div class="audiobook-chapters-container">
-            <h3 class="chapters-title-large">Chapters & Timestamps</h3>
-            <div class="audiobook-chapters-list" id="audiobook-chapters-list">
-              <!-- Populated dynamically in JavaScript -->
-            </div>
-          </div>
-        </div>
-      </section>
+      <div class="ab-music-shell" id="ab-music-shell">
 
-      <!-- Right Panel: Audiobook Player & Study Tools (Dictation & Notebook) -->
-      <section class="audiobook-right-pane">
-        <!-- Advanced Audiobook Player Card -->
-        <div class="ab-player-card">
-          <h3 class="ab-player-header-title">Audiobook Player</h3>
-          
-          <!-- Audio element for Audiobook workspace -->
+        <!-- Cover + chapters zone (overlay shu yerda ochiladi) -->
+        <div class="ab-upper-zone" id="ab-upper-zone">
+          <section class="ab-hero">
+            <div class="ab-cover-frame">
+              <img src="/dracula_cover.jpg" alt="Dracula Cover" class="ab-cover-art" id="ab-cover-art">
+              <div class="ab-cover-glow" aria-hidden="true"></div>
+            </div>
+            <div class="ab-now-playing">
+              <p class="ab-now-label" data-i18n="ab_now_playing">Now Playing</p>
+              <h2 class="ab-now-title" id="ab-now-title">Dracula</h2>
+              <p class="ab-now-author" id="ab-now-author">Bram Stoker</p>
+              <p class="ab-now-chapter" id="ab-now-chapter">Chapter 1</p>
+            </div>
+          </section>
+
+          <section class="ab-chapters-band">
+            <div class="ab-chapters-head">
+              <h3 class="ab-chapters-title" data-i18n="ab_chapters_title">Chapters</h3>
+            </div>
+            <div class="ab-chapters-scroll" id="audiobook-chapters-list" role="tablist" aria-label="Chapters">
+              <!-- Populated dynamically -->
+            </div>
+          </section>
+        </div>
+
+        <!-- Desktop: player + study | Mobile: player + FAB -->
+        <div class="ab-right-column" id="ab-right-column">
+          <div class="ab-player-stack" id="ab-player-stack">
+          <button type="button" id="ab-study-fab" class="ab-study-fab" aria-expanded="false" aria-controls="ab-study-panel">
+            <svg class="ab-study-fab-icon-open" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+            <svg class="ab-study-fab-icon-close" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+            <span class="ab-study-fab-label" data-i18n="ab_study_fab">Dictation / Notes</span>
+          </button>
+
+          <section class="ab-player-band">
           <audio id="audiobook-audio" style="display:none;"></audio>
-          
-          <!-- Progress bar & Jumps -->
+
           <div class="ab-player-progress-area">
             <div class="ab-progress-row">
               <span class="ab-time" id="ab-time-current">0:00</span>
@@ -530,96 +552,91 @@
               </div>
               <span class="ab-time" id="ab-time-total">0:00</span>
             </div>
-            
-            <!-- Dynamic Minute Suggestions -->
-            <div class="ab-minute-jumps-row" id="ab-minute-jumps-row">
-              <!-- Dynamically populated minute jump buttons -->
-            </div>
+            <div class="ab-minute-jumps-row" id="ab-minute-jumps-row"></div>
           </div>
 
-          <!-- Controls panel -->
-          <div class="ab-player-controls-row">
-            <div class="ab-player-buttons">
-              <button id="ab-btn-backward-5s" class="ab-control-btn" title="Back 5s">
-                <svg viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05 1.05-6.9 2.75L3.5 8V14H9.5L7.35 11.85c1.4-1.25 3.25-2 5.15-2 3.6 0 6.6 2.6 7.25 6H21.8c-.7-4.35-4.45-7.5-9.3-7.5z"/></svg>
-                <span>-5s</span>
-              </button>
-              <button id="ab-btn-backward-30s" class="ab-control-btn" title="Back 30s">
-                <svg viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05 1.05-6.9 2.75L3.5 8V14H9.5L7.35 11.85c1.4-1.25 3.25-2 5.15-2 3.6 0 6.6 2.6 7.25 6H21.8c-.7-4.35-4.45-7.5-9.3-7.5z"/></svg>
-                <span>-30s</span>
-              </button>
-              
-              <button id="ab-btn-play-pause" class="ab-play-btn" title="Play / Pause">
-                <svg id="ab-play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                <svg id="ab-pause-icon" viewBox="0 0 24 24" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-              </button>
-              
-              <button id="ab-btn-forward-30s" class="ab-control-btn" title="Forward 30s">
-                <svg viewBox="0 0 24 24"><path d="M11.5 8.01v-2.3L6.81 10.4 11.5 15.1v-2.3c3.85 0 6.95 2.8 7.45 6.4h2.1c-.5-4.8-4.65-8.6-9.55-8.6z" transform="scale(-1, 1) translate(-24, 0)"/></svg>
-                <span>+30s</span>
-              </button>
-              <button id="ab-btn-forward-5s" class="ab-control-btn" title="Forward 5s">
-                <svg viewBox="0 0 24 24"><path d="M11.5 8.01v-2.3L6.81 10.4 11.5 15.1v-2.3c3.85 0 6.95 2.8 7.45 6.4h2.1c-.5-4.8-4.65-8.6-9.55-8.6z" transform="scale(-1, 1) translate(-24, 0)"/></svg>
-                <span>+5s</span>
+          <div class="ab-player-main-controls">
+            <button id="ab-btn-prev-chapter" class="ab-skip-btn" title="Previous Chapter" aria-label="Previous Chapter">
+              <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+            </button>
+            <button id="ab-btn-backward-15s" class="ab-rewind-btn" title="Back 15s" aria-label="Back 15 seconds">
+              <svg viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05 1.05-6.9 2.75L3.5 8V14H9.5L7.35 11.85c1.4-1.25 3.25-2 5.15-2 3.6 0 6.6 2.6 7.25 6H21.8c-.7-4.35-4.45-7.5-9.3-7.5z"/></svg>
+              <span>15</span>
+            </button>
+            <button id="ab-btn-play-pause" class="ab-play-btn-large" title="Play / Pause" aria-label="Play or Pause">
+              <svg id="ab-play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              <svg id="ab-pause-icon" viewBox="0 0 24 24" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+            </button>
+            <button id="ab-btn-forward-15s" class="ab-rewind-btn ab-forward-btn" title="Forward 15s" aria-label="Forward 15 seconds">
+              <svg viewBox="0 0 24 24"><path d="M11.5 8.01v-2.3L6.81 10.4 11.5 15.1v-2.3c3.85 0 6.95 2.8 7.45 6.4h2.1c-.5-4.8-4.65-8.6-9.55-8.6z" transform="scale(-1, 1) translate(-24, 0)"/></svg>
+              <span>15</span>
+            </button>
+            <button id="ab-btn-next-chapter" class="ab-skip-btn" title="Next Chapter" aria-label="Next Chapter">
+              <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zm2-12v12h10V6H8z"/></svg>
+            </button>
+          </div>
+
+          <div class="ab-player-secondary-controls">
+            <button id="ab-btn-loop" class="ab-chip-btn" title="A-B Repeat">
+              <svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
+              <span id="ab-loop-label">A-B</span>
+            </button>
+            <div class="ab-speed-selector">
+              <button id="ab-btn-speed" class="ab-chip-btn ab-speed-chip">1.0x</button>
+              <div class="ab-speed-dropdown" id="ab-speed-dropdown">
+                <div class="ab-speed-opt" data-speed="0.5">0.5x</div>
+                <div class="ab-speed-opt" data-speed="0.75">0.75x</div>
+                <div class="ab-speed-opt active" data-speed="1.0">1.0x</div>
+                <div class="ab-speed-opt" data-speed="1.25">1.25x</div>
+                <div class="ab-speed-opt" data-speed="1.5">1.5x</div>
+                <div class="ab-speed-opt" data-speed="2.0">2.0x</div>
+              </div>
+            </div>
+          </div>
+          </section>
+          </div>
+        </div>
+
+        <!-- Diktant / Daftar (desktop: o'ng ustunda, mobile: overlay) -->
+        <section class="ab-study-panel" id="ab-study-panel" aria-hidden="true">
+          <div class="ab-study-panel-inner">
+            <div class="ab-study-panel-header">
+              <nav class="ab-segmented-nav" id="ab-segmented-nav">
+                <div class="ab-segment-indicator" id="ab-segment-indicator"></div>
+                <button class="ab-segment-btn active" data-ab-tab="dictation" type="button">
+                  <span data-i18n="tab_dictation">Dictation</span>
+                </button>
+                <button class="ab-segment-btn" data-ab-tab="notes" type="button">
+                  <span data-i18n="tab_notes">Notebook</span>
+                </button>
+              </nav>
+              <button type="button" id="ab-study-close" class="ab-study-close-btn" aria-label="Close">
+                <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
               </button>
             </div>
-            
-            <div class="ab-player-settings">
-              <!-- A-B Repeat Loop -->
-              <button id="ab-btn-loop" class="ab-settings-btn" title="A-B Repeat">
-                <svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
-                <span id="ab-loop-label">A-B Loop</span>
-              </button>
-              
-              <!-- Speed selection -->
-              <div class="ab-speed-selector">
-                <button id="ab-btn-speed" class="ab-speed-btn">1.0x</button>
-                <div class="ab-speed-dropdown" id="ab-speed-dropdown">
-                  <div class="ab-speed-opt" data-speed="0.5">0.5x</div>
-                  <div class="ab-speed-opt" data-speed="0.75">0.75x</div>
-                  <div class="ab-speed-opt active" data-speed="1.0">1.0x</div>
-                  <div class="ab-speed-opt" data-speed="1.25">1.25x</div>
-                  <div class="ab-speed-opt" data-speed="1.5">1.5x</div>
-                  <div class="ab-speed-opt" data-speed="2.0">2.0x</div>
+            <div class="ab-tools-content">
+              <div id="ab-panel-dictation" class="ab-tool-panel active">
+                <textarea id="ab-dictation-text" class="ab-textarea" data-i18n-placeholder="dictation_placeholder" placeholder="Start typing the transcript here..."></textarea>
+                <div class="ab-tool-actions">
+                  <div class="ab-textarea-stats">
+                    <span><span data-i18n="stats_words">Words:</span> <strong id="ab-dict-words">0</strong></span>
+                    <span><span data-i18n="stats_chars">Characters:</span> <strong id="ab-dict-chars">0</strong></span>
+                  </div>
+                  <button id="ab-btn-save-dictation" class="ab-save-btn" data-i18n="btn_save_dictation">Save Dictation</button>
+                </div>
+              </div>
+              <div id="ab-panel-notes" class="ab-tool-panel">
+                <textarea id="ab-notes-text" class="ab-textarea" data-i18n-placeholder="notebook_placeholder" placeholder="Write down vocabulary, notes, or tips..."></textarea>
+                <div class="ab-tool-actions">
+                  <button id="ab-btn-save-notes" class="ab-save-btn" data-i18n="btn_save_notes">Save Notes</button>
+                  <button id="ab-btn-export-notes" class="ab-export-btn" data-i18n="btn_export_notes">Export Notes (.txt)</button>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        <!-- Audiobook study tools (Dictation & Notebook tabs) -->
-        <div class="ab-study-tools-card">
-          <nav class="ab-tools-nav">
-            <button class="ab-tool-btn active" data-ab-tab="dictation">Dictation Pad / Diktant</button>
-            <button class="ab-tool-btn" data-ab-tab="notes">Notebook / Daftar</button>
-          </nav>
-          
-          <div class="ab-tools-content">
-            <!-- Dictation -->
-            <div id="ab-panel-dictation" class="ab-tool-panel active">
-              <p class="ab-tool-desc">Listen to the audiobook and type what you hear. Save progress to record your entries.</p>
-              <textarea id="ab-dictation-text" class="ab-textarea" placeholder="Start typing the audiobook transcript here..."></textarea>
-              <div class="ab-tool-actions">
-                <div class="ab-textarea-stats">
-                  <span>Words: <strong id="ab-dict-words">0</strong></span>
-                  <span>Chars: <strong id="ab-dict-chars">0</strong></span>
-                </div>
-                <button id="ab-btn-save-dictation" class="ab-save-btn">Save Dictation</button>
-              </div>
-            </div>
-            
-            <!-- Notes -->
-            <div id="ab-panel-notes" class="ab-tool-panel">
-              <p class="ab-tool-desc">Save spelling notes, vocabulary words, or general thoughts from this chapter.</p>
-              <textarea id="ab-notes-text" class="ab-textarea" placeholder="Write down chapter vocabulary, notes, or tips..."></textarea>
-              <div class="ab-tool-actions">
-                <button id="ab-btn-save-notes" class="ab-save-btn">Save Notes</button>
-                <button id="ab-btn-export-notes" class="ab-export-btn">Export Notes (.txt)</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      </div>
     </main>
 
 
@@ -843,14 +860,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Floating Feedback & Bug Report Button -->
-    <a href="https://t.me/jaxongirtoshpolatov" target="_blank" class="floating-feedback-btn" title="Feedback & Bug Report" aria-label="Feedback & Bug Report">
-      <svg viewBox="0 0 24 24">
-        <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 12h-2v-2h2v2zm0-4h-2V6h2v4z"/>
-      </svg>
-      <span class="floating-feedback-text" data-i18n="feedback_btn_text">Feedback & Bugs</span>
-    </a>
 
     <!-- Landing About App Button -->
     <button id="floating-code-btn" class="floating-code-btn" title="About the app" aria-label="About the app">
