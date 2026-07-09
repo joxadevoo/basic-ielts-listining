@@ -193,7 +193,11 @@ export async function loadStats({ telegramToken, chatId } = {}) {
     if (legacy) {
       const migrated = recomputeDerivedFields(legacy);
       migrated.updatedAt = new Date().toISOString();
-      await saveToPrimaryStore(migrated);
+      try {
+        await saveToPrimaryStore(migrated);
+      } catch (err) {
+        console.error('Failed to migrate legacy stats to Blob:', err?.message || err);
+      }
       return migrated;
     }
   }

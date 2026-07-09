@@ -2,6 +2,7 @@ const API_ROUTES = {
   '/api/log': () => import('./api/log.js'),
   '/api/stats': () => import('./api/stats.js'),
   '/api/webhook': () => import('./api/webhook.js'),
+  '/api/blob-test': () => import('./api/blob-test.js'),
 };
 
 function readJsonBody(req) {
