@@ -11,5 +11,13 @@ export default defineConfig(({ mode }) => {
       host: true,
     },
     plugins: [vercelApiDevPlugin(env)],
+    build: {
+      rollupOptions: {
+        input: {
+          main: 'index.html',
+          stats: 'stats.html'
+        }
+      }
+    }
   };
 });
