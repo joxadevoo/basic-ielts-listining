@@ -15,14 +15,8 @@ function getBlobToken() {
 
 function getBlobOptionSets() {
   const token = getBlobToken();
-  const storeId = process.env.BLOB_STORE_ID || '';
-  const sets = [];
-
-  if (token) sets.push({ token });
-  if (token && storeId) sets.push({ token, storeId });
-  if (storeId) sets.push({ storeId });
-
-  return sets;
+  // Use token only — BLOB_STORE_ID from an old project/domain causes "store does not exist"
+  return token ? [{ token }] : [];
 }
 
 async function readBlobJson() {
