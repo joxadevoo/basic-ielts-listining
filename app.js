@@ -2191,9 +2191,13 @@ function setupAudiobookEventListeners() {
     abStudyClose.addEventListener('click', closeAbStudyOverlay);
   }
 
+  let lastWindowWidth = window.innerWidth;
   window.addEventListener('resize', () => {
-    syncAbStudyOverlayBounds();
-    resetAbStudyLayout();
+    if (window.innerWidth !== lastWindowWidth) {
+      lastWindowWidth = window.innerWidth;
+      syncAbStudyOverlayBounds();
+      resetAbStudyLayout();
+    }
   });
   syncAbStudyOverlayBounds();
   resetAbStudyLayout();
