@@ -13,35 +13,45 @@ function getBlobToken() {
   return process.env.BLOB_READ_WRITE_TOKEN || process.env.VERCEL_BLOB_READ_WRITE_TOKEN || '';
 }
 
-async function readBlobJson(access) {
+function getBlobOptions() {
   const token = getBlobToken();
-  const { get, head } = await import('@vercel/blob');
-  const getOptions = { access, ...(token ? { token } : {}) };
+  const storeId = process.env.BLOB_STORE_ID || '';
+  return {
+    ...(token ? { token } : {}),
+    ...(storeId ? { storeId } : {}),
+  };
+}
 
-  try {
-    const result = await get(BLOB_PATHNAME, getOptions);
-    if (result?.stream) {
-      const text = await new Response(result.stream).text();
-      if (text) return JSON.parse(text);
-    }
-  } catch (err) {
-    if (err?.name !== 'BlobNotFoundError') {
-      console.error(`Blob stats load failed (${access}):`, err);
+async function readBlobJson() {
+  const blobOptions = getBlobOptions();
+  const { get, head } = await import('@vercel/blob');
+
+  for (const access of ['private', 'public']) {
+    try {
+      const result = await get(BLOB_PATHNAME, { access, ...blobOptions });
+      if (result?.stream) {
+        const text = await new Response(result.stream).text();
+        if (text) return JSON.parse(text);
+      }
+    } catch (err) {
+      if (err?.name !== 'BlobNotFoundError') {
+        console.error(`Blob get failed (${access}):`, err?.message || err);
+      }
     }
   }
 
-  if (access === 'public') {
-    try {
-      const meta = await head(BLOB_PATHNAME, token ? { token } : undefined);
-      if (meta?.downloadUrl) {
-        const res = await fetch(meta.downloadUrl);
-        if (res.ok) {
-          const text = await res.text();
-          if (text) return JSON.parse(text);
-        }
+  try {
+    const meta = await head(BLOB_PATHNAME, blobOptions);
+    if (meta?.downloadUrl) {
+      const res = await fetch(meta.downloadUrl);
+      if (res.ok) {
+        const text = await res.text();
+        if (text) return JSON.parse(text);
       }
-    } catch (err) {
-      console.error('Blob stats head/download failed:', err);
+    }
+  } catch (err) {
+    if (err?.name !== 'BlobNotFoundError') {
+      console.error('Blob head/download failed:', err?.message || err);
     }
   }
 
@@ -50,46 +60,40 @@ async function readBlobJson(access) {
 
 async function writeBlobJson(stats) {
   const payload = JSON.stringify(stats);
-  const token = getBlobToken();
+  const blobOptions = getBlobOptions();
   const { put } = await import('@vercel/blob');
   const baseOptions = {
     contentType: 'application/json',
     addRandomSuffix: false,
     allowOverwrite: true,
-    ...(token ? { token } : {}),
+    ...blobOptions,
   };
 
-  try {
-    const result = await put(BLOB_PATHNAME, payload, {
-      ...baseOptions,
-      access: 'private',
-    });
-    console.log('Stats saved to private Blob:', result.pathname);
-    return;
-  } catch (privateErr) {
-    console.error('Private Blob save failed, trying public fallback:', privateErr);
+  const attempts = ['public', 'private'];
+  let lastError = null;
+
+  for (const access of attempts) {
+    try {
+      const result = await put(BLOB_PATHNAME, payload, {
+        ...baseOptions,
+        access,
+      });
+      console.log(`Stats saved to ${access} Blob:`, result.pathname);
+      return;
+    } catch (err) {
+      lastError = err;
+      console.error(`Blob put failed (${access}):`, err?.message || err);
+    }
   }
 
-  const result = await put(BLOB_PATHNAME, payload, {
-    ...baseOptions,
-    access: 'public',
-  });
-  console.log('Stats saved to public Blob:', result.pathname);
+  throw lastError || new Error('Blob save failed');
 }
 
 async function loadFromPrimaryStore() {
   const token = getBlobToken();
 
   if (token || IS_VERCEL) {
-    const privateStats = await readBlobJson('private');
-    if (privateStats) return privateStats;
-
-    const publicStats = await readBlobJson('public');
-    if (publicStats) return publicStats;
-  }
-
-  if (IS_VERCEL) {
-    return null;
+    return readBlobJson();
   }
 
   try {
@@ -106,7 +110,7 @@ async function saveToPrimaryStore(stats) {
   if (token || IS_VERCEL) {
     if (!token) {
       throw new Error(
-        'BLOB_READ_WRITE_TOKEN is missing on Vercel. Open fluentear project → Storage → connect Blob store.',
+        'BLOB_READ_WRITE_TOKEN is missing. Connect Blob store to the fluentear project in Vercel Storage.',
       );
     }
     await writeBlobJson(stats);
