@@ -518,6 +518,10 @@
             <div class="ab-cover-frame">
               <img src="/dracula_cover.jpg" alt="Dracula Cover" class="ab-cover-art" id="ab-cover-art">
               <div class="ab-cover-glow" aria-hidden="true"></div>
+              <button type="button" id="ab-study-fab" class="ab-study-fab" aria-expanded="false" aria-controls="ab-study-panel">
+                <svg class="ab-study-fab-icon" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                <span class="ab-study-fab-label" data-i18n="ab_study_fab">Dictation / Notes</span>
+              </button>
             </div>
             <div class="ab-now-playing">
               <p class="ab-now-label" data-i18n="ab_now_playing">Now Playing</p>
@@ -540,10 +544,6 @@
         <!-- Desktop: player + study | Mobile: player + FAB -->
         <div class="ab-right-column" id="ab-right-column">
           <div class="ab-player-stack" id="ab-player-stack">
-          <button type="button" id="ab-study-fab" class="ab-study-fab" aria-expanded="false" aria-controls="ab-study-panel">
-            <svg class="ab-study-fab-icon" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-            <span class="ab-study-fab-label" data-i18n="ab_study_fab">Dictation / Notes</span>
-          </button>
 
           <section class="ab-player-band">
           <audio id="audiobook-audio" style="display:none;"></audio>
