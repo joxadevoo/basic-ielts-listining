@@ -13,45 +13,50 @@ function getBlobToken() {
   return process.env.BLOB_READ_WRITE_TOKEN || process.env.VERCEL_BLOB_READ_WRITE_TOKEN || '';
 }
 
-function getBlobOptions() {
+function getBlobOptionSets() {
   const token = getBlobToken();
   const storeId = process.env.BLOB_STORE_ID || '';
-  return {
-    ...(token ? { token } : {}),
-    ...(storeId ? { storeId } : {}),
-  };
+  const sets = [];
+
+  if (token) sets.push({ token });
+  if (token && storeId) sets.push({ token, storeId });
+  if (storeId) sets.push({ storeId });
+
+  return sets;
 }
 
 async function readBlobJson() {
-  const blobOptions = getBlobOptions();
+  const optionSets = getBlobOptionSets();
   const { get, head } = await import('@vercel/blob');
 
-  for (const access of ['private', 'public']) {
+  for (const blobOptions of optionSets) {
+    for (const access of ['public', 'private']) {
+      try {
+        const result = await get(BLOB_PATHNAME, { access, ...blobOptions });
+        if (result?.stream) {
+          const text = await new Response(result.stream).text();
+          if (text) return JSON.parse(text);
+        }
+      } catch (err) {
+        if (err?.name !== 'BlobNotFoundError') {
+          console.error(`Blob get failed (${access}):`, err?.message || err);
+        }
+      }
+    }
+
     try {
-      const result = await get(BLOB_PATHNAME, { access, ...blobOptions });
-      if (result?.stream) {
-        const text = await new Response(result.stream).text();
-        if (text) return JSON.parse(text);
+      const meta = await head(BLOB_PATHNAME, blobOptions);
+      if (meta?.downloadUrl) {
+        const res = await fetch(meta.downloadUrl);
+        if (res.ok) {
+          const text = await res.text();
+          if (text) return JSON.parse(text);
+        }
       }
     } catch (err) {
       if (err?.name !== 'BlobNotFoundError') {
-        console.error(`Blob get failed (${access}):`, err?.message || err);
+        console.error('Blob head/download failed:', err?.message || err);
       }
-    }
-  }
-
-  try {
-    const meta = await head(BLOB_PATHNAME, blobOptions);
-    if (meta?.downloadUrl) {
-      const res = await fetch(meta.downloadUrl);
-      if (res.ok) {
-        const text = await res.text();
-        if (text) return JSON.parse(text);
-      }
-    }
-  } catch (err) {
-    if (err?.name !== 'BlobNotFoundError') {
-      console.error('Blob head/download failed:', err?.message || err);
     }
   }
 
@@ -60,29 +65,26 @@ async function readBlobJson() {
 
 async function writeBlobJson(stats) {
   const payload = JSON.stringify(stats);
-  const blobOptions = getBlobOptions();
+  const optionSets = getBlobOptionSets();
   const { put } = await import('@vercel/blob');
-  const baseOptions = {
-    contentType: 'application/json',
-    addRandomSuffix: false,
-    allowOverwrite: true,
-    ...blobOptions,
-  };
-
-  const attempts = ['public', 'private'];
   let lastError = null;
 
-  for (const access of attempts) {
-    try {
-      const result = await put(BLOB_PATHNAME, payload, {
-        ...baseOptions,
-        access,
-      });
-      console.log(`Stats saved to ${access} Blob:`, result.pathname);
-      return;
-    } catch (err) {
-      lastError = err;
-      console.error(`Blob put failed (${access}):`, err?.message || err);
+  for (const blobOptions of optionSets) {
+    for (const access of ['public', 'private']) {
+      try {
+        const result = await put(BLOB_PATHNAME, payload, {
+          access,
+          contentType: 'application/json',
+          addRandomSuffix: false,
+          allowOverwrite: true,
+          ...blobOptions,
+        });
+        console.log(`Stats saved to ${access} Blob:`, result.pathname);
+        return;
+      } catch (err) {
+        lastError = err;
+        console.error(`Blob put failed (${access}):`, err?.message || err);
+      }
     }
   }
 
