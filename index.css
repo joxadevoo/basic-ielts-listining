@@ -3460,26 +3460,7 @@ a.menu-item-link {
     display: none;
   }
 
-  .ab-chapters-band::before,
-  .ab-chapters-band::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 6px;
-    width: 28px;
-    pointer-events: none;
-    z-index: 2;
-  }
 
-  .ab-chapters-band::before {
-    left: 0;
-    background: linear-gradient(to right, var(--bg-base) 20%, transparent);
-  }
-
-  .ab-chapters-band::after {
-    right: 0;
-    background: linear-gradient(to left, var(--bg-base) 20%, transparent);
-  }
 
   .ab-chapters-scroll {
     display: flex;
@@ -4459,7 +4440,7 @@ a.menu-item-link {
   inset: 0;
   background-size: cover;
   background-position: center;
-  filter: blur(20px);
+  filter: blur(10px);
   opacity: 0;
   transition: opacity 0.4s ease;
   pointer-events: none;
@@ -4470,11 +4451,11 @@ a.menu-item-link {
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.4);
 }
 
 [data-theme="dark"] .ab-blur-bg::after {
-  background: rgba(13, 21, 39, 0.7);
+  background: rgba(13, 21, 39, 0.52);
 }
 
 .ab-now-description {
