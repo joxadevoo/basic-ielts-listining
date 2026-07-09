@@ -3481,65 +3481,93 @@ a.menu-item-link {
   }
 
   .ab-chapters-scroll {
+    display: flex;
     flex-direction: row;
     overflow-x: auto;
     overflow-y: hidden;
-    padding: 4px 16px 6px;
-    gap: 6px;
-    scroll-snap-type: x proximity;
+    padding: 8px 20px 16px;
+    gap: 12px;
+    scroll-snap-type: x mandatory;
+    scroll-padding: 0 20px;
     -webkit-overflow-scrolling: touch;
     touch-action: pan-x;
     flex: none;
+    scrollbar-width: none;
   }
 
-  .ab-chapter-card {
-    flex: 0 0 auto;
-    width: auto;
-    padding: 5px 10px;
-    border-radius: 20px;
-    gap: 5px;
-    transform: none;
-  }
-
-  .ab-chapter-card:hover {
-    transform: none;
-  }
-
-  .ab-chapter-card-num,
-  .ab-chapter-card-body,
-  .ab-chapter-card-badge {
+  .ab-chapters-scroll::-webkit-scrollbar {
     display: none;
   }
 
-  .ab-chapter-card-mobile-label {
-    display: inline;
-    font-size: 0.72rem;
+  .ab-chapter-card {
+    flex: 0 0 260px;
+    width: 260px;
+    scroll-snap-align: center;
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    text-align: left;
+    opacity: 0.65;
+    transform: scale(0.96);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .ab-chapter-card:hover {
+    transform: scale(0.98);
+  }
+
+  .ab-chapter-card-num {
+    display: flex;
+    font-size: 1.1rem;
     font-weight: 800;
+    opacity: 0.7;
+  }
+
+  .ab-chapter-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .ab-chapter-card-title {
+    font-size: 0.8rem;
+    font-weight: 700;
     color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
+  .ab-chapter-card-time {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .ab-chapter-card-badge {
+    display: flex;
+    font-size: 0.62rem;
+    padding: 2px 6px;
+    border-radius: 8px;
+  }
+
+  .ab-chapter-card-mobile-label,
   .ab-chapter-card-dot {
-    display: block;
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: var(--text-muted);
-    opacity: 0.35;
-    flex-shrink: 0;
-  }
-
-  .ab-chapter-card-dot.in-progress {
-    background: #ffaa00;
-    opacity: 1;
-  }
-
-  .ab-chapter-card-dot.completed {
-    background: #00c873;
-    opacity: 1;
+    display: none;
   }
 
   .ab-chapter-card.active {
-    box-shadow: 0 2px 10px rgba(110, 68, 255, 0.22);
+    opacity: 1;
+    transform: scale(1);
+    border-color: var(--color-primary);
+    background: color-mix(in srgb, var(--color-primary) 8%, var(--bg-card));
+    box-shadow: 0 8px 24px rgba(110, 68, 255, 0.18);
   }
 }
 
