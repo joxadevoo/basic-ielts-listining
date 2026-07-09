@@ -6,7 +6,117 @@ import { buildPinnedSummaryText, recomputeDerivedFields } from './stats-metrics.
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const LOCAL_STATS_FILE = path.resolve(__dirname, '../../.data/fluentear-stats.json');
-const BLOB_PATHNAME = 'private/fluentear-stats.json';
+const BLOB_PATHNAME = 'internal/fluentear-stats.json';
+const IS_VERCEL = Boolean(process.env.VERCEL);
+
+function getBlobToken() {
+  return process.env.BLOB_READ_WRITE_TOKEN || process.env.VERCEL_BLOB_READ_WRITE_TOKEN || '';
+}
+
+async function readBlobJson(access) {
+  const token = getBlobToken();
+  const { get, head } = await import('@vercel/blob');
+  const getOptions = { access, ...(token ? { token } : {}) };
+
+  try {
+    const result = await get(BLOB_PATHNAME, getOptions);
+    if (result?.stream) {
+      const text = await new Response(result.stream).text();
+      if (text) return JSON.parse(text);
+    }
+  } catch (err) {
+    if (err?.name !== 'BlobNotFoundError') {
+      console.error(`Blob stats load failed (${access}):`, err);
+    }
+  }
+
+  if (access === 'public') {
+    try {
+      const meta = await head(BLOB_PATHNAME, token ? { token } : undefined);
+      if (meta?.downloadUrl) {
+        const res = await fetch(meta.downloadUrl);
+        if (res.ok) {
+          const text = await res.text();
+          if (text) return JSON.parse(text);
+        }
+      }
+    } catch (err) {
+      console.error('Blob stats head/download failed:', err);
+    }
+  }
+
+  return null;
+}
+
+async function writeBlobJson(stats) {
+  const payload = JSON.stringify(stats);
+  const token = getBlobToken();
+  const { put } = await import('@vercel/blob');
+  const baseOptions = {
+    contentType: 'application/json',
+    addRandomSuffix: false,
+    allowOverwrite: true,
+    ...(token ? { token } : {}),
+  };
+
+  try {
+    const result = await put(BLOB_PATHNAME, payload, {
+      ...baseOptions,
+      access: 'private',
+    });
+    console.log('Stats saved to private Blob:', result.pathname);
+    return;
+  } catch (privateErr) {
+    console.error('Private Blob save failed, trying public fallback:', privateErr);
+  }
+
+  const result = await put(BLOB_PATHNAME, payload, {
+    ...baseOptions,
+    access: 'public',
+  });
+  console.log('Stats saved to public Blob:', result.pathname);
+}
+
+async function loadFromPrimaryStore() {
+  const token = getBlobToken();
+
+  if (token || IS_VERCEL) {
+    const privateStats = await readBlobJson('private');
+    if (privateStats) return privateStats;
+
+    const publicStats = await readBlobJson('public');
+    if (publicStats) return publicStats;
+  }
+
+  if (IS_VERCEL) {
+    return null;
+  }
+
+  try {
+    const raw = await fs.readFile(LOCAL_STATS_FILE, 'utf8');
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+async function saveToPrimaryStore(stats) {
+  const token = getBlobToken();
+
+  if (token || IS_VERCEL) {
+    if (!token) {
+      throw new Error(
+        'BLOB_READ_WRITE_TOKEN is missing on Vercel. Open fluentear project → Storage → connect Blob store.',
+      );
+    }
+    await writeBlobJson(stats);
+    return;
+  }
+
+  const payload = JSON.stringify(stats);
+  await fs.mkdir(path.dirname(LOCAL_STATS_FILE), { recursive: true });
+  await fs.writeFile(LOCAL_STATS_FILE, payload, 'utf8');
+}
 
 export function emptyStats() {
   return {
@@ -61,64 +171,11 @@ async function loadLegacyFromTelegram(token, chatId) {
     const chatRes = await fetch(`https://api.telegram.org/bot${token}/getChat?chat_id=${chatId}`);
     const chatData = await chatRes.json();
     if (!chatRes.ok || !chatData.ok) return null;
-    const legacy = parseLegacyStatsFromPinnedMessage(chatData.result.pinned_message);
-    return legacy || null;
+    return parseLegacyStatsFromPinnedMessage(chatData.result.pinned_message);
   } catch (err) {
     console.error('Legacy Telegram stats migration failed:', err);
     return null;
   }
-}
-
-async function loadFromPrimaryStore() {
-  const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
-  if (blobToken) {
-    try {
-      const { get } = await import('@vercel/blob');
-      const result = await get(BLOB_PATHNAME, { access: 'private', token: blobToken });
-      if (result?.stream) {
-        const text = await new Response(result.stream).text();
-        if (text) return JSON.parse(text);
-      }
-    } catch (err) {
-      if (!(err?.name === 'BlobNotFoundError')) {
-        console.error('Blob stats load failed:', err);
-      }
-    }
-  }
-
-  try {
-    const raw = await fs.readFile(LOCAL_STATS_FILE, 'utf8');
-    return JSON.parse(raw);
-  } catch {
-    return null;
-  }
-}
-
-async function saveToPrimaryStore(stats) {
-  const payload = JSON.stringify(stats);
-  const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
-
-  if (blobToken) {
-    try {
-      const { put } = await import('@vercel/blob');
-      const result = await put(BLOB_PATHNAME, payload, {
-        access: 'private',
-        token: blobToken,
-        contentType: 'application/json',
-        addRandomSuffix: false,
-        allowOverwrite: true,
-      });
-      console.log('Stats saved to Blob:', result.pathname);
-      return;
-    } catch (err) {
-      console.error('Blob stats save failed:', err);
-      throw err;
-    }
-  }
-
-  console.warn('BLOB_READ_WRITE_TOKEN missing — saving stats to local .data file (dev only)');
-  await fs.mkdir(path.dirname(LOCAL_STATS_FILE), { recursive: true });
-  await fs.writeFile(LOCAL_STATS_FILE, payload, 'utf8');
 }
 
 export async function loadStats({ telegramToken, chatId } = {}) {

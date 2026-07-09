@@ -1,4 +1,3 @@
-import { TRACKS } from '../tracks.js';
 import {
   buildLogMessage,
   buildReplyMarkup,
@@ -14,6 +13,13 @@ import {
   saveStats,
   syncPinnedSummaryMessages,
 } from './lib/stats-store.js';
+
+async function resolveTrackTitle(trackNum) {
+  if (trackNum == null) return '';
+  const { TRACKS } = await import('../tracks.js');
+  const track = TRACKS.find((entry) => entry.trackNum === trackNum);
+  return track?.title?.split(' - ')[1] || track?.title || '';
+}
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', resolveCorsOrigin(req));
@@ -52,12 +58,7 @@ export default async function handler(req, res) {
 
   try {
     if (telegramReady && payload.type === 'session_start') {
-      let trackTitle = '';
-      if (payload.trackNum != null) {
-        const track = TRACKS.find((entry) => entry.trackNum === payload.trackNum);
-        trackTitle = track?.title?.split(' - ')[1] || track?.title || '';
-      }
-
+      const trackTitle = await resolveTrackTitle(payload.trackNum);
       const text = buildLogMessage(payload, trackTitle);
       const replyMarkup = buildReplyMarkup();
       const url = `https://api.telegram.org/bot${token}/sendMessage`;
@@ -91,7 +92,11 @@ export default async function handler(req, res) {
     stats = await saveStats(stats);
 
     if (telegramReady) {
-      await syncPinnedSummaryMessages(token, chatIds, stats);
+      try {
+        await syncPinnedSummaryMessages(token, chatIds, stats);
+      } catch (syncErr) {
+        console.error('Telegram pin sync failed (stats already saved):', syncErr);
+      }
     }
 
     return res.status(200).json({ success: true, nickname: finalNickname });
