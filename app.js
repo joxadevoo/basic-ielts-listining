@@ -2124,6 +2124,17 @@ function setupAudiobookEventListeners() {
     speedMenuBackdrop.addEventListener('click', () => setSpeedMenuOpen(false));
   }
 
+  const btnToggleCover = document.getElementById('ab-btn-toggle-cover');
+  if (btnToggleCover) {
+    btnToggleCover.addEventListener('click', () => {
+      const shell = document.getElementById('ab-music-shell');
+      if (!shell) return;
+      const isCollapsed = shell.classList.toggle('ab-cover-collapsed');
+      localStorage.setItem('ab_cover_collapsed', isCollapsed ? 'true' : 'false');
+      updateAbToggleCoverUI(isCollapsed);
+    });
+  }
+
   const abSpeedOpts = document.querySelectorAll('.ab-speed-opt');
   abSpeedOpts.forEach(opt => {
     opt.addEventListener('click', (e) => {
@@ -2217,6 +2228,36 @@ function setupAudiobookEventListeners() {
   // Live count words/chars in dictation
   if (abDictationText) {
     abDictationText.addEventListener('input', updateAbDictStats);
+  }
+  initAbCoverCollapseState();
+}
+
+function initAbCoverCollapseState() {
+  const shell = document.getElementById('ab-music-shell');
+  const blurBg = document.getElementById('ab-blur-bg');
+  if (blurBg) {
+    blurBg.style.backgroundImage = "url('/dracula_cover.jpg')";
+  }
+  const isCollapsed = localStorage.getItem('ab_cover_collapsed') === 'true';
+  if (shell) {
+    shell.classList.toggle('ab-cover-collapsed', isCollapsed);
+  }
+  updateAbToggleCoverUI(isCollapsed);
+}
+
+function updateAbToggleCoverUI(isCollapsed) {
+  const btn = document.getElementById('ab-btn-toggle-cover');
+  if (!btn) return;
+  const eyeIcon = btn.querySelector('.ab-toggle-cover-icon-eye');
+  const eyeSlashIcon = btn.querySelector('.ab-toggle-cover-icon-eye-slash');
+  if (eyeIcon && eyeSlashIcon) {
+    if (isCollapsed) {
+      eyeIcon.style.display = 'block';
+      eyeSlashIcon.style.display = 'none';
+    } else {
+      eyeIcon.style.display = 'none';
+      eyeSlashIcon.style.display = 'block';
+    }
   }
 }
 

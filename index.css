@@ -3111,6 +3111,7 @@ a.menu-item-link {
   overflow-y: auto;
   padding: 24px;
   border-right: 1px solid var(--border-color);
+  position: relative;
 }
 
 .ab-right-column {
@@ -4445,6 +4446,105 @@ a.menu-item-link {
     text-align: center;
     font-size: 0.68rem;
     padding: 5px 6px;
+  }
+}
+
+/* ─── Responsive Cover Art and Collapse Styling ─── */
+.ab-toggle-cover-btn {
+  display: none;
+}
+
+.ab-blur-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(36px);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@media (max-width: 768px) {
+  .ab-toggle-cover-btn {
+    display: inline-flex;
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 10;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    padding: 0;
+    justify-content: center;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border-color);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: var(--text-primary);
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  [data-theme="light"] .ab-toggle-cover-btn {
+    background: rgba(255, 255, 255, 0.75);
+  }
+
+  .ab-toggle-cover-btn svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+  }
+
+  /* Collapse Cover Art Logic */
+  .ab-music-shell.ab-cover-collapsed .ab-cover-frame {
+    display: none;
+  }
+
+  .ab-music-shell.ab-cover-collapsed .ab-now-playing {
+    margin-top: 12px;
+    align-items: flex-start;
+    text-align: left;
+    padding-left: 56px;
+    padding-right: 56px;
+  }
+
+  .ab-music-shell.ab-cover-collapsed .ab-now-label {
+    display: none;
+  }
+
+  .ab-music-shell.ab-cover-collapsed .ab-hero {
+    padding: 16px 20px 0;
+    align-items: stretch;
+    text-align: left;
+  }
+
+  .ab-music-shell.ab-cover-collapsed .ab-blur-bg {
+    opacity: 0.15;
+  }
+
+  [data-theme="dark"] .ab-music-shell.ab-cover-collapsed .ab-blur-bg {
+    opacity: 0.25;
+  }
+
+  /* Shrink Cover on Small Height Screens (e.g., iPhone SE/8) */
+  @media (max-height: 680px) {
+    .ab-cover-frame {
+      width: min(140px, 35vw);
+      margin-bottom: 8px;
+    }
+    .ab-hero {
+      padding: 12px 20px 6px;
+    }
+    .ab-now-playing h2 {
+      font-size: 1.1rem;
+    }
+    .ab-now-playing p {
+      font-size: 0.75rem;
+    }
   }
 }
 
