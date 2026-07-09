@@ -3207,6 +3207,7 @@ a.menu-item-link {
   text-align: center;
   padding: 20px 20px 12px;
   flex-shrink: 0;
+  position: relative;
 }
 
 .ab-cover-frame {
@@ -3907,8 +3908,8 @@ a.menu-item-link {
   .ab-study-fab {
     display: inline-flex;
     position: absolute;
-    top: 12px;
-    right: 12px;
+    top: 20px;
+    right: 20px;
     z-index: 10;
     width: 42px;
     height: 42px;
