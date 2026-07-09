@@ -95,8 +95,12 @@ export default async function handler(req, res) {
       return res.status(503).json({ error: 'Telegram is required for stats storage' });
     }
 
-    await syncPinnedSummaryMessages(token, chatIds, stats);
-    return res.status(200).json({ success: true, nickname: finalNickname });
+    const statsPersisted = await syncPinnedSummaryMessages(token, chatIds, stats);
+    return res.status(200).json({
+      success: true,
+      nickname: finalNickname,
+      statsPersisted,
+    });
   } catch (err) {
     console.error('Error in /api/log:', err);
     return res.status(500).json({ error: 'Internal server error' });

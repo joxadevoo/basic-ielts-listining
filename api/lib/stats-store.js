@@ -325,15 +325,81 @@ export function applyUserEvent(stats, payload, ip, userAgent) {
   return finalNickname;
 }
 
+async function telegramApi(token, method, body) {
+  const res = await fetch(`https://api.telegram.org/bot${token}/${method}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  const data = await res.json();
+  return { ok: res.ok && data.ok, data };
+}
+
 export async function getPinnedMessageId(token, chatId) {
-  const chatRes = await fetch(`https://api.telegram.org/bot${token}/getChat?chat_id=${chatId}`);
-  const chatData = await chatRes.json();
-  if (!chatRes.ok || !chatData.ok) return null;
-  return chatData.result.pinned_message?.message_id || null;
+  const { ok, data } = await telegramApi(token, 'getChat', { chat_id: chatId });
+  if (!ok) return null;
+  return data.result?.pinned_message?.message_id || null;
+}
+
+function buildStatsMessageBody(stats) {
+  let statsText = buildPinnedMessageWithStats(stats);
+  if (statsText.length > 4000) {
+    const encoded = encodeStatsPayload(stats);
+    const summary = buildPinnedSummaryText(stats);
+    statsText = `${summary}\n${STATS_B64_START}${encoded}${STATS_B64_END}`;
+  }
+  return statsText;
+}
+
+async function syncPinnedStatsForChat(token, chatId, statsText, inlineKeyboard) {
+  const pinnedMessageId = await getPinnedMessageId(token, chatId);
+
+  if (pinnedMessageId) {
+    const edited = await telegramApi(token, 'editMessageText', {
+      chat_id: chatId,
+      message_id: pinnedMessageId,
+      text: statsText,
+      parse_mode: 'HTML',
+      reply_markup: inlineKeyboard,
+    });
+    if (edited.ok) return { ok: true };
+
+    console.error('editMessageText failed:', edited.data);
+    await telegramApi(token, 'unpinChatMessage', {
+      chat_id: chatId,
+      message_id: pinnedMessageId,
+    });
+  }
+
+  const sent = await telegramApi(token, 'sendMessage', {
+    chat_id: chatId,
+    text: statsText,
+    parse_mode: 'HTML',
+    reply_markup: inlineKeyboard,
+  });
+  if (!sent.ok) {
+    console.error('sendMessage for stats failed:', sent.data);
+    return { ok: false, error: sent.data?.description || 'sendMessage failed' };
+  }
+
+  const messageId = sent.data.result?.message_id;
+  const pinned = await telegramApi(token, 'pinChatMessage', {
+    chat_id: chatId,
+    message_id: messageId,
+    disable_notification: true,
+  });
+  if (pinned.ok) return { ok: true };
+
+  console.error('pinChatMessage failed:', pinned.data);
+  return {
+    ok: false,
+    error: pinned.data?.description || 'pinChatMessage failed',
+    messageId,
+  };
 }
 
 export async function syncPinnedSummaryMessages(token, chatIds, stats) {
-  const statsText = buildPinnedMessageWithStats(stats);
+  const statsText = buildStatsMessageBody(stats);
   const inlineKeyboard = {
     inline_keyboard: [
       [
@@ -343,69 +409,19 @@ export async function syncPinnedSummaryMessages(token, chatIds, stats) {
     ],
   };
 
-  let syncedAny = false;
+  const errors = [];
 
   for (const chatId of chatIds) {
     try {
-      const pinnedMessageId = await getPinnedMessageId(token, chatId);
-
-      if (pinnedMessageId) {
-        const editRes = await fetch(`https://api.telegram.org/bot${token}/editMessageText`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: chatId,
-            message_id: pinnedMessageId,
-            text: statsText,
-            parse_mode: 'HTML',
-            reply_markup: inlineKeyboard,
-          }),
-        });
-        const editData = await editRes.json();
-        if (editRes.ok && editData.ok) {
-          syncedAny = true;
-          continue;
-        }
-        console.error('editMessageText failed:', editData);
-      }
-
-      const sendRes = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: chatId,
-          text: statsText,
-          parse_mode: 'HTML',
-          reply_markup: inlineKeyboard,
-        }),
-      });
-      const sendData = await sendRes.json();
-      if (!sendRes.ok || !sendData.ok) {
-        console.error('sendMessage for stats failed:', sendData);
-        continue;
-      }
-
-      const pinRes = await fetch(`https://api.telegram.org/bot${token}/pinChatMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: chatId,
-          message_id: sendData.result.message_id,
-          disable_notification: true,
-        }),
-      });
-      const pinData = await pinRes.json();
-      if (pinRes.ok && pinData.ok) {
-        syncedAny = true;
-      } else {
-        console.error('pinChatMessage failed:', pinData);
-      }
+      const result = await syncPinnedStatsForChat(token, chatId, statsText, inlineKeyboard);
+      if (result.ok) return true;
+      errors.push(`chat ${chatId}: ${result.error || 'unknown error'}`);
     } catch (err) {
       console.error(`Failed to sync pinned stats for chat ${chatId}:`, err);
+      errors.push(`chat ${chatId}: ${err?.message || 'exception'}`);
     }
   }
 
-  if (!syncedAny) {
-    throw new Error('Failed to sync stats to Telegram pinned message');
-  }
+  console.error('Telegram stats sync failed:', errors.join('; '));
+  return false;
 }

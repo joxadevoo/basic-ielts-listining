@@ -392,32 +392,36 @@
 
       try {
         const res = await fetch(endpoint);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
-        
-        if (!data || (data.totalUnique === 0 && data.totalVisits === 0)) {
-          throw new Error("No data returned");
-        }
+        if (!data) throw new Error('Empty response');
 
         loading.remove();
-        renderStats(container, data);
+        const isEmpty = data.totalUnique === 0 && data.totalVisits === 0;
+        renderStats(container, data, isEmpty);
       } catch (err) {
-        console.warn("Failed to fetch, displaying debug info...", err);
+        console.warn('Failed to fetch stats:', err);
         loading.innerHTML = `
           <div class="spinner" style="border-top-color: hsl(340, 85%, 60%)"></div>
-          <div class="loading-text" style="color: hsl(340, 85%, 60%)">Ma'lumot topilmadi</div>
-          <div style="font-size:0.8rem; color:var(--text-muted); text-align:center; max-width:400px; line-height:1.6; margin-top:10px;">
-            Mahalliy ishga tushirishda Telegram API tokeni kiritilmagani sababli real statistika ko'rinmaydi. 
-            Serverga yuklanganda to'liq ishlaydi.
+          <div class="loading-text" style="color: hsl(340, 85%, 60%)">Statistikani yuklab bo'lmadi</div>
+          <div style="font-size:0.8rem; color:var(--text-muted); text-align:center; max-width:420px; line-height:1.6; margin-top:10px;">
+            Server bilan bog'lanishda xatolik. Sahifani yangilab ko'ring.
           </div>
         `;
       }
     }
 
-    function renderStats(container, data) {
+    function renderStats(container, data, isEmpty = false) {
       const { dailyActive = 0, weeklyActive = 0, monthlyActive = 0 } = data;
+      const emptyBanner = isEmpty ? `
+        <div style="margin-bottom:16px;padding:14px 16px;border-radius:12px;background:hsla(340,85%,60%,0.12);color:var(--text-muted);font-size:0.85rem;line-height:1.6;text-align:center;max-width:520px;margin-left:auto;margin-right:auto;">
+          Hozircha statistika <b>0</b>. Ilovaga kirishlar yozilmayapti — odatda Blob token eski yoki Telegram bot guruhda <b>admin + pin</b> huquqiga ega emas.
+        </div>
+      ` : '';
 
       // 1. Render progress bars directly inside the glass-card
       container.innerHTML = `
+        ${emptyBanner}
         <div class="glass-card">
           <div class="chart-title-area">
             <div class="chart-title">
