@@ -89,16 +89,13 @@ export default async function handler(req, res) {
       telegramReady ? { telegramToken: token, chatId: primaryChatId } : {},
     );
     const finalNickname = applyUserEvent(stats, payload, clientIp, userAgent);
-    stats = await saveStats(stats);
+    stats = await saveStats(stats, { telegramReady });
 
-    if (telegramReady) {
-      try {
-        await syncPinnedSummaryMessages(token, chatIds, stats);
-      } catch (syncErr) {
-        console.error('Telegram pin sync failed (stats already saved):', syncErr);
-      }
+    if (!telegramReady) {
+      return res.status(503).json({ error: 'Telegram is required for stats storage' });
     }
 
+    await syncPinnedSummaryMessages(token, chatIds, stats);
     return res.status(200).json({ success: true, nickname: finalNickname });
   } catch (err) {
     console.error('Error in /api/log:', err);

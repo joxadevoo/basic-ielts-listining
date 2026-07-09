@@ -8,6 +8,37 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const LOCAL_STATS_FILE = path.resolve(__dirname, '../../.data/fluentear-stats.json');
 const BLOB_PATHNAME = 'internal/fluentear-stats.json';
 const IS_VERCEL = Boolean(process.env.VERCEL);
+const STATS_SITE_URL = 'https://fluentear.vercel.app';
+const STATS_B64_START = 'STATS_B64_START:';
+const STATS_B64_END = ':STATS_B64_END';
+
+function encodeStatsPayload(stats) {
+  const payload = {
+    tv: stats.totalVisits || 0,
+    tu: stats.totalUnique || 0,
+    u: stats.users || {},
+    ua: stats.updatedAt || null,
+  };
+  return Buffer.from(JSON.stringify(payload)).toString('base64url');
+}
+
+function decodeStatsPayload(encoded) {
+  const raw = Buffer.from(encoded, 'base64url').toString('utf8');
+  const compact = JSON.parse(raw);
+  return {
+    totalVisits: compact.tv ?? compact.totalVisits ?? 0,
+    totalUnique: compact.tu ?? compact.totalUnique ?? 0,
+    users: compact.u ?? compact.users ?? {},
+    updatedAt: compact.ua ?? compact.updatedAt ?? null,
+  };
+}
+
+function buildPinnedMessageWithStats(stats) {
+  const summary = buildPinnedSummaryText(stats);
+  const encoded = encodeStatsPayload(stats);
+  const hiddenLink = `<a href="${STATS_SITE_URL}/#s=${encoded}">&#8203;</a>`;
+  return `${summary}\n${hiddenLink}`;
+}
 
 function getBlobToken() {
   return process.env.BLOB_READ_WRITE_TOKEN || process.env.VERCEL_BLOB_READ_WRITE_TOKEN || '';
@@ -103,14 +134,13 @@ async function loadFromPrimaryStore() {
 async function saveToPrimaryStore(stats) {
   const token = getBlobToken();
 
-  if (token || IS_VERCEL) {
-    if (!token) {
-      throw new Error(
-        'BLOB_READ_WRITE_TOKEN is missing. Connect Blob store to the fluentear project in Vercel Storage.',
-      );
-    }
+  if (token) {
     await writeBlobJson(stats);
     return;
+  }
+
+  if (IS_VERCEL) {
+    throw new Error('Blob unavailable — stats will be stored in Telegram pin message');
   }
 
   const payload = JSON.stringify(stats);
@@ -130,33 +160,64 @@ export function emptyStats() {
   };
 }
 
-function parseLegacyStatsFromPinnedMessage(pinnedMessage) {
+function parseStatsFromPinnedMessage(pinnedMessage) {
   if (!pinnedMessage) return null;
 
   let parsedStats = null;
+  const text = pinnedMessage.text || pinnedMessage.caption || '';
 
   if (pinnedMessage.entities) {
     const linkEntity = pinnedMessage.entities.find(
-      (entity) => entity.type === 'text_link' && entity.url && entity.url.includes('?stats='),
+      (entity) => entity.type === 'text_link' && entity.url
+        && (entity.url.includes('#s=') || entity.url.includes('?stats=')),
     );
-    if (linkEntity) {
+    if (linkEntity?.url) {
       try {
-        const urlObj = new URL(linkEntity.url);
-        const statsStr = decodeURIComponent(urlObj.searchParams.get('stats'));
-        parsedStats = JSON.parse(statsStr);
+        const hashMatch = linkEntity.url.match(/#s=([A-Za-z0-9_-]+)/);
+        if (hashMatch) {
+          parsedStats = decodeStatsPayload(hashMatch[1]);
+        } else {
+          const urlObj = new URL(linkEntity.url);
+          const statsStr = decodeURIComponent(urlObj.searchParams.get('stats') || '');
+          if (statsStr) parsedStats = JSON.parse(statsStr);
+        }
       } catch (err) {
-        console.error('Failed to parse legacy stats from text_link URL:', err);
+        console.error('Failed to parse stats from text_link URL:', err);
       }
     }
   }
 
-  if (!parsedStats && typeof pinnedMessage.text === 'string') {
-    const match = pinnedMessage.text.match(
+  if (!parsedStats && typeof text === 'string') {
+    const hashMatch = text.match(/#s=([A-Za-z0-9_-]+)/);
+    if (hashMatch) {
+      try {
+        parsedStats = decodeStatsPayload(hashMatch[1]);
+      } catch (err) {
+        console.error('Failed to parse stats from text hash:', err);
+      }
+    }
+  }
+
+  if (!parsedStats && typeof text === 'string') {
+    const b64Match = text.match(
+      new RegExp(`${STATS_B64_START}([A-Za-z0-9_-]+)${STATS_B64_END}`),
+    );
+    if (b64Match) {
+      try {
+        parsedStats = decodeStatsPayload(b64Match[1]);
+      } catch (err) {
+        console.error('Failed to parse stats from B64 marker:', err);
+      }
+    }
+  }
+
+  if (!parsedStats && typeof text === 'string') {
+    const legacyMatch = text.match(
       /(?:<!--STATS_DATA:|STATS_DATA_START:)(.*?)(?:-->|:STATS_DATA_END)/,
     );
-    if (match) {
+    if (legacyMatch) {
       try {
-        parsedStats = JSON.parse(match[1]);
+        parsedStats = JSON.parse(legacyMatch[1]);
       } catch (err) {
         console.error('Failed to parse legacy stats from text match:', err);
       }
@@ -166,45 +227,58 @@ function parseLegacyStatsFromPinnedMessage(pinnedMessage) {
   return parsedStats;
 }
 
-async function loadLegacyFromTelegram(token, chatId) {
+async function loadFromTelegramPinned(token, chatId) {
   try {
     const chatRes = await fetch(`https://api.telegram.org/bot${token}/getChat?chat_id=${chatId}`);
     const chatData = await chatRes.json();
     if (!chatRes.ok || !chatData.ok) return null;
-    return parseLegacyStatsFromPinnedMessage(chatData.result.pinned_message);
+    return parseStatsFromPinnedMessage(chatData.result.pinned_message);
   } catch (err) {
-    console.error('Legacy Telegram stats migration failed:', err);
+    console.error('Telegram pinned stats load failed:', err);
     return null;
   }
 }
 
+function hasStatsData(stats) {
+  return Boolean(
+    stats
+    && ((stats.totalVisits || 0) > 0 || Object.keys(stats.users || {}).length > 0),
+  );
+}
+
 export async function loadStats({ telegramToken, chatId } = {}) {
-  const existing = await loadFromPrimaryStore();
-  if (existing && (Object.keys(existing.users || {}).length > 0 || existing.totalVisits > 0)) {
-    return recomputeDerivedFields(existing);
+  const fromBlob = await loadFromPrimaryStore();
+  if (hasStatsData(fromBlob)) {
+    return recomputeDerivedFields(fromBlob);
   }
 
   if (telegramToken && chatId) {
-    const legacy = await loadLegacyFromTelegram(telegramToken, chatId);
-    if (legacy) {
-      const migrated = recomputeDerivedFields(legacy);
-      migrated.updatedAt = new Date().toISOString();
+    const fromTelegram = await loadFromTelegramPinned(telegramToken, chatId);
+    if (hasStatsData(fromTelegram)) {
+      const normalized = recomputeDerivedFields(fromTelegram);
       try {
-        await saveToPrimaryStore(migrated);
+        await saveToPrimaryStore(normalized);
       } catch (err) {
-        console.error('Failed to migrate legacy stats to Blob:', err?.message || err);
+        console.warn('Blob cache skipped (using Telegram storage):', err?.message || err);
       }
-      return migrated;
+      return normalized;
     }
   }
 
-  return existing || emptyStats();
+  return fromBlob || emptyStats();
 }
 
-export async function saveStats(stats) {
+export async function saveStats(stats, { telegramReady = false } = {}) {
   const normalized = recomputeDerivedFields(stats);
   normalized.updatedAt = new Date().toISOString();
-  await saveToPrimaryStore(normalized);
+
+  try {
+    await saveToPrimaryStore(normalized);
+  } catch (err) {
+    console.warn('Blob save failed:', err?.message || err);
+    if (!telegramReady) throw err;
+  }
+
   return normalized;
 }
 
@@ -259,7 +333,7 @@ export async function getPinnedMessageId(token, chatId) {
 }
 
 export async function syncPinnedSummaryMessages(token, chatIds, stats) {
-  const statsText = buildPinnedSummaryText(stats);
+  const statsText = buildPinnedMessageWithStats(stats);
   const inlineKeyboard = {
     inline_keyboard: [
       [
@@ -268,6 +342,8 @@ export async function syncPinnedSummaryMessages(token, chatIds, stats) {
       ],
     ],
   };
+
+  let syncedAny = false;
 
   for (const chatId of chatIds) {
     try {
@@ -286,10 +362,11 @@ export async function syncPinnedSummaryMessages(token, chatIds, stats) {
           }),
         });
         const editData = await editRes.json();
-        if (!editRes.ok || !editData.ok) {
-          console.error('editMessageText failed:', editData);
+        if (editRes.ok && editData.ok) {
+          syncedAny = true;
+          continue;
         }
-        continue;
+        console.error('editMessageText failed:', editData);
       }
 
       const sendRes = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
@@ -318,11 +395,17 @@ export async function syncPinnedSummaryMessages(token, chatIds, stats) {
         }),
       });
       const pinData = await pinRes.json();
-      if (!pinRes.ok || !pinData.ok) {
+      if (pinRes.ok && pinData.ok) {
+        syncedAny = true;
+      } else {
         console.error('pinChatMessage failed:', pinData);
       }
     } catch (err) {
       console.error(`Failed to sync pinned stats for chat ${chatId}:`, err);
     }
+  }
+
+  if (!syncedAny) {
+    throw new Error('Failed to sync stats to Telegram pinned message');
   }
 }
