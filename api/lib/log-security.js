@@ -33,18 +33,57 @@ export function getClientIp(req) {
   return req.headers['x-real-ip'] || req.socket?.remoteAddress || 'unknown';
 }
 
+function toOrigin(urlOrHost) {
+  if (!urlOrHost) return null;
+  const value = String(urlOrHost).trim().replace(/\/$/, '');
+  if (!value) return null;
+  if (value.startsWith('http://') || value.startsWith('https://')) return value;
+  return `https://${value}`;
+}
+
+export function getPrimaryAppUrl() {
+  const fromEnv = toOrigin(process.env.APP_URL)
+    || toOrigin(process.env.VERCEL_PROJECT_PRODUCTION_URL)
+    || toOrigin(process.env.VERCEL_URL);
+  return (fromEnv || 'https://fluentear.vercel.app').replace(/\/$/, '');
+}
+
 export function getAllowedOrigins() {
-  return (process.env.ALLOWED_ORIGINS
-    || 'https://tinglash.vercel.app,http://localhost:3000,http://127.0.0.1:3000')
+  const configured = (process.env.ALLOWED_ORIGINS || '')
     .split(',')
     .map((entry) => entry.trim())
     .filter(Boolean);
+
+  const defaults = [
+    'https://fluentear.vercel.app',
+    'https://tinglash.vercel.app',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+  ];
+
+  const deploymentOrigins = [
+    process.env.APP_URL,
+    process.env.VERCEL_URL,
+    process.env.VERCEL_BRANCH_URL,
+    process.env.VERCEL_PROJECT_PRODUCTION_URL,
+  ]
+    .map(toOrigin)
+    .filter(Boolean);
+
+  return [...new Set([...configured, ...defaults, ...deploymentOrigins])];
 }
 
 export function isAllowedOrigin(req) {
   const allowed = getAllowedOrigins();
   const origin = req.headers.origin || '';
   const referer = req.headers.referer || '';
+  const host = req.headers.host || req.headers['x-forwarded-host'] || '';
+  const hostOrigin = toOrigin(host);
+
+  if (hostOrigin && allowed.includes(hostOrigin)) {
+    if (!origin && !referer) return true;
+    if (origin === hostOrigin || referer.startsWith(hostOrigin)) return true;
+  }
 
   if (!origin && !referer) {
     return process.env.NODE_ENV !== 'production';
@@ -56,7 +95,7 @@ export function isAllowedOrigin(req) {
 export function resolveCorsOrigin(req) {
   const origin = req.headers.origin || '';
   if (origin && getAllowedOrigins().includes(origin)) return origin;
-  return (process.env.APP_URL || 'https://tinglash.vercel.app').replace(/\/$/, '');
+  return getPrimaryAppUrl();
 }
 
 export function checkRateLimit(ip, type) {
@@ -172,7 +211,7 @@ export function buildLogMessage(payload, trackTitle = '') {
 }
 
 export function buildReplyMarkup() {
-  const appUrl = (process.env.APP_URL || 'https://tinglash.vercel.app').replace(/\/$/, '');
+  const appUrl = getPrimaryAppUrl();
   return {
     inline_keyboard: [
       [
