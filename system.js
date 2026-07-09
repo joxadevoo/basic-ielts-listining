@@ -158,7 +158,7 @@ function buildButtons() {
       ],
       [
         {
-          text: "🌐 TinglangApp'ni ochish",
+          text: "🌐 FluentEar'ni ochish",
           url: window.location.origin || "https://tinglash.vercel.app/"
         }
       ]

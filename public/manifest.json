@@ -1,7 +1,7 @@
 {
-  "short_name": "TinglangApp",
-  "name": "TinglangApp - Basic IELTS Listening",
-  "description": "Basic IELTS Listening uchun Uzbekcha qulay mashq ilovasi.",
+  "short_name": "FluentEar",
+  "name": "FluentEar — IELTS Practice & Audiobooks",
+  "description": "FluentEar — IELTS Listening va Audiobooks uchun qulay mashq ilovasi.",
   "icons": [
     {
       "src": "favicon.svg",

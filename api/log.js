@@ -168,22 +168,29 @@ async function updatePinnedStats(token, chatId, nickname, device, deviceType, to
     if (ip && userAgent) {
       const fingerprintRaw = `${ip}_${userAgent}`;
       const fingerprint = crypto.createHash('sha256').update(fingerprintRaw).digest('hex').substring(0, 16);
-      user.fingerprint = fingerprint;
+      user.fp = fingerprint;
     }
     
     if (type === 'session_start') {
-      user.totalVisits = (user.totalVisits || 0) + 1;
-      if (!user.dailyVisits) user.dailyVisits = {};
-      user.dailyVisits[today] = (user.dailyVisits[today] || 0) + 1;
-      user.lastActive = today;
+      user.v = (user.v || 0) + 1;
+      user.la = today;
       stats.totalVisits = (stats.totalVisits || 0) + 1;
     }
 
-    if (device) user.device = device;
-    if (deviceType) user.deviceType = deviceType;
-    if (typeof totalUsageTime === 'number') user.totalUsageTime = totalUsageTime;
-    if (typeof listenedTracksCount === 'number') user.listenedTracksCount = listenedTracksCount;
-    if (typeof totalTracksDuration === 'number') user.totalTracksDuration = totalTracksDuration;
+    // Store only compact device info (e.g. "Android" not full UA)
+    if (device) user.d = device;
+    if (deviceType) user.dt = deviceType;
+
+    // Clean old per-user bloat fields if they exist from legacy data
+    delete user.totalVisits;
+    delete user.dailyVisits;
+    delete user.lastActive;
+    delete user.fingerprint;
+    delete user.device;
+    delete user.deviceType;
+    delete user.totalUsageTime;
+    delete user.listenedTracksCount;
+    delete user.totalTracksDuration;
 
     // Calculate totalUnique and monthlyActive dynamically based on unique fingerprints
     const uniqueFingerprints = new Set();
@@ -196,63 +203,67 @@ async function updatePinnedStats(token, chatId, nickname, device, deviceType, to
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().split('T')[0];
 
+    // Aggregate device stats for charts
+    const deviceTypes = {};
+    const osBrowsers = {};
+
     if (stats.users) {
       for (const uData of Object.values(stats.users)) {
         // Uniqueness
-        if (uData.fingerprint) {
-          uniqueFingerprints.add(uData.fingerprint);
+        if (uData.fp) {
+          uniqueFingerprints.add(uData.fp);
         } else {
           legacyUniques++;
         }
 
         // Monthly active (last 30 days)
-        if (uData.lastActive && uData.lastActive >= thirtyDaysAgoStr) {
-          if (uData.fingerprint) {
-            activeFingerprints.add(uData.fingerprint);
+        const lastAct = uData.la || uData.lastActive;
+        if (lastAct && lastAct >= thirtyDaysAgoStr) {
+          if (uData.fp) {
+            activeFingerprints.add(uData.fp);
           } else {
             legacyActive++;
           }
         }
+
+        // Device breakdown
+        const dt = uData.dt || uData.deviceType || 'Unknown';
+        deviceTypes[dt] = (deviceTypes[dt] || 0) + 1;
+        
+        const db = uData.d || uData.device || 'Unknown';
+        osBrowsers[db] = (osBrowsers[db] || 0) + 1;
       }
     }
 
     stats.totalUnique = uniqueFingerprints.size + legacyUniques;
     let monthlyActive = activeFingerprints.size + legacyActive;
 
-    // Sum stats across all users
-    let totalUsageTimeAll = 0;
-    let totalTrackDurationAll = 0;
-    let totalTracksCountAll = 0;
-
-    if (stats.users) {
-      for (const uData of Object.values(stats.users)) {
-        totalUsageTimeAll += uData.totalUsageTime || 0;
-        totalTrackDurationAll += uData.totalTracksDuration || 0;
-        totalTracksCountAll += uData.listenedTracksCount || 0;
-      }
+    // Build device breakdown text for Telegram (compact)
+    let deviceBreakdown = '';
+    for (const [dt, count] of Object.entries(deviceTypes).sort((a, b) => b[1] - a[1])) {
+      const emoji = dt === 'Kompyuter' ? '💻' : dt === 'Telefon' ? '📱' : '📟';
+      deviceBreakdown += `  ${emoji} ${dt}: ${count}\n`;
     }
 
-    // Format helper for duration
-    function formatDuration(seconds) {
-      const h = Math.floor(seconds / 3600);
-      const m = Math.floor((seconds % 3600) / 60);
-      if (h > 0) {
-        return `${h} soat ${m} daqiqa`;
-      }
-      return `${m} daqiqa`;
+    let browserBreakdown = '';
+    for (const [db, count] of Object.entries(osBrowsers).sort((a, b) => b[1] - a[1]).slice(0, 5)) {
+      browserBreakdown += `  🌐 ${db}: ${count}\n`;
     }
+
+    // Store device stats in stats object for public API
+    stats.deviceTypes = deviceTypes;
+    stats.osBrowsers = osBrowsers;
 
     // Format the pinned summary message text
-    let statsText = `<a href="https://tinglash.vercel.app/?stats=${encodeURIComponent(JSON.stringify(stats))}">&#8203;</a>` +
-                    `📌 <b>TinglangApp Foydalanish Statistikasi</b>\n\n` +
-                    `👥 <b>Jami unikal qurilmalar:</b> ${stats.totalUnique || 0} ta\n` +
-                    `📈 <b>Jami kirishlar soni:</b> ${stats.totalVisits || 0} marta\n` +
-                    `📅 <b>Oylik faol foydalanuvchilar (MAU):</b> ${monthlyActive} ta\n` +
-                    `⏱️ <b>Jami foydalanish vaqti:</b> ${formatDuration(totalUsageTimeAll)}\n` +
-                    `🎵 <b>Eshitilgan treklar soni:</b> ${totalTracksCountAll} ta\n` +
-                    `⏳ <b>Treklar jami eshitilgan vaqti:</b> ${formatDuration(totalTrackDurationAll)}\n`;
+    let statsText = `<a href="https://tinglash.vercel.app/?stats=${encodeURIComponent(JSON.stringify(stats))}">\u200B</a>` +
+                    `📌 <b>FluentEar Statistikasi</b>\n\n` +
+                    `👥 <b>Unikal foydalanuvchilar:</b> ${stats.totalUnique || 0} ta\n` +
+                    `📈 <b>Jami kirishlar:</b> ${stats.totalVisits || 0} marta\n` +
+                    `📅 <b>Oylik faol (MAU):</b> ${monthlyActive} ta\n\n` +
+                    `📊 <b>Qurilma turlari:</b>\n${deviceBreakdown}\n` +
+                    `🖥️ <b>Tizimlar:</b>\n${browserBreakdown}`;
 
-    statsText += `\n🕒 <b>Oxirgi yangilanish:</b> ${new Date().toLocaleString('uz-UZ', { timeZone: 'Asia/Tashkent' })}`;
+    statsText += `\n🕒 <b>Yangilangan:</b> ${new Date().toLocaleString('uz-UZ', { timeZone: 'Asia/Tashkent' })}`;
 
     const inlineKeyboard = {
       inline_keyboard: [

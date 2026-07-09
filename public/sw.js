@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ielts-listening-v19';
+const CACHE_NAME = 'ielts-listening-v20';
 const ASSETS_TO_CACHE = [
   './',
   './favicon.svg',
@@ -49,9 +49,8 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
-  // Bypass cache-first for large media files (.mp3, .pdf) to prevent range request/quota errors
+  // Bypass service worker for large media files (.mp3, .pdf) to let browser handle range requests natively
   if (url.pathname.endsWith('.mp3') || url.pathname.endsWith('.pdf')) {
-    e.respondWith(fetch(e.request));
     return;
   }
 

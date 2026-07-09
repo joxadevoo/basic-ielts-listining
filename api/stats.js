@@ -21,10 +21,9 @@ export default async function handler(req, res) {
   const chatIds = chatIdEnv.split(',').map(id => id.trim()).filter(id => id);
 
   if (!token || chatIds.length === 0) {
-    return res.status(200).json({ totalUnique: 0, totalVisits: 0, monthlyActive: 0 });
+    return res.status(200).json({ totalUnique: 0, totalVisits: 0, dailyActive: 0, weeklyActive: 0, monthlyActive: 0, deviceTypes: {} });
   }
 
-  // Use the group chat ID (starts with -) if available, otherwise the first chat ID
   const chatId = chatIds.find(id => id.startsWith('-')) || chatIds[0];
 
   try {
@@ -32,16 +31,16 @@ export default async function handler(req, res) {
     const chatData = await chatRes.json();
 
     if (!chatRes.ok || !chatData.ok) {
-      return res.status(200).json({ totalUnique: 0, totalVisits: 0, monthlyActive: 0 });
+      return res.status(200).json({ totalUnique: 0, totalVisits: 0, dailyActive: 0, weeklyActive: 0, monthlyActive: 0, deviceTypes: {} });
     }
 
     const pinnedMessage = chatData.result.pinned_message;
-    let stats = { totalUnique: 0, totalVisits: 0, monthlyActive: 0 };
+    let result = { totalUnique: 0, totalVisits: 0, dailyActive: 0, weeklyActive: 0, monthlyActive: 0, deviceTypes: {} };
 
     if (pinnedMessage) {
       let parsedStats = null;
       
-      // Try extracting from text_link entities first
+      // Try text_link first
       if (pinnedMessage.entities) {
         const linkEntity = pinnedMessage.entities.find(e => e.type === 'text_link' && e.url && e.url.includes('?stats='));
         if (linkEntity) {
@@ -50,7 +49,7 @@ export default async function handler(req, res) {
             const statsStr = decodeURIComponent(urlObj.searchParams.get('stats'));
             parsedStats = JSON.parse(statsStr);
           } catch (e) {
-            console.error("Failed to parse stats from text_link entity URL:", e);
+            console.error("Failed to parse stats from text_link entity:", e);
           }
         }
       }
@@ -70,34 +69,67 @@ export default async function handler(req, res) {
       }
 
       if (parsedStats) {
-        stats.totalUnique = parsedStats.totalUnique || 0;
-        stats.totalVisits = parsedStats.totalVisits || 0;
+        result.totalUnique = parsedStats.totalUnique || 0;
+        result.totalVisits = parsedStats.totalVisits || 0;
         
-        // Calculate active users in the last 30 days (Monthly Active Users)
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().split('T')[0];
+        // Calculate date boundaries in Tashkent time (GMT+5)
+        const getTashkentDateString = (offsetDays = 0) => {
+          const d = new Date();
+          // Adjust UTC to Tashkent (UTC+5)
+          const utc = d.getTime() + (d.getTimezoneOffset() * 60000);
+          const tzDate = new Date(utc + (3600000 * 5));
+          if (offsetDays !== 0) {
+            tzDate.setDate(tzDate.getDate() - offsetDays);
+          }
+          return tzDate.toISOString().split('T')[0];
+        };
 
-        const activeFingerprints = new Set();
-        let legacyActive = 0;
+        const todayStr = getTashkentDateString(0);
+        const sevenDaysAgoStr = getTashkentDateString(7);
+        const thirtyDaysAgoStr = getTashkentDateString(30);
+
+        const dailySet = new Set();
+        const weeklySet = new Set();
+        const monthlySet = new Set();
+        const deviceTypes = {};
 
         if (parsedStats.users) {
           for (const uData of Object.values(parsedStats.users)) {
-            if (uData.lastActive && uData.lastActive >= thirtyDaysAgoStr) {
-              if (uData.fingerprint) {
-                activeFingerprints.add(uData.fingerprint);
-              } else {
-                legacyActive++;
+            const lastAct = uData.la || uData.lastActive;
+            const fp = uData.fp || uData.fingerprint;
+
+            if (lastAct && fp) {
+              if (lastAct === todayStr) {
+                dailySet.add(fp);
               }
+              if (lastAct >= sevenDaysAgoStr) {
+                weeklySet.add(fp);
+              }
+              if (lastAct >= thirtyDaysAgoStr) {
+                monthlySet.add(fp);
+              }
+            } else if (lastAct) {
+              // Legacy fallback
+              if (lastAct === todayStr) dailySet.add(Math.random());
+              if (lastAct >= sevenDaysAgoStr) weeklySet.add(Math.random());
+              if (lastAct >= thirtyDaysAgoStr) monthlySet.add(Math.random());
             }
+
+            // Device types breakdown
+            const dt = uData.dt || uData.deviceType || 'Unknown';
+            deviceTypes[dt] = (deviceTypes[dt] || 0) + 1;
           }
         }
-        stats.monthlyActive = activeFingerprints.size + legacyActive;
+
+        result.dailyActive = dailySet.size;
+        result.weeklyActive = weeklySet.size;
+        result.monthlyActive = monthlySet.size;
+        result.deviceTypes = deviceTypes;
       }
     }
 
-    return res.status(200).json(stats);
+    return res.status(200).json(result);
   } catch (err) {
-    return res.status(200).json({ totalUnique: 0, totalVisits: 0, monthlyActive: 0, error: err.message });
+    return res.status(200).json({ totalUnique: 0, totalVisits: 0, dailyActive: 0, weeklyActive: 0, monthlyActive: 0, deviceTypes: {}, error: err.message });
   }
 }

@@ -211,7 +211,7 @@ const TRANSLATIONS = {
     setting_reset_desc: "Permanently delete all saved notes, scores, and track progress history.",
     btn_reset_data: "Reset Data",
     btn_save_close: "Save & Close",
-    dev_credit: "Designed by Joxa · Jakhongir Toshpulatov",
+    dev_credit: "Created by Jaxongir Toshpo'latov",
     coffee_desc: "If you find this application helpful, consider supporting the developer!",
     support_modal_title: "Support Developer",
     support_desc: "If you find this application helpful, you can support the developer.",
@@ -387,7 +387,7 @@ const TRANSLATIONS = {
     setting_reset_desc: "Barcha saqlangan eslatmalar, diktantlar va o'zlashtirish tarixini butunlay o'chirib yuborish.",
     btn_reset_data: "Ma'lumotlarni tozalash",
     btn_save_close: "Saqlash va yopish",
-    dev_credit: "Joxa · Jakhongir Toshpulatov tomonidan dizayn qilingan",
+    dev_credit: "Jaxongir Toshpo'latov tomonidan yaratilgan",
     coffee_desc: "Agar ushbu ilova sizga yoqqan bo'lsa, dasturchini qo'llab-quvvatlashni o'ylab ko'ring!",
     support_modal_title: "Dasturchini qo'llab-quvvatlash",
     support_desc: "Agar ushbu ilova sizga yoqqan bo'lsa, dasturchini qo'llab-quvvatlashingiz mumkin.",
@@ -2790,6 +2790,7 @@ function setupEventListeners() {
 
   tourClose.addEventListener('click', endTour);
   tourShade.addEventListener('click', endTour);
+
   tourPrev.addEventListener('click', previousTourStep);
   tourNext.addEventListener('click', nextTourStep);
   window.addEventListener('resize', () => {
@@ -2825,132 +2826,10 @@ function setupEventListeners() {
     });
   }
 
+  // Stats button opens dedicated stats page
   if (btnStatsToggle) {
-    btnStatsToggle.addEventListener('click', async () => {
-      publicStatsModal.classList.add('active');
-      
-      const now = Date.now();
-      const lastFetched = localStorage.getItem('ielts_public_stats_timestamp');
-      const cachedStats = localStorage.getItem('ielts_public_stats');
-      
-      // 2 days = 2 * 24 * 60 * 60 * 1000 = 172,800,000 milliseconds
-      const cacheDuration = 172800000;
-      
-      if (cachedStats && lastFetched && (now - parseInt(lastFetched, 10) < cacheDuration)) {
-        // Stats are fresh, use cached data
-        try {
-          const stats = JSON.parse(cachedStats);
-          if (stats && stats.totalUnique > 0) {
-            if (pubStatsUnique) pubStatsUnique.textContent = stats.totalUnique || 0;
-            if (pubStatsVisits) pubStatsVisits.textContent = stats.totalVisits || 0;
-            if (pubStatsMonthly) pubStatsMonthly.textContent = stats.monthlyActive || 0;
-            return;
-          }
-        } catch (e) {
-          // Fallback to fetch on parse error
-        }
-      }
-
-      // Fetch fresh stats if no cache or expired (2 days passed)
-      try {
-        const res = await fetch('/api/stats');
-        if (res.ok) {
-          const stats = await res.json();
-          if (pubStatsUnique) pubStatsUnique.textContent = stats.totalUnique || 0;
-          if (pubStatsVisits) pubStatsVisits.textContent = stats.totalVisits || 0;
-          if (pubStatsMonthly) pubStatsMonthly.textContent = stats.monthlyActive || 0;
-          
-          // Cache the response
-          localStorage.setItem('ielts_public_stats', JSON.stringify(stats));
-          localStorage.setItem('ielts_public_stats_timestamp', now.toString());
-        } else {
-          throw new Error("Stats endpoint returned non-OK status");
-        }
-      } catch (err) {
-        console.warn("Failed to fetch from /api/stats, trying client-side Telegram API fallback...", err);
-        const t = import.meta.env.VITE_TELEGRAM_BOT_TOKEN || "";
-        const cEnv = import.meta.env.VITE_TELEGRAM_CHAT_ID || "";
-        const chatIds = cEnv.split(',').map(id => id.trim()).filter(id => id);
-        
-        if (t && chatIds.length > 0) {
-          try {
-            const chatId = chatIds.find(id => id.startsWith('-')) || chatIds[0];
-            const chatRes = await fetch(`https://api.telegram.org/bot${t}/getChat?chat_id=${chatId}`);
-            if (chatRes.ok) {
-              const chatData = await chatRes.json();
-              if (chatData.ok && chatData.result.pinned_message) {
-                const pm = chatData.result.pinned_message;
-                let parsedStats = null;
-                
-                // Try text_link first
-                if (pm.entities) {
-                  const linkEntity = pm.entities.find(e => e.type === 'text_link' && e.url && e.url.includes('?stats='));
-                  if (linkEntity) {
-                    try {
-                      const urlObj = new URL(linkEntity.url);
-                      const statsStr = decodeURIComponent(urlObj.searchParams.get('stats'));
-                      parsedStats = JSON.parse(statsStr);
-                    } catch (e) {
-                      console.error("Failed to parse stats from text_link entity URL:", e);
-                    }
-                  }
-                }
-                
-                // Fallback to text matching
-                if (!parsedStats) {
-                  const match = (pm.text && typeof pm.text === 'string')
-                    ? pm.text.match(/(?:<!--STATS_DATA:|STATS_DATA_START:)(.*?)(?:-->|:STATS_DATA_END)/)
-                    : null;
-                  if (match) {
-                    try {
-                      parsedStats = JSON.parse(match[1]);
-                    } catch (e) {
-                      console.error("Failed to parse stats from text match:", e);
-                    }
-                  }
-                }
-                
-                if (parsedStats) {
-                  const stats = parsedStats;
-                  const thirtyDaysAgo = new Date();
-                  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-                  const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().split('T')[0];
-
-                  let monthlyActive = 0;
-                  if (stats.users) {
-                    for (const uData of Object.values(stats.users)) {
-                      if (uData.lastActive && uData.lastActive >= thirtyDaysAgoStr) {
-                        monthlyActive++;
-                      }
-                    }
-                  }
-                  
-                  const displayStats = {
-                    totalUnique: stats.totalUnique || 0,
-                    totalVisits: stats.totalVisits || 0,
-                    monthlyActive: monthlyActive
-                  };
-                  
-                  if (pubStatsUnique) pubStatsUnique.textContent = displayStats.totalUnique;
-                  if (pubStatsVisits) pubStatsVisits.textContent = displayStats.totalVisits;
-                  if (pubStatsMonthly) pubStatsMonthly.textContent = displayStats.monthlyActive;
-                  
-                  localStorage.setItem('ielts_public_stats', JSON.stringify(displayStats));
-                  localStorage.setItem('ielts_public_stats_timestamp', now.toString());
-                }
-              }
-            }
-          } catch (fallbackErr) {
-            console.error("Client-side Telegram stats fallback failed:", fallbackErr);
-          }
-        }
-      }
-    });
-  }
-
-  if (btnClosePublicStats) {
-    btnClosePublicStats.addEventListener('click', () => {
-      publicStatsModal.classList.remove('active');
+    btnStatsToggle.addEventListener('click', () => {
+      window.open('/stats.html', '_blank');
     });
   }
 
