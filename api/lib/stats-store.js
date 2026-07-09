@@ -44,9 +44,23 @@ function getBlobToken() {
   return process.env.BLOB_READ_WRITE_TOKEN || process.env.VERCEL_BLOB_READ_WRITE_TOKEN || '';
 }
 
+function getBlobStoreId() {
+  return process.env.BLOB_STORE_ID || '';
+}
+
+function canUseBlobStore() {
+  return IS_VERCEL || Boolean(getBlobStoreId() || getBlobToken());
+}
+
 function getBlobOptionSets() {
   const token = getBlobToken();
-  // Use token only — BLOB_STORE_ID from an old project/domain causes "store does not exist"
+  const storeId = getBlobStoreId();
+
+  // Vercel OIDC: BLOB_STORE_ID + VERCEL_OIDC_TOKEN (never pass stale token — it overrides OIDC)
+  if (IS_VERCEL && storeId) return [{}];
+  if (IS_VERCEL) return [{}];
+
+  // Local dev: static read-write token only
   return token ? [{ token }] : [];
 }
 
@@ -117,9 +131,7 @@ async function writeBlobJson(stats) {
 }
 
 async function loadFromPrimaryStore() {
-  const token = getBlobToken();
-
-  if (token || IS_VERCEL) {
+  if (canUseBlobStore()) {
     return readBlobJson();
   }
 
@@ -132,9 +144,7 @@ async function loadFromPrimaryStore() {
 }
 
 async function saveToPrimaryStore(stats) {
-  const token = getBlobToken();
-
-  if (token) {
+  if (canUseBlobStore()) {
     await writeBlobJson(stats);
     return;
   }
