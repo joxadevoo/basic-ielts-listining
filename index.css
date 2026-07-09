@@ -1384,9 +1384,7 @@ h1, h2, h3, h4, h5, h6 {
   bottom: 100%;
   right: 0;
   margin-bottom: 8px;
-  background: color-mix(in srgb, var(--bg-surface) 82%, transparent);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   display: none;
@@ -2656,9 +2654,9 @@ body.menu-open .app-header {
 .speed-menu-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   z-index: 108;
   opacity: 0;
   visibility: hidden;
@@ -3844,19 +3842,18 @@ a.menu-item-link {
   position: absolute;
   bottom: calc(100% + 8px);
   right: 0;
-  background: color-mix(in srgb, var(--bg-surface) 82%, transparent);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
   z-index: 230;
   min-width: 80px;
   overflow: hidden;
 }
 
 .ab-speed-dropdown.active {
-  display: block;
+  display: flex;
+  flex-direction: column;
 }
 
 .ab-speed-opt {
