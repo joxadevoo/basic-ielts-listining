@@ -4459,11 +4459,31 @@ a.menu-item-link {
   inset: 0;
   background-size: cover;
   background-position: center;
-  filter: blur(36px);
+  filter: blur(20px);
   opacity: 0;
   transition: opacity 0.4s ease;
   pointer-events: none;
   z-index: 0;
+}
+
+.ab-blur-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.55);
+}
+
+[data-theme="dark"] .ab-blur-bg::after {
+  background: rgba(13, 21, 39, 0.7);
+}
+
+.ab-now-description {
+  font-size: 0.74rem;
+  font-family: var(--font-body);
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-top: 5px;
+  line-height: 1.45;
 }
 
 @media (max-width: 768px) {
@@ -4505,7 +4525,7 @@ a.menu-item-link {
   }
 
   .ab-music-shell.ab-cover-collapsed .ab-now-playing {
-    margin-top: 12px;
+    margin-top: 48px; /* Push down to align beautifully below buttons */
     align-items: flex-start;
     text-align: left;
     padding-left: 56px;
@@ -4517,17 +4537,20 @@ a.menu-item-link {
   }
 
   .ab-music-shell.ab-cover-collapsed .ab-hero {
-    padding: 16px 20px 0;
+    padding: 24px 20px 16px;
+    margin-bottom: 24px; /* Push chapters list down a bit */
     align-items: stretch;
     text-align: left;
+    position: relative;
+    z-index: 1;
   }
 
   .ab-music-shell.ab-cover-collapsed .ab-blur-bg {
-    opacity: 0.15;
+    opacity: 0.55; /* Higher visibility for recognizable background shapes */
   }
 
   [data-theme="dark"] .ab-music-shell.ab-cover-collapsed .ab-blur-bg {
-    opacity: 0.25;
+    opacity: 0.65;
   }
 
   /* Shrink Cover on Small Height Screens (e.g., iPhone SE/8) */

@@ -558,6 +558,7 @@ const abSpeedDropdown = document.getElementById('ab-speed-dropdown');
 const abChaptersList = document.getElementById('audiobook-chapters-list');
 const abNowTitle = document.getElementById('ab-now-title');
 const abNowChapter = document.getElementById('ab-now-chapter');
+const abNowDescription = document.getElementById('ab-now-description');
 const abNowAuthor = document.getElementById('ab-now-author');
 const abSegmentNav = document.getElementById('ab-segmented-nav');
 const abSegmentIndicator = document.getElementById('ab-segment-indicator');
@@ -1584,6 +1585,19 @@ function updateAbNowPlaying(chapter) {
   if (abNowChapter && ch) {
     const label = state.language === 'en' ? 'Chapter' : 'Bob';
     abNowChapter.textContent = `${label} ${ch.chapterNum}: ${getAbChapterShortTitle(ch)}`;
+  }
+  if (abNowDescription && ch) {
+    const diff = ch.end - ch.start;
+    const minutes = Math.floor(diff / 60);
+    const seconds = Math.floor(diff % 60);
+    const durationText = state.language === 'en'
+      ? `${minutes} min ${seconds} sec`
+      : `${minutes} daqiqa ${seconds} soniya`;
+    const startText = formatAbChapterTime(ch.start);
+    const endText = formatAbChapterTime(ch.end);
+    abNowDescription.textContent = state.language === 'en'
+      ? `Duration: ${durationText} (${startText} – ${endText})`
+      : `Davomiyligi: ${durationText} (${startText} dan ${endText} gacha)`;
   }
 }
 
