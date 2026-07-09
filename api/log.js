@@ -48,23 +48,18 @@ export default async function handler(req, res) {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatIdEnv = process.env.TELEGRAM_CHAT_ID || '';
   const chatIds = chatIdEnv.split(',').map((id) => id.trim()).filter(Boolean);
-
-  if (!token || chatIds.length === 0) {
-    return res.status(500).json({ error: 'Configuration missing on server.' });
-  }
+  const telegramReady = Boolean(token && chatIds.length > 0);
 
   try {
-    let trackTitle = '';
-    if (payload.trackNum != null) {
-      const track = TRACKS.find((entry) => entry.trackNum === payload.trackNum);
-      trackTitle = track?.title?.split(' - ')[1] || track?.title || '';
-    }
+    if (telegramReady && payload.type === 'session_start') {
+      let trackTitle = '';
+      if (payload.trackNum != null) {
+        const track = TRACKS.find((entry) => entry.trackNum === payload.trackNum);
+        trackTitle = track?.title?.split(' - ')[1] || track?.title || '';
+      }
 
-    const text = buildLogMessage(payload, trackTitle);
-    const replyMarkup = buildReplyMarkup();
-    const shouldSendMessage = payload.type === 'session_start';
-
-    if (shouldSendMessage) {
+      const text = buildLogMessage(payload, trackTitle);
+      const replyMarkup = buildReplyMarkup();
       const url = `https://api.telegram.org/bot${token}/sendMessage`;
       const sendPromises = chatIds.map(async (cid) => {
         try {
@@ -89,10 +84,15 @@ export default async function handler(req, res) {
     const userAgent = req.headers['user-agent'] || 'unknown';
     const primaryChatId = chatIds.find((id) => id.startsWith('-')) || chatIds[0];
 
-    let stats = await loadStats({ telegramToken: token, chatId: primaryChatId });
+    let stats = await loadStats(
+      telegramReady ? { telegramToken: token, chatId: primaryChatId } : {},
+    );
     const finalNickname = applyUserEvent(stats, payload, clientIp, userAgent);
     stats = await saveStats(stats);
-    await syncPinnedSummaryMessages(token, chatIds, stats);
+
+    if (telegramReady) {
+      await syncPinnedSummaryMessages(token, chatIds, stats);
+    }
 
     return res.status(200).json({ success: true, nickname: finalNickname });
   } catch (err) {

@@ -99,17 +99,24 @@ async function saveToPrimaryStore(stats) {
   const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
 
   if (blobToken) {
-    const { put } = await import('@vercel/blob');
-    await put(BLOB_PATHNAME, payload, {
-      access: 'private',
-      token: blobToken,
-      contentType: 'application/json',
-      addRandomSuffix: false,
-      allowOverwrite: true,
-    });
-    return;
+    try {
+      const { put } = await import('@vercel/blob');
+      const result = await put(BLOB_PATHNAME, payload, {
+        access: 'private',
+        token: blobToken,
+        contentType: 'application/json',
+        addRandomSuffix: false,
+        allowOverwrite: true,
+      });
+      console.log('Stats saved to Blob:', result.pathname);
+      return;
+    } catch (err) {
+      console.error('Blob stats save failed:', err);
+      throw err;
+    }
   }
 
+  console.warn('BLOB_READ_WRITE_TOKEN missing — saving stats to local .data file (dev only)');
   await fs.mkdir(path.dirname(LOCAL_STATS_FILE), { recursive: true });
   await fs.writeFile(LOCAL_STATS_FILE, payload, 'utf8');
 }
