@@ -1,0 +1,336 @@
+================================================================================
+  FluentEar (basic-ielts-listining) — LOYIHA TAHLILI VA XAVFSIZLIK HISOBOTI
+  Sana: 2026-yil 9-iyul
+================================================================================
+
+--------------------------------------------------------------------------------
+1. LOYIHA HAQIDA QISQACHA
+--------------------------------------------------------------------------------
+
+FluentEar — IELTS Listening mashq qilish uchun brauzer/PWA ilovasi.
+
+  Frontend      : Vanilla JavaScript, Vite, PWA (Service Worker)
+  Ma'lumot      : localStorage (progress, diktant, eslatmalar)
+  Media         : Vercel Blob yoki public/ papkadagi fayllar
+  Backend       : Vercel serverless API (/api/log, /api/stats, /api/webhook)
+  Admin panel   : Telegram bot orqali foydalanuvchi faolligi va statistika
+
+Asosiy funksiyalar:
+  - 97 ta audio trek, PDF kitob ko'rish
+  - Diktant va daftar (notebook)
+  - Progress saqlash
+  - Dracula audiokitob
+  - Til (UZ/EN), tema
+  - Statistika dashboard (stats.html)
+
+
+--------------------------------------------------------------------------------
+2. MA'LUMOTLAR OQIMI
+--------------------------------------------------------------------------------
+
+  Foydalanuvchi brauzeri
+       |
+       |-- localStorage --> Progress, diktant, eslatmalar (faqat qurilmada)
+       |
+       |-- POST /api/log --> Vercel API --> Telegram bot --> Admin guruhi
+       |
+       |-- Pin xabarda ?stats=JSON --> Ochiq URL (xavfli!)
+       |
+       '-- GET /api/stats --> stats.html dashboard
+
+
+--------------------------------------------------------------------------------
+3. XAVFSIZLIK MUAMMOLARI (JIDDIYLIK BO'YICHA)
+--------------------------------------------------------------------------------
+
+
+================================================================================
+🔴 KRITIK MUAMMOLAR
+================================================================================
+
+--------------------------------------------------------------------------------
+3.1. Telegram bot tokeni brauzerga chiqishi mumkin
+--------------------------------------------------------------------------------
+
+Muammo:
+  system.js faylida API ishlamasa, token to'g'ridan-to'g'ri klientdan
+  Telegram API ga yuboriladi. Vite "VITE_" prefiksli o'zgaruvchilarni
+  build vaqtida brauzerga qo'shadi.
+
+Fayl: system.js (116-122 qatorlar)
+
+Xavf:
+  - Token production .env da bo'lsa, har kim DevTools orqali ko'ra oladi
+  - Botni boshqarish, xabar yuborish, guruh ma'lumotlarini olish mumkin
+
+Hal qilish:
+  [ ] VITE_TELEGRAM_BOT_TOKEN va VITE_TELEGRAM_CHAT_ID ni butunlay olib tashlang
+  [ ] Faqat serverda TELEGRAM_BOT_TOKEN va TELEGRAM_CHAT_ID ishlating
+      (Vercel Environment Variables)
+  [ ] system.js dagi Telegram fallback kodini o'chiring
+  [ ] Faqat /api/log orqali yuborish qolsin
+
+
+--------------------------------------------------------------------------------
+3.2. /api/log ochiq va himoyalanmagan
+--------------------------------------------------------------------------------
+
+Muammo:
+  Har kim POST so'rov yuborishi mumkin. Hech qanday autentifikatsiya,
+  rate limit yoki imzo tekshiruvi yo'q.
+
+Fayl: api/log.js (29-30 qatorlar)
+
+Xavf:
+  - Telegram guruhiga spam yuborish
+  - Statistikani soxtalashtirish (soxta nickname, visit soni)
+  - "text" maydoni HTML bilan (parse_mode: HTML) — Telegram xabarlarini buzish
+
+Hal qilish:
+  [ ] Rate limiting qo'shing (Vercel KV yoki Upstash Redis)
+  [ ] So'rov imzosi: HMAC-SHA256 yoki qisqa muddatli JWT
+  [ ] "text" ni serverda o'zingiz generatsiya qiling; klientdan faqat
+      type, trackNum qabul qiling
+  [ ] HTML escape: <, >, & belgilarini filtrlash
+  [ ] IP bo'yicha kunlik limit (masalan, 20 so'rov/soat)
+
+
+--------------------------------------------------------------------------------
+3.3. Foydalanuvchi ma'lumotlari ochiq URL da saqlanadi
+--------------------------------------------------------------------------------
+
+Muammo:
+  Pin qilingan Telegram xabarida butun statistika JSON ko'rinishida URL ga
+  yoziladi:
+
+  https://tinglash.vercel.app/?stats={...butun JSON...}
+
+Fayl: api/log.js (258-qator)
+
+Xavf:
+  - Nickname lar, fingerprint (fp), qurilma turi, kirishlar soni ochiq
+  - Telegram xabarini ko'rgan har kim yoki URL ni intercept qilgan odam
+    barcha ma'lumotlarni olishi mumkin
+
+Hal qilish:
+  [ ] Statistikani URL o'rniga serverda saqlang (Vercel KV, Postgres, Supabase)
+  [ ] Telegram xabarida faqat qisqa summary ko'rsating
+  [ ] /api/stats uchun autentifikatsiya qo'shing (admin API key yoki session)
+
+
+================================================================================
+🟠 YUQORI DARAJADAGI MUAMMOLAR
+================================================================================
+
+--------------------------------------------------------------------------------
+3.4. Haqiqiy Telegram Chat ID repoda ochiq
+--------------------------------------------------------------------------------
+
+Muammo:
+  .env.example faylida haqiqiy guruh ID si bor va git ga commit qilingan:
+  TELEGRAM_CHAT_ID=-1004410038889
+
+Xavf:
+  - Admin guruhi ma'lumoti ochiq
+  - Hujumchilar guruhga nishon olishi mumkin
+
+Hal qilish:
+  [ ] .env.example da placeholder ishlating: TELEGRAM_CHAT_ID=your_group_id_here
+  [ ] Agar bu haqiqiy guruh bo'lsa — yangi guruh oching yoki botni qayta sozlang
+
+
+--------------------------------------------------------------------------------
+3.5. Webhook himoyasiz
+--------------------------------------------------------------------------------
+
+Muammo:
+  /api/webhook Telegram secret_token ni tekshirmaydi.
+  Guruh ID tekshiruvi bor, lekin bu yetarli emas.
+
+Xavf:
+  - Soxta webhook so'rovlari yuborilishi mumkin
+
+Hal qilish:
+  [ ] X-Telegram-Bot-Api-Secret-Token header ni tekshiring
+  [ ] setWebhook da secret_token parametrini o'rnating
+  [ ] Noto'g'ri secret bo'lsa 401 qaytaring
+
+
+--------------------------------------------------------------------------------
+3.6. IP + User-Agent fingerprinting (maxfiylik)
+--------------------------------------------------------------------------------
+
+Muammo:
+  IP va User-Agent dan SHA-256 fingerprint yaratiladi va statistikada saqlanadi.
+
+Fayl: api/log.js (64-66, 144-172 qatorlar)
+
+Xavf:
+  - GDPR / ma'lumotlar himoyasi qonunlariga zid bo'lishi mumkin
+  - Foydalanuvchini kuzatish (tracking)
+
+Hal qilish:
+  [ ] Foydalanuvchidan aniq rozilik oling (landing disclaimer bor — yaxshi,
+      lekin yetarli emas)
+  [ ] IP ni saqlamang; faqat anonim device_id (localStorage) ishlating
+  [ ] Ma'lumotlarni 90 kundan keyin avtomatik o'chiring
+  [ ] Privacy Policy sahifasi qo'shing
+
+
+--------------------------------------------------------------------------------
+3.7. Ichki xato ma'lumotlari ochiladi
+--------------------------------------------------------------------------------
+
+Muammo:
+  API xato javoblarida err.message qaytariladi.
+
+Fayl: api/log.js (83-qator)
+
+Xavf:
+  - Production da server ichki tuzilmasi ochilishi mumkin
+
+Hal qilish:
+  [ ] Production da faqat { error: 'Internal server error' } qaytaring
+  [ ] details faqat development rejimida ko'rsatilsin
+
+
+================================================================================
+🟡 O'RTA DARAJADAGI MUAMMOLAR
+================================================================================
+
+--------------------------------------------------------------------------------
+3.8. CORS noto'g'ri sozlangan
+--------------------------------------------------------------------------------
+
+Muammo:
+  Access-Control-Allow-Credentials: true
+  Access-Control-Allow-Origin: *
+  Bir vaqtda ishlatilmasligi kerak.
+
+Hal qilish:
+  [ ] Origin ni aniq domen qiling: https://tinglash.vercel.app
+  [ ] Credentials ni false qiling
+
+
+--------------------------------------------------------------------------------
+3.9. /api/stats ochiq GET endpoint
+--------------------------------------------------------------------------------
+
+Muammo:
+  Statistika autentifikatsiyasiz olinadi.
+
+Hal qilish:
+  [ ] Admin API key yoki faqat ichki (Telegram webhook) orqali kirish
+
+
+--------------------------------------------------------------------------------
+3.10. Rate limiting yo'q
+--------------------------------------------------------------------------------
+
+Muammo:
+  Barcha API endpointlarida cheklov yo'q — DDoS va spam xavfi.
+
+Hal qilish:
+  [ ] Vercel Edge Middleware yoki Upstash rate limiter qo'shing
+
+
+--------------------------------------------------------------------------------
+3.11. localStorage da shifrlanmagan ma'lumotlar
+--------------------------------------------------------------------------------
+
+Muammo:
+  Diktant, eslatmalar, progress localStorage da ochiq JSON.
+
+Izoh:
+  Serverga yuborilmaydi (yaxshi), lekin qurilma o'g'irlansa ma'lumot ochiq.
+
+Hal qilish (ixtiyoriy):
+  [ ] sessionStorage yoki Web Crypto API bilan shifrlash
+
+
+--------------------------------------------------------------------------------
+3.12. Content-Security-Policy (CSP) yo'q
+--------------------------------------------------------------------------------
+
+Muammo:
+  index.html da CSP header yo'q — XSS hujumlariga qo'shimcha himoya yo'q.
+
+Hal qilish:
+  [ ] vercel.json da CSP header qo'shing:
+      default-src 'self'
+      script-src 'self'
+      style-src 'self' 'unsafe-inline'
+      img-src 'self' data: https:
+      connect-src 'self' https://api.telegram.org
+
+
+================================================================================
+🟢 PAST DARAJA / IJOBIY TOMONLAR
+================================================================================
+
+  [+] .env gitignore da — tokenlar repoga tushmaydi
+  [+] Diktant/eslatmalar serverga yuborilmaydi — faqat localStorage
+  [+] Webhook chat ID tekshiradi — boshqa chatlardan so'rov rad etiladi
+  [+] localhost da Service Worker o'chiriladi — dev rejimida cache muammosi yo'q
+  [+] Landing disclaimer — foydalanuvchiga ma'lumot yig'ilishi haqida xabar berilgan
+  [+] Nickname readonly — foydalanuvchi o'zi o'zgartira olmaydi
+
+
+--------------------------------------------------------------------------------
+4. USTUVORLIK BO'YICHA TUZATISH REJASI
+--------------------------------------------------------------------------------
+
+  # | Vazifa                                              | Vaqt    | Ta'sir
+  --|-----------------------------------------------------|---------|------------------
+  1 | VITE_TELEGRAM_* o'zgaruvchilarni olib tashlash,     | 30 daq  | Token oqishi
+    | client fallback ni o'chirish                        |         | oldini oladi
+  --|-----------------------------------------------------|---------|------------------
+  2 | .env.example dagi haqiqiy Chat ID ni almashtirish   | 5 daq   | Guruh yashirish
+  --|-----------------------------------------------------|---------|------------------
+  3 | /api/log da server-side message + HTML escape       | 2 soat  | Spam/injection
+  --|-----------------------------------------------------|---------|------------------
+  4 | Statistikani URL dan server DB ga ko'chirish        | 4-8 soat| Ma'lumot himoyasi
+  --|-----------------------------------------------------|---------|------------------
+  5 | Webhook secret_token tekshiruvi                     | 30 daq  | Soxta webhook
+  --|-----------------------------------------------------|---------|------------------
+  6 | Rate limiting qo'shish                              | 1-2 soat| DDoS/spam himoya
+  --|-----------------------------------------------------|---------|------------------
+  7 | CORS va error response tuzatish                     | 30 daq  | Konfig xatolari
+  --|-----------------------------------------------------|---------|------------------
+  8 | CSP header qo'shish                                 | 30 daq  | XSS himoyasi
+
+
+--------------------------------------------------------------------------------
+5. XULOSA
+--------------------------------------------------------------------------------
+
+Loyiha funksional jihatdan yaxshi ishlaydi va foydalanuvchi kontenti
+(diktant, eslatmalar) serverga yuborilmaydi — bu katta plus.
+
+Asosiy xavf Telegram integratsiyasida:
+  1. Token brauzerga chiqishi
+  2. Ochiq API endpoint (/api/log)
+  3. Statistikaning URL da saqlanishi
+
+ENG SHOSHILINCH 3 TA QADAM:
+  1. VITE_TELEGRAM_BOT_TOKEN ni hech qachon production .env ga qo'ymang
+  2. system.js dagi client-side Telegram fallback ni o'chiring
+  3. /api/log ga autentifikatsiya va rate limit qo'shing
+
+
+--------------------------------------------------------------------------------
+6. MUHIM FAYLLAR (xavfsizlik nuqtai nazaridan)
+--------------------------------------------------------------------------------
+
+  system.js          — Telegram client fallback (XAVFLI)
+  api/log.js         — Ochiq POST endpoint, stats URL da saqlanadi
+  api/stats.js       — Ochiq GET endpoint
+  api/webhook.js     — Secret token tekshiruvi yo'q
+  .env.example       — Haqiqiy Chat ID ochiq
+  vite-api-plugin.js — Dev rejimida API stub
+  public/sw.js       — Service Worker cache
+
+
+================================================================================
+  Hisobot tayyorlandi: FluentEar xavfsizlik audit
+================================================================================

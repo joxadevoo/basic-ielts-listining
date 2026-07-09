@@ -56,17 +56,28 @@ function createVercelResponse(res) {
 }
 
 function hasTelegramConfig(env) {
-  const token = env.TELEGRAM_BOT_TOKEN || env.VITE_TELEGRAM_BOT_TOKEN;
-  const chatId = env.TELEGRAM_CHAT_ID || env.VITE_TELEGRAM_CHAT_ID;
+  const token = env.TELEGRAM_BOT_TOKEN;
+  const chatId = env.TELEGRAM_CHAT_ID;
   return Boolean(token && chatId);
 }
 
 function devStubResponse(urlPath, body) {
   if (urlPath === '/api/log') {
-    return { success: true, nickname: body?.nickname || null };
+    const allowedTypes = new Set(['session_start', 'track_play', 'note_save', 'dictation_save']);
+    if (!body?.type || !allowedTypes.has(body.type) || !body?.deviceId) {
+      return { error: 'Invalid payload' };
+    }
+    return { success: true, nickname: body.nickname || null };
   }
   if (urlPath === '/api/stats') {
-    return { totalUnique: 0, totalVisits: 0, monthlyActive: 0 };
+    return {
+      totalUnique: 0,
+      totalVisits: 0,
+      dailyActive: 0,
+      weeklyActive: 0,
+      monthlyActive: 0,
+      deviceTypes: {},
+    };
   }
   if (urlPath === '/api/webhook') {
     return { ok: true };

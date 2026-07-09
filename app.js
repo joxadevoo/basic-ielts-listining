@@ -2644,7 +2644,7 @@ function setupEventListeners() {
     updatePlaylistPlayState();
     logStatsSession();
     if (state.currentTrack && state.currentTrack.trackNum !== lastLoggedTrackNum) {
-      logTrackPlay(state.currentTrack.trackNum, state.currentTrack.title);
+      logTrackPlay(state.currentTrack.trackNum);
       lastLoggedTrackNum = state.currentTrack.trackNum;
     }
   });

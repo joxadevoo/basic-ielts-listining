@@ -9,3 +9,4 @@ public/basic-ielts-listening1/
 public/basic-ielts-listening2/
 public/basic-ielts-listening3/
 *.mp3
+.data/
