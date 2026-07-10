@@ -1560,6 +1560,11 @@ function ensureAbAudioSource() {
     abAudio.src = AB_AUDIO_URL;
     abAudio.load();
     resetAbMinuteJumps();
+    try {
+      abAudio.playbackRate = state.audiobookState.playbackSpeed || 1.0;
+    } catch (e) {
+      console.warn("Could not set abAudio playbackRate in ensureAbAudioSource:", e);
+    }
   }
   return true;
 }
@@ -1831,9 +1836,13 @@ function seekAbAudio(secs) {
 // Set playback speed
 function setAbSpeed(speed) {
   if (!abAudio) return;
-  abAudio.playbackRate = speed;
+  try {
+    abAudio.playbackRate = speed;
+  } catch (e) {
+    console.warn("Could not set abAudio playbackRate directly:", e);
+  }
   state.audiobookState.playbackSpeed = speed;
-  if (abBtnSpeed) abBtnSpeed.textContent = `${speed.toFixed(2)}x`;
+  if (abBtnSpeed) abBtnSpeed.textContent = `${speed.toFixed(1)}x`;
 }
 
 // Drag & Seek progress bar
@@ -2068,6 +2077,11 @@ function setupAudiobookEventListeners() {
     abAudio.addEventListener('loadedmetadata', () => {
       resetAbMinuteJumps();
       updateAbMinuteJumps(true);
+      try {
+        abAudio.playbackRate = state.audiobookState.playbackSpeed || 1.0;
+      } catch (e) {
+        console.warn("Could not restore abAudio playbackRate on loadedmetadata:", e);
+      }
     });
     abAudio.addEventListener('seeked', () => {
       resetAbMinuteJumps();
@@ -2078,6 +2092,11 @@ function setupAudiobookEventListeners() {
       state.audiobookState.isPlaying = true;
       if (abPlayIcon) abPlayIcon.style.display = 'none';
       if (abPauseIcon) abPauseIcon.style.display = 'block';
+      try {
+        abAudio.playbackRate = state.audiobookState.playbackSpeed || 1.0;
+      } catch (e) {
+        console.warn("Could not set abAudio playbackRate on play:", e);
+      }
     });
     abAudio.addEventListener('pause', () => {
       state.audiobookState.isPlaying = false;

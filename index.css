@@ -2651,28 +2651,12 @@ body.menu-open .app-header {
 }
 
 /* Tezlik tanlash ochilganda blur fon */
-.speed-menu-backdrop {
-  position: fixed;
-  inset: 0;
-  background: transparent;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  z-index: 108;
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transition: opacity 0.2s ease, visibility 0.2s ease;
-}
 
-.speed-menu-backdrop.active {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-}
 
 body.speed-menu-open .app-header,
 body.speed-menu-open .audio-player-footer,
-body.speed-menu-open .ab-player-stack {
+body.speed-menu-open .ab-player-stack,
+body.speed-menu-open .ab-music-shell {
   z-index: 110;
 }
 
