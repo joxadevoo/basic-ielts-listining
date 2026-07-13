@@ -871,8 +871,10 @@ function switchBook(bookId) {
   // Update tracks list for active book
   state.tracks = TRACKS.filter(t => t.bookId === bookId);
   
+  const landingDismissed = appContainer && appContainer.classList.contains('landing-dismissed');
+
   // Sync PDF view page
-  if (state.activeBook.shortcuts && state.activeBook.shortcuts.length > 0) {
+  if (landingDismissed && state.activeBook.shortcuts && state.activeBook.shortcuts.length > 0) {
     syncPdfViewer(state.activeBook.shortcuts[0].page);
   }
 
@@ -885,7 +887,7 @@ function switchBook(bookId) {
   // Select first track and sync PDF
   if (state.tracks.length > 0) {
     selectTrack(state.tracks[0], false);
-    if (state.activeBook.type !== 'audiobook' && state.activeBook.shortcuts.length > 0) {
+    if (landingDismissed && state.activeBook.type !== 'audiobook' && state.activeBook.shortcuts.length > 0) {
       syncPdfViewer(state.activeBook.shortcuts[0].page);
     }
   }
@@ -1491,7 +1493,7 @@ function switchWorkspace(workspace) {
       }
       
       // Sync PDF
-      if (state.activeBook.shortcuts && state.activeBook.shortcuts.length > 0) {
+      if (landingDismissed && state.activeBook.shortcuts && state.activeBook.shortcuts.length > 0) {
         syncPdfViewer(state.activeBook.shortcuts[0].page);
       }
     }
