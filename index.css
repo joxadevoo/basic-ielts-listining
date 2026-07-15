@@ -3890,6 +3890,58 @@ a.menu-item-link {
   margin-top: 0;
 }
 
+/* Mini audiobook playback controls inside study panel header */
+.ab-mini-player {
+  display: none;
+  align-items: center;
+  gap: 10px;
+}
+
+.ab-mini-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  padding: 6px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.ab-mini-btn:hover {
+  background: hsla(0, 0%, 100%, 0.08);
+}
+
+[data-theme="light"] .ab-mini-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.ab-mini-btn svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+.ab-mini-play-btn {
+  width: 32px;
+  height: 32px;
+  background: var(--color-primary);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(110, 68, 255, 0.3);
+}
+
+.ab-mini-play-btn:hover {
+  background: var(--color-primary);
+  transform: scale(1.05);
+}
+
+.ab-mini-play-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
 /* Desktop: FAB va yopish tugmasi yashirin */
 .ab-study-fab,
 .ab-study-close-btn {
@@ -3929,6 +3981,10 @@ a.menu-item-link {
   }
 
   .ab-study-close-btn {
+    display: flex;
+  }
+
+  .ab-mini-player {
     display: flex;
   }
 

@@ -66,7 +66,8 @@ const BOOKS = [
       { chapterNum: 2, title: "Chapter 2: Castle Dracula", start: 761.85, end: 1691.98 },
       { chapterNum: 3, title: "Chapter 3: The Three Sisters", start: 1691.98, end: 2294.74 },
       { chapterNum: 4, title: "Chapter 4: The Escape Attempt", start: 2294.74, end: 3328.85 },
-      { chapterNum: 5, title: "Chapter 5: Mina Murray's Journal", start: 3328.85, end: 4399.36 }
+      { chapterNum: 5, title: "Chapter 5: Lucy & Mina's Letters", start: 3328.85, end: 3820.0 },
+      { chapterNum: 6, title: "Chapter 6: Mina Murray's Journal", start: 3820.0, end: 4399.36 }
     ]
   }
 ];
@@ -547,6 +548,13 @@ const abMinuteJumpsRow = document.getElementById('ab-minute-jumps-row');
 const abBtnPlayPause = document.getElementById('ab-btn-play-pause');
 const abPlayIcon = document.getElementById('ab-play-icon');
 const abPauseIcon = document.getElementById('ab-pause-icon');
+
+// Mini player elements inside study panel
+const abMiniPlayPause = document.getElementById('ab-mini-play-pause');
+const abMiniPlayIcon = document.querySelector('.ab-mini-play-icon');
+const abMiniPauseIcon = document.querySelector('.ab-mini-pause-icon');
+const abMiniBackward = document.getElementById('ab-mini-backward');
+const abMiniForward = document.getElementById('ab-mini-forward');
 const abBtnBackward15s = document.getElementById('ab-btn-backward-15s');
 const abBtnForward15s = document.getElementById('ab-btn-forward-15s');
 const abBtnPrevChapter = document.getElementById('ab-btn-prev-chapter');
@@ -809,14 +817,22 @@ function updateLandingScreenUI() {
     if (landingSubtitle) landingSubtitle.textContent = state.language === 'en' ? "Listen to Bram Stoker's gothic masterpiece, transcribe chapters, log vocabulary, and learn dynamically." : "Bram Stokerning mashhur gotik asarini tinglang, boblar bo'yicha diktant yozing va o'zlashtirish qaydlarini yuriting.";
     
     if (landingStats) {
+      const dracula = BOOKS.find(b => b.id === 'dracula');
+      const totalChapters = dracula ? dracula.chapters.length : 6;
+      const totalSeconds = dracula && dracula.chapters.length > 0 ? dracula.chapters[dracula.chapters.length - 1].end : 4399.36;
+      const hours = Math.floor(totalSeconds / 3600);
+      const mins = Math.floor((totalSeconds % 3600) / 60);
+      const secs = Math.round(totalSeconds % 60);
+      const durationStr = `${hours}:${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
+
       landingStats.innerHTML = `
         <div class="landing-stat">
-          <strong>5</strong>
+          <strong>${totalChapters}</strong>
           <span>${state.language === 'en' ? 'chapters' : 'boblar'}</span>
         </div>
         <div class="landing-stat">
-          <strong>73</strong>
-          <span>${state.language === 'en' ? 'minutes audio' : 'daqiqa tinglash'}</span>
+          <strong>${durationStr}</strong>
+          <span>${state.language === 'en' ? 'duration' : 'davomiyligi'}</span>
         </div>
         <div class="landing-stat">
           <strong>A-B</strong>
@@ -1859,15 +1875,10 @@ function seekAbToPosition(e) {
 function updateAbPlayerProgress() {
   const cur = abAudio.currentTime;
   const dur = abAudio.duration || 0;
-  
-  const formatTime = (seconds) => {
-    const m = Math.floor(seconds / 60);
-    const s = Math.floor(seconds % 60);
-    return `${m}:${s < 10 ? '0' : ''}${s}`;
-  };
+  const forceHours = dur >= 3600;
 
-  if (abTimeCurrent) abTimeCurrent.textContent = formatTime(cur);
-  if (abTimeTotal) abTimeTotal.textContent = formatTime(dur);
+  if (abTimeCurrent) abTimeCurrent.textContent = formatTime(cur, forceHours);
+  if (abTimeTotal) abTimeTotal.textContent = formatTime(dur, forceHours);
   
   if (dur > 0) {
     const pct = (cur / dur) * 100;
@@ -1956,16 +1967,12 @@ function updateAbMinuteJumps(force = false) {
   lastAbMinuteJumpSec = sec;
   lastAbMinuteJumpDuration = duration;
 
-  const formatTime = (seconds) => {
-    const m = Math.floor(seconds / 60);
-    const s = Math.floor(seconds % 60);
-    return `${m}:${s < 10 ? '0' : ''}${s}`;
-  };
+  const forceHours = duration >= 3600;
 
   const jumpConfigs = [
     { label: '-2m', diff: -120 },
     { label: '-1m', diff: -60 },
-    { label: formatTime(t), diff: 0, isNow: true },
+    { label: formatTime(t, forceHours), diff: 0, isNow: true },
     { label: '+1m', diff: 60 },
     { label: '+2m', diff: 120 },
   ];
@@ -1977,7 +1984,7 @@ function updateAbMinuteJumps(force = false) {
     const btn = document.createElement('button');
     btn.className = `ab-jump-pill-btn${cfg.isNow ? ' ab-jump-pill-now' : ''}`;
     btn.type = 'button';
-    btn.textContent = cfg.isNow ? cfg.label : `${cfg.label} (${formatTime(targetTime)})`;
+    btn.textContent = cfg.isNow ? cfg.label : `${cfg.label} (${formatTime(targetTime, forceHours)})`;
     btn.disabled = cfg.isNow;
 
     if (!cfg.isNow) {
@@ -2004,12 +2011,7 @@ function updateAbMinuteJumps(force = false) {
 function toggleAbLoop() {
   const loopState = state.audiobookState.abLoop;
   const t = abAudio.currentTime;
-  
-  const formatTime = (seconds) => {
-    const m = Math.floor(seconds / 60);
-    const s = Math.floor(seconds % 60);
-    return `${m}:${s < 10 ? '0' : ''}${s}`;
-  };
+  const forceHours = (abAudio && abAudio.duration >= 3600) || false;
 
   if (!loopState.start && !loopState.end) {
     loopState.start = t;
@@ -2476,10 +2478,14 @@ function updateAbLoopIndicator() {
 }
 
 // Time Formatting
-function formatTime(seconds) {
-  if (isNaN(seconds)) return "0:00";
-  const m = Math.floor(seconds / 60);
+function formatTime(seconds, forceHours = false) {
+  if (isNaN(seconds)) return forceHours ? "0:00:00" : "0:00";
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
   const s = Math.floor(seconds % 60);
+  if (h > 0 || forceHours) {
+    return `${h}:${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+  }
   return `${m}:${s < 10 ? '0' : ''}${s}`;
 }
 
@@ -2487,9 +2493,10 @@ function formatTime(seconds) {
 function updatePlayerProgress() {
   const cur = audio.currentTime;
   const dur = audio.duration || 0;
+  const forceHours = dur >= 3600;
   
-  currentTimeDisplay.textContent = formatTime(cur);
-  totalTimeDisplay.textContent = formatTime(dur);
+  currentTimeDisplay.textContent = formatTime(cur, forceHours);
+  totalTimeDisplay.textContent = formatTime(dur, forceHours);
   
   if (dur > 0) {
     const pct = (cur / dur) * 100;
