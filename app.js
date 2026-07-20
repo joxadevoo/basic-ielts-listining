@@ -464,12 +464,12 @@ let highlightedTourElement = null;
 let deferredInstallPrompt = null;
 let lastLoggedTrackNum = null;
 
-// Media files are served from the public Vercel Blob store.
-const DEFAULT_MEDIA_BASE_URL = 'https://3rdqnprfkrc5djuh.public.blob.vercel-storage.com';
+// Media files are served from Cloudflare R2 (see VITE_MEDIA_BASE_URL).
+const DEFAULT_MEDIA_BASE_URL = 'https://pub-37d1294bb9b946a48bab7e9dbe6bf4f7.r2.dev';
 const MEDIA_BASE_URL = (
   import.meta.env.VITE_MEDIA_BASE_URL || DEFAULT_MEDIA_BASE_URL
 ).replace(/\/$/, '');
-const AB_AUDIO_URL = `${DEFAULT_MEDIA_BASE_URL}/audio-books/Dracula%20-%20Bram%20Stoker.mp3`;
+const AB_AUDIO_URL = `${MEDIA_BASE_URL}/audio-books/Dracula%20-%20Bram%20Stoker.mp3`;
 
 function encodeMediaFilename(localPath) {
   const parts = localPath.split('/');
