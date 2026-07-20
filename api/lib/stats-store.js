@@ -1,13 +1,13 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { S3Client, GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 import { fingerprintFromRequest } from './log-security.js';
 import { buildPinnedSummaryText, recomputeDerivedFields } from './stats-metrics.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const LOCAL_STATS_FILE = path.resolve(__dirname, '../../.data/fluentear-stats.json');
-const BLOB_PATHNAME = 'internal/fluentear-stats.json';
-const IS_VERCEL = Boolean(process.env.VERCEL);
+const R2_STATS_KEY = 'internal/fluentear-stats.json';
 const STATS_SITE_URL = 'https://fluentear.vercel.app';
 const STATS_B64_START = 'STATS_B64_START:';
 const STATS_B64_END = ':STATS_B64_END';
@@ -40,100 +40,60 @@ function buildPinnedMessageWithStats(stats) {
   return `${summary}\n${hiddenLink}`;
 }
 
-function getBlobToken() {
-  return process.env.BLOB_READ_WRITE_TOKEN || process.env.VERCEL_BLOB_READ_WRITE_TOKEN || '';
+function getR2StatsClient() {
+  const accountId = process.env.R2_ACCOUNT_ID;
+  const accessKeyId = process.env.R2_STATS_ACCESS_KEY_ID;
+  const secretAccessKey = process.env.R2_STATS_SECRET_ACCESS_KEY;
+  const bucket = process.env.R2_STATS_BUCKET;
+  if (!accountId || !accessKeyId || !secretAccessKey || !bucket) return null;
+
+  const endpoint = process.env.R2_ENDPOINT || `https://${accountId}.r2.cloudflarestorage.com`;
+  return {
+    bucket,
+    client: new S3Client({
+      region: 'auto',
+      endpoint,
+      credentials: { accessKeyId, secretAccessKey },
+    }),
+  };
 }
 
-function getBlobStoreId() {
-  return process.env.BLOB_STORE_ID || '';
+async function streamToString(stream) {
+  if (typeof stream.transformToString === 'function') return stream.transformToString();
+  const chunks = [];
+  for await (const chunk of stream) chunks.push(chunk);
+  return Buffer.concat(chunks).toString('utf8');
 }
 
-function canUseBlobStore() {
-  return IS_VERCEL || Boolean(getBlobStoreId() || getBlobToken());
-}
-
-function getBlobOptionSets() {
-  const token = getBlobToken();
-  const storeId = getBlobStoreId();
-
-  // Vercel OIDC: BLOB_STORE_ID + VERCEL_OIDC_TOKEN (never pass stale token — it overrides OIDC)
-  if (IS_VERCEL && storeId) return [{}];
-  if (IS_VERCEL) return [{}];
-
-  // Local dev: static read-write token only
-  return token ? [{ token }] : [];
-}
-
-async function readBlobJson() {
-  const optionSets = getBlobOptionSets();
-  const { get, head } = await import('@vercel/blob');
-
-  for (const blobOptions of optionSets) {
-    for (const access of ['public', 'private']) {
-      try {
-        const result = await get(BLOB_PATHNAME, { access, ...blobOptions });
-        if (result?.stream) {
-          const text = await new Response(result.stream).text();
-          if (text) return JSON.parse(text);
-        }
-      } catch (err) {
-        if (err?.name !== 'BlobNotFoundError') {
-          console.error(`Blob get failed (${access}):`, err?.message || err);
-        }
-      }
+async function readR2Json(r2) {
+  try {
+    const res = await r2.client.send(
+      new GetObjectCommand({ Bucket: r2.bucket, Key: R2_STATS_KEY }),
+    );
+    const text = await streamToString(res.Body);
+    return text ? JSON.parse(text) : null;
+  } catch (err) {
+    if (err?.name !== 'NoSuchKey') {
+      console.error('R2 stats read failed:', err?.message || err);
     }
-
-    try {
-      const meta = await head(BLOB_PATHNAME, blobOptions);
-      if (meta?.downloadUrl) {
-        const res = await fetch(meta.downloadUrl);
-        if (res.ok) {
-          const text = await res.text();
-          if (text) return JSON.parse(text);
-        }
-      }
-    } catch (err) {
-      if (err?.name !== 'BlobNotFoundError') {
-        console.error('Blob head/download failed:', err?.message || err);
-      }
-    }
+    return null;
   }
-
-  return null;
 }
 
-async function writeBlobJson(stats) {
-  const payload = JSON.stringify(stats);
-  const optionSets = getBlobOptionSets();
-  const { put } = await import('@vercel/blob');
-  let lastError = null;
-
-  for (const blobOptions of optionSets) {
-    for (const access of ['public', 'private']) {
-      try {
-        const result = await put(BLOB_PATHNAME, payload, {
-          access,
-          contentType: 'application/json',
-          addRandomSuffix: false,
-          allowOverwrite: true,
-          ...blobOptions,
-        });
-        console.log(`Stats saved to ${access} Blob:`, result.pathname);
-        return;
-      } catch (err) {
-        lastError = err;
-        console.error(`Blob put failed (${access}):`, err?.message || err);
-      }
-    }
-  }
-
-  throw lastError || new Error('Blob save failed');
+async function writeR2Json(r2, stats) {
+  await r2.client.send(
+    new PutObjectCommand({
+      Bucket: r2.bucket,
+      Key: R2_STATS_KEY,
+      Body: JSON.stringify(stats),
+      ContentType: 'application/json',
+    }),
+  );
 }
 
 async function loadFromPrimaryStore() {
-  if (canUseBlobStore()) {
-    return readBlobJson();
-  }
+  const r2 = getR2StatsClient();
+  if (r2) return readR2Json(r2);
 
   try {
     const raw = await fs.readFile(LOCAL_STATS_FILE, 'utf8');
@@ -144,13 +104,10 @@ async function loadFromPrimaryStore() {
 }
 
 async function saveToPrimaryStore(stats) {
-  if (canUseBlobStore()) {
-    await writeBlobJson(stats);
+  const r2 = getR2StatsClient();
+  if (r2) {
+    await writeR2Json(r2, stats);
     return;
-  }
-
-  if (IS_VERCEL) {
-    throw new Error('Blob unavailable — stats will be stored in Telegram pin message');
   }
 
   const payload = JSON.stringify(stats);
