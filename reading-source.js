@@ -74,15 +74,15 @@ function extractParagraphs(extract) {
     .filter(Boolean);
 
   // Primary: lines that read like prose (headings are short).
-  let paras = lines.filter(l => l.split(/\s+/).length >= 20);
-  if (paras.length >= 2) return paras.slice(0, 5);
+  let paras = lines.filter(l => l.split(/\s+/).length >= 15);
+  if (paras.length >= 1) return paras.slice(0, 6);
 
   // Fallback: join everything that isn't an obvious heading, then chunk sentences.
   const body = lines.filter(l => l.split(/\s+/).length >= 5).join(' ');
   const sentences = splitSentences(body);
-  if (sentences.length < 6) return [];
+  if (sentences.length < 2) return [];
   const chunks = [];
-  for (let i = 0; i < sentences.length && chunks.length < 5; i += 3) {
+  for (let i = 0; i < sentences.length && chunks.length < 6; i += 3) {
     chunks.push(sentences.slice(i, i + 3).join(' '));
   }
   return chunks;
@@ -91,15 +91,15 @@ function extractParagraphs(extract) {
 // Turn cleaned Wikipedia text into a passage + auto gap-fill questions.
 function buildPassageFromText({ id, title, extract, sourceUrl, simple }) {
   const chosen = extractParagraphs(extract);
-  if (chosen.length < 2) {
-    throw new Error('Article does not contain enough readable prose.');
+  if (chosen.length < 1) {
+    throw new Error('Maqolada yetarli matn topilmadi. Boshqa mavzu sinab ko\'ring.');
   }
 
   const markers = ['A', 'B', 'C', 'D', 'E', 'F'];
   const paragraphs = chosen.map((text, i) => ({ marker: markers[i], text }));
   const wordCount = chosen.join(' ').split(/\s+/).length;
 
-  // Generate up to 8 gap-fill questions, spread across paragraphs.
+  // Generate gap-fill questions, spread across paragraphs.
   const questions = [];
   const usedAnswers = new Set();
   let qid = 1;
@@ -109,7 +109,6 @@ function buildPassageFromText({ id, title, extract, sourceUrl, simple }) {
     for (const p of paragraphs) {
       if (questions.length >= 8) break outer;
       const sentences = splitSentences(p.text);
-      // pass 0 -> earlier sentence, pass 1 -> a later one
       const sentence = sentences[pass] || sentences[sentences.length - 1 - pass];
       if (!sentence) continue;
 
@@ -133,8 +132,8 @@ function buildPassageFromText({ id, title, extract, sourceUrl, simple }) {
     }
   }
 
-  if (questions.length < 3) {
-    throw new Error('Could not generate enough questions from this article.');
+  if (questions.length < 1) {
+    throw new Error('Ushbu maqoladan savol tuzib bo\'lmadi. Boshqa mavzu kiriting.');
   }
 
   return {
@@ -150,6 +149,20 @@ function buildPassageFromText({ id, title, extract, sourceUrl, simple }) {
     paragraphs,
     questions
   };
+}
+
+// Search Wikipedia for a matching article title if exact string lookup misses.
+async function searchWikipediaTitle(host, query) {
+  try {
+    const url = `https://${host}/w/api.php?action=opensearch&search=${encodeURIComponent(query)}&limit=1&format=json&origin=*`;
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const data = await res.json();
+    const titles = data?.[1];
+    return titles && titles[0] ? titles[0] : null;
+  } catch (_) {
+    return null;
+  }
 }
 
 // Fetch the plain-text extract for a single title. Returns { title, extract, sourceUrl }.
@@ -171,26 +184,46 @@ async function fetchExtract(host, title) {
 
 // Public: fetch a passage from Wikipedia. `topic` optional — omit for a random article.
 export async function fetchWikipediaPassage(topic, { simple = true } = {}) {
-  const host = simple ? 'simple.wikipedia.org' : 'en.wikipedia.org';
-  const title = (topic || '').trim();
+  const primaryHost = simple ? 'simple.wikipedia.org' : 'en.wikipedia.org';
+  const rawTitle = (topic || '').trim();
 
-  // Specific topic: one shot.
-  if (title) {
-    const ex = await fetchExtract(host, title);
-    if (!ex) throw new Error(`Article not found: "${title}". Try another topic.`);
+  // Specific topic requested:
+  if (rawTitle) {
+    // 1. Direct extract on primary host
+    let ex = await fetchExtract(primaryHost, rawTitle);
+    
+    // 2. Search title on primary host if direct lookup missed
+    if (!ex) {
+      const searchTitle = await searchWikipediaTitle(primaryHost, rawTitle);
+      if (searchTitle) ex = await fetchExtract(primaryHost, searchTitle);
+    }
+    
+    // 3. Fallback to en.wikipedia.org if simple.wikipedia.org had no match
+    if (!ex && simple) {
+      ex = await fetchExtract('en.wikipedia.org', rawTitle);
+      if (!ex) {
+        const searchTitle = await searchWikipediaTitle('en.wikipedia.org', rawTitle);
+        if (searchTitle) ex = await fetchExtract('en.wikipedia.org', searchTitle);
+      }
+    }
+
+    if (!ex) {
+      throw new Error(`"${rawTitle}" bo'yicha maqola topilmadi. Boshqa mavzu kiritib ko'ring (masalan: Photosynthesis, Football, Space).`);
+    }
+
     return buildPassageFromText({ id: `wiki-${Date.now()}`, ...ex, simple });
   }
 
-  // Random: many articles are stubs, so pull a batch and try until one is long enough.
+  // Random article flow
   const rr = await fetch(
-    `https://${host}/w/api.php?action=query&list=random&rnnamespace=0&rnlimit=8&format=json&origin=*`
+    `https://${primaryHost}/w/api.php?action=query&list=random&rnnamespace=0&rnlimit=8&format=json&origin=*`
   );
   const rj = await rr.json();
   const candidates = (rj?.query?.random || []).map(a => a.title);
   if (!candidates.length) throw new Error('Could not fetch a random article.');
 
   for (const cand of candidates) {
-    const ex = await fetchExtract(host, cand);
+    const ex = await fetchExtract(primaryHost, cand);
     if (!ex) continue;
     try {
       return buildPassageFromText({ id: `wiki-${Date.now()}`, ...ex, simple });
@@ -198,5 +231,5 @@ export async function fetchWikipediaPassage(topic, { simple = true } = {}) {
       // too short / not enough prose — try the next candidate
     }
   }
-  throw new Error('No suitable random article found. Try again or enter a topic.');
+  throw new Error('Mos keladigan tasodifiy maqola topilmadi. Qayta urinib ko\'ring yoki mavzu kiriting.');
 }
