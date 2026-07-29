@@ -246,6 +246,7 @@ export default async function handler(req, res) {
     const body = req.body || {};
     const passage = body.passage || body; // accept a full passage object or loose fields
     const paragraphs = Array.isArray(passage.paragraphs) ? passage.paragraphs : [];
+    const types = Array.isArray(body.types) && body.types.length ? body.types : ['tfng', 'mcq', 'text'];
     const count = 2; // Strict limit: exactly 2 AI questions
 
     if (paragraphs.length < 2) {
