@@ -728,7 +728,6 @@ function buildReadingResultBanner({ band, correctCount, totalCount, pct, byType,
 
   return `
     <div class="score-banner-content">
-      <div class="band-badge-lg">${band}</div>
       <div class="score-details">
         <h4>${tone.title} ${tone.emoji}</h4>
         <p class="result-encourage">${tone.msg}</p>
@@ -922,13 +921,13 @@ async function generateAiQuestions() {
       body: JSON.stringify({
         passage,                       // full passage (paragraphs + metadata) so it can be saved
         types: ['tfng', 'mcq', 'text'],
-        count: 2
+        count: 5
       })
     });
     const data = await res.json();
 
     if (data && data.ok && Array.isArray(data.questions) && data.questions.length) {
-      passage.questions = data.questions.slice(0, 2);
+      passage.questions = data.questions.slice(0, 5);
       if (data.hash) passage.hash = data.hash;
       // Reset test/review state for the new question set
       state.readingState.userAnswers = {};
@@ -940,7 +939,7 @@ async function generateAiQuestions() {
       renderReadingPassage(passage.id);
       fetchSavedPassages();            // refresh the "saved" list so this passage appears
       showToast(
-        data.cached ? 'AI savollar (2 ta savol keshdan) ✨' : '2 ta AI savol tayyor va saqlandi ✨',
+        data.cached ? `AI savollar (${passage.questions.length} ta savol keshdan) ✨` : `${passage.questions.length} ta AI savol tayyor va saqlandi ✨`,
         'cyan'
       );
     } else {
@@ -2047,6 +2046,10 @@ function loadLocalStorage() {
   } else {
     state.audiobookState.progress = {};
   }
+
+function loadReadingProgress() {
+  fetchSavedPassages();
+}
 
   // Load reading progress (F1.4)
   loadReadingProgress();

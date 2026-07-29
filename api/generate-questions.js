@@ -247,7 +247,7 @@ export default async function handler(req, res) {
     const passage = body.passage || body; // accept a full passage object or loose fields
     const paragraphs = Array.isArray(passage.paragraphs) ? passage.paragraphs : [];
     const types = Array.isArray(body.types) && body.types.length ? body.types : ['tfng', 'mcq', 'text'];
-    const count = 2; // Strict limit: exactly 2 AI questions
+    const count = 5; // Strict limit: exactly 5 AI questions
 
     if (paragraphs.length < 2) {
       return res.status(400).json({ error: 'passage.paragraphs required (min 2)' });
@@ -262,12 +262,12 @@ export default async function handler(req, res) {
     // 1) cache hit -> zero tokens (return full saved passage + questions)
     const existing = await dbGetByHash(hash);
     if (existing && Array.isArray(existing.questions) && existing.questions.length) {
-      return res.status(200).json({ ok: true, cached: true, hash, questions: existing.questions.slice(0, 2) });
+      return res.status(200).json({ ok: true, cached: true, hash, questions: existing.questions.slice(0, 5) });
     }
 
     // 2) generate + save the full passage
     const raw = await generateWithOpenAI(paragraphs, types, count);
-    const questions = normalizeQuestions(raw).slice(0, 2);
+    const questions = normalizeQuestions(raw).slice(0, 5);
     if (questions.length < 1) {
       return res.status(200).json({ ok: false, fallback: true, reason: 'generation-too-few' });
     }

@@ -3472,6 +3472,10 @@ a.menu-item-link {
   display: none !important;
 }
 
+.band-badge-lg {
+  display: none !important;
+}
+
 .ab-cover-collapsed .ab-now-playing {
   margin-top: 16px;
   padding: 14px 18px;
