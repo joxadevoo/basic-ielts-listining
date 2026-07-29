@@ -696,12 +696,12 @@ function readingTypeLabel(type) {
 // Encouraging title + message keyed to the score (Uzbek).
 function readingResultTone(pct) {
   if (pct >= 80) return { title: "A'lo natija!", emoji: '🎉', msg: "Zo'r ishladingiz — shu tarzda davom eting." };
-  if (pct >= 65) return { title: 'Yaxshi natija!', emoji: '👍', msg: 'Band 7.0 gacha ozgina qoldi — xatolarni ko\'rib chiqing.' };
+  if (pct >= 65) return { title: 'Yaxshi natija!', emoji: '👍', msg: 'Ozgina qoldi — xatolarni ko\'rib chiqing.' };
   if (pct >= 50) return { title: 'Yomon emas', emoji: '🙂', msg: 'Xatolaringizni tahlil qilsangiz, tez o\'sasiz.' };
   return { title: 'Mashq davom etadi', emoji: '💪', msg: 'Har bir xato — o\'rganish imkoni. Pastdagi izohlarni o\'qing.' };
 }
 
-function buildReadingResultBanner({ band, correctCount, totalCount, pct, byType, bestBefore }) {
+function buildReadingResultBanner({ correctCount, totalCount, pct, byType, bestBefore }) {
   const tone = readingResultTone(pct);
   const incorrect = totalCount - correctCount;
   const roundPct = Math.round(pct);
@@ -749,35 +749,44 @@ function buildReadingResultBanner({ band, correctCount, totalCount, pct, byType,
 function submitReadingTest() {
   const passageId = state.readingState.activePassageId;
   const passage = passageId ? READING_PASSAGES[passageId] : null;
-  if (!passage) {
-    showToast('Avval passage yuklang', 'warning');
-    return;
-  }
+  if (!passage || !passage.questions || !passage.questions.length) return;
 
   let correctCount = 0;
   const totalCount = passage.questions.length;
   const results = {};
   const highlight = new Set();
-  const byType = {};   // type -> { correct, total }
+  const byType = {};
 
   passage.questions.forEach(q => {
-    const rawUserVal = state.readingState.userAnswers[q.id] || '';
-    const isCorrect = isReadingAnswerCorrect(q, rawUserVal);
+    const userVal = (state.readingState.userAnswers[q.id] || '').trim();
+    let isCorrect = false;
+
+    if (q.type === 'tfng') {
+      isCorrect = userVal.toUpperCase() === String(q.correctAnswer).toUpperCase();
+    } else if (q.type === 'mcq') {
+      isCorrect = userVal.toUpperCase() === String(q.correctAnswer).toUpperCase();
+    } else {
+      const answers = Array.isArray(q.correctAnswer) ? q.correctAnswer : [q.correctAnswer];
+      isCorrect = answers.some(ans => userVal.toLowerCase() === String(ans).toLowerCase().trim());
+    }
+
     if (isCorrect) correctCount++;
     results[q.id] = {
-      userVal: rawUserVal,
+      userVal: userVal,
       correctVal: formatReadingCorrectAnswer(q),
       isCorrect
     };
-    if (q.keywordParagraph) highlight.add(q.keywordParagraph);
+    if (!isCorrect && q.keywordParagraph) {
+      highlight.add(q.keywordParagraph);
+    }
 
-    const bt = byType[q.type] || (byType[q.type] = { correct: 0, total: 0 });
-    bt.total++;
-    if (isCorrect) bt.correct++;
+    const t = q.type || 'other';
+    if (!byType[t]) byType[t] = { correct: 0, total: 0 };
+    byType[t].total += 1;
+    if (isCorrect) byType[t].correct += 1;
   });
 
   const pct = totalCount ? (correctCount / totalCount) * 100 : 0;
-  const band = bandFromPct(pct);
   const bestBefore = state.readingState.progress?.[passageId]?.bestPct ?? null;
 
   // Enter review mode
@@ -800,7 +809,7 @@ function submitReadingTest() {
   const banner = document.getElementById('reading-score-result-banner');
   if (banner) {
     banner.innerHTML = buildReadingResultBanner({
-      band, correctCount, totalCount, pct, byType, bestBefore
+      correctCount, totalCount, pct, byType, bestBefore
     });
     banner.style.display = 'block';
   }
@@ -808,7 +817,7 @@ function submitReadingTest() {
   // Re-render passage (adds highlights) + questions (adds review panels)
   renderReadingPassage(passageId);
 
-  showToast(`Test topshirildi! Natija: ${band} (${correctCount}/${totalCount})`, 'cyan');
+  showToast(`Test topshirildi! Natija: ${correctCount}/${totalCount} (${Math.round(pct)}%)`, 'cyan');
 }
 
 function resetReadingTest() {
