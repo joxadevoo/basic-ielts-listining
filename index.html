@@ -5,31 +5,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <!-- SEO & Brand Metadata -->
-  <title>FluentEar - IELTS Listening Practice</title>
-  <meta name="description" content="FluentEar — IELTS Listening uchun qulay mashq ilovasi: audio treklar, PDF kitob, audiokitoblar, diktant va progress saqlash bir joyda.">
+  <title>IELTSprep — Complete IELTS Preparation Suite</title>
+  <meta name="description" content="IELTSprep — IELTS tayyorgarligi uchun mukammal suit: Listening, Reading exam simulator, Writing tools & Speaking practice.">
   <meta name="author" content="Jaxongir Toshpo'latov">
   <meta name="robots" content="index, follow">
 
   <!-- Open Graph / Social Media Preview -->
-  <meta property="og:title" content="FluentEar - IELTS Listening Practice">
-  <meta property="og:description" content="Audio treklar, PDF kitob, diktant va eslatmalar bilan IELTS Listening'ni qulay mashq qiling.">
-  <meta property="og:image" content="https://fluentear.vercel.app/og-preview.svg">
+  <meta property="og:title" content="IELTSprep — Complete IELTS Preparation Suite">
+  <meta property="og:description" content="Listening, Reading exam simulator, Band Score calculator va interaktiv ta'lim vositalari bilan IELTS'ni 8.5+ darajaga tayyorlang.">
+  <meta property="og:image" content="https://ieltsprep.app/og-preview.svg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://fluentear.vercel.app/">
+  <meta property="og:url" content="https://ieltsprep.app/">
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="FluentEar - IELTS Listening Practice">
-  <meta name="twitter:description" content="Audio treklar, PDF kitob, diktant va eslatmalar bilan IELTS Listening'ni qulay mashq qiling.">
-  <meta name="twitter:image" content="https://fluentear.vercel.app/og-preview.svg">
+  <meta name="twitter:title" content="IELTSprep — Complete IELTS Preparation Suite">
+  <meta name="twitter:description" content="Listening, Reading exam simulator, Band Score calculator va interaktiv ta'lim vositalari bilan IELTS'ni 8.5+ darajaga tayyorlang.">
+  <meta name="twitter:image" content="https://ieltsprep.app/og-preview.svg">
 
   <!-- PWA Configurations -->
   <meta name="theme-color" content="#040815">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="FluentEar">
+  <meta name="apple-mobile-web-app-title" content="IELTSprep">
   <link rel="apple-touch-icon" href="./favicon.svg">
   <link rel="icon" type="image/svg+xml" href="./favicon.svg">
   <link rel="manifest" href="./manifest.json">
@@ -52,45 +52,39 @@
     
     <!-- Top Navigation Header -->
     <header class="app-header">
-      <div class="logo-section">
+      <div class="logo-section" id="logo-section" style="cursor: pointer;" title="Landing Page / Asosiy Sahifa">
         <div class="logo-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <!-- Stylized Headphone / Ear bracket -->
-            <path d="M12 2C6.48 2 2 6.48 2 12c0 4 2.5 7.5 6 9" />
-            <path d="M22 12c0-5.52-4.48-10-10-10" />
-            <!-- Interconnected 'FE' Monogram -->
-            <path d="M7 8h5" />
-            <path d="M7 12h10" />
-            <path d="M7 8v8" />
-            <path d="M13 8h5" />
-            <path d="M13 8v8h6" />
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
           </svg>
         </div>
         <div class="logo-text-group">
-          <h1 class="logo-text" data-i18n="logo_title">FluentEar</h1>
-          <span class="logo-subtitle" data-i18n="logo_subtitle">IELTS listening practice</span>
+          <h1 class="logo-text" data-i18n="logo_title">IELTSprep</h1>
+          <span class="logo-subtitle" data-i18n="logo_subtitle">IELTS preparation suite</span>
         </div>
       </div>
 
-      <!-- Workspace switcher -->
-      <div class="workspace-switcher" id="workspace-switcher">
-        <button class="switcher-btn active" data-workspace="ielts" data-i18n="workspace_ielts">IELTS Practice</button>
-        <button class="switcher-btn" data-workspace="audiobooks" data-i18n="workspace_audiobooks">Audiobooks</button>
-      </div>
-
-      <div class="book-select-wrapper" id="ielts-book-select-wrapper">
-        <select id="book-select" class="book-select">
-          <option value="basic-ielts" data-i18n="book_basic_ielts">Basic IELTS Listening</option>
-          <option value="listening-strategies" data-i18n="book_listening_strategies">Listening Strategies</option>
-        </select>
-      </div>
-
-      <!-- Audiobook selector (shown when in audiobooks workspace) -->
-      <div class="book-select-wrapper" id="audiobook-select-wrapper" style="display:none;">
-        <select id="audiobook-select" class="book-select">
-          <option value="dracula">🧛 Dracula — Bram Stoker</option>
-        </select>
-      </div>
+      <!-- 4 Skill Navigation Tabs -->
+      <nav class="skill-nav-tabs" id="skill-nav-tabs">
+        <button class="skill-tab-btn active" data-skill="listening">
+          <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+          <span data-i18n="skill_listening">Listening</span>
+        </button>
+        <button class="skill-tab-btn" data-skill="reading">
+          <svg viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+          <span data-i18n="skill_reading">Reading</span>
+        </button>
+        <button class="skill-tab-btn" data-skill="writing">
+          <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+          <span data-i18n="skill_writing">Writing</span>
+          <span class="badge-soon">Soon</span>
+        </button>
+        <button class="skill-tab-btn" data-skill="speaking">
+          <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg>
+          <span data-i18n="skill_speaking">Speaking</span>
+          <span class="badge-soon">Soon</span>
+        </button>
+      </nav>
       
       <div class="header-controls">
         <!-- Theme toggle (always visible) -->
@@ -162,524 +156,677 @@
 
     <div class="menu-backdrop" id="menu-backdrop" aria-hidden="true"></div>
 
-    <!-- One-Screen Landing -->
+    <!-- Complete IELTSprep Landing Page -->
     <section class="landing-screen" id="landing-screen" aria-labelledby="landing-title">
-      <div class="landing-copy">
-        <div class="landing-kicker" data-i18n="landing_kicker">IELTS listening practice suite</div>
-        <h2 id="landing-title" class="landing-title" data-i18n="landing_title">Basic IELTS Listening</h2>
-        <div class="landing-author" data-i18n="landing_author">Book by Li Ya Bin</div>
-        <p class="landing-subtitle" data-i18n="landing_subtitle">Study with the book, stream every track, write dictation, and save your progress in one focused workspace.</p>
-        <div class="landing-actions">
-          <button id="landing-start" class="btn-primary landing-start-btn" data-i18n="landing_start">Start practice</button>
-          <button id="landing-preview" class="btn-secondary landing-preview-btn" data-i18n="landing_preview">View workspace</button>
-          <button id="landing-install" class="btn-secondary landing-install-btn" data-i18n="install_app">Ilovani o'rnatish</button>
-        </div>
-        <div class="landing-disclaimer">
-          <svg class="disclaimer-icon" viewBox="0 0 24 24">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
-          </svg>
-          <span class="disclaimer-text" data-i18n="landing_disclaimer">Diqqat: Statistik tahlil maqsadida sizning kirish ma'lumotlaringiz (shu jumladan qurilma nomi va turi) yig'iladi.</span>
-        </div>
-        <div class="landing-stats" aria-label="Practice features">
-          <div class="landing-stat">
-            <strong>97</strong>
-            <span data-i18n="landing_stat_tracks">audio tracks</span>
-          </div>
-          <div class="landing-stat">
-            <strong>5</strong>
-            <span data-i18n="landing_stat_units">study units</span>
-          </div>
-          <div class="landing-stat">
-            <strong>A-B</strong>
-            <span data-i18n="landing_stat_loop">repeat loop</span>
-          </div>
-        </div>
-      </div>
+      <div class="landing-inner-scroll">
+        
+        <!-- Hero Section -->
+        <div class="landing-hero-grid">
+          <div class="landing-hero-copy">
+            <div class="landing-badge-pill">
+              <span class="badge-dot"></span>
+              <span data-i18n="landing_hero_badge">✨ Ultimate IELTS Preparation Suite</span>
+            </div>
 
-      <div class="landing-product ielts-only" aria-hidden="true">
-        <div class="landing-book">
-          <div class="landing-book-bar">
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
-          <div class="landing-book-title">Basic IELTS Listening</div>
-          <div class="landing-book-lines">
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
-          <div class="landing-wave">
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
-        </div>
-        <div class="landing-panel-preview">
-          <div class="landing-track active">
-            <span>01</span>
-            <div>
-              <strong>Letters of the Alphabet</strong>
-              <small>Unit 1 - Exercise 1</small>
-            </div>
-          </div>
-          <div class="landing-track">
-            <span>47</span>
-            <div>
-              <strong>Survival English</strong>
-              <small>Unit 3 - Listening</small>
-            </div>
-          </div>
-          <div class="landing-player">
-            <div class="landing-play-dot"></div>
-            <div class="landing-progress">
-              <span></span>
-            </div>
-            <small>1.0x</small>
-          </div>
-        </div>
-      </div>
+            <h1 id="landing-title" class="landing-hero-title">
+              IELTSprep — <span class="gradient-text">Interaktiv Tayyorgarlik Platformasi</span>
+            </h1>
 
-      <div class="landing-product audiobooks-only" aria-hidden="true" style="display: none;">
-        <div class="ab-landing-widget">
-          <!-- Book body -->
-          <div class="ab-book-body">
-            <div class="ab-book-spine"></div>
-            <div class="ab-book-cover">
-              <!-- Decorative lines on cover -->
-              <div class="ab-cover-lines">
-                <span></span><span></span><span></span><span></span>
+            <p class="landing-hero-subtitle" data-i18n="landing_subtitle">
+              IELTSprep — IELTS imtihoniga tayyorlanish uchun mo'ljallangan interaktiv platforma. Hozirda Listening (PDF kitob, audio treklar va diktant) hamda Reading (interaktiv simulyator va taymer) bo'limlari to'liq ishlaydi. Writing va Speaking modullari tez kunda taqdim etiladi.
+            </p>
+
+            <div class="landing-actions">
+              <button id="landing-start" class="btn-primary landing-start-btn">
+                <svg viewBox="0 0 24 24" style="width:18px; height:18px; fill:currentColor; margin-right:6px;"><path d="M8 5v14l11-7z"/></svg>
+                <span data-i18n="landing_start">Start Practice Now</span>
+              </button>
+              <button id="landing-preview" class="btn-secondary landing-preview-btn">
+                <span data-i18n="landing_preview">View Workspace</span>
+              </button>
+              <button id="landing-install" class="btn-secondary landing-install-btn">
+                <svg viewBox="0 0 24 24" style="width:18px; height:18px; fill:currentColor; margin-right:6px;"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                <span data-i18n="install_app">Install App</span>
+              </button>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="landing-stats-row">
+              <div class="landing-stat-box">
+                <strong class="stat-number">4</strong>
+                <span class="stat-label">Core Skills</span>
               </div>
-              <div class="ab-cover-title">
-                <span class="ab-cover-t1">AUDIO</span>
-                <span class="ab-cover-t2">BOOK</span>
+              <div class="landing-stat-box">
+                <strong class="stat-number">100+</strong>
+                <span class="stat-label">Audio Tracks & Passages</span>
+              </div>
+              <div class="landing-stat-box">
+                <strong class="stat-number">60m</strong>
+                <span class="stat-label">Exam Timers</span>
+              </div>
+              <div class="landing-stat-box">
+                <strong class="stat-number">Band 9</strong>
+                <span class="stat-label">Score Calculator</span>
               </div>
             </div>
-            <!-- Sound waves bursting out from book -->
-            <div class="ab-waves-right">
-              <span class="ab-wave" style="--i:1"></span>
-              <span class="ab-wave" style="--i:2"></span>
-              <span class="ab-wave" style="--i:3"></span>
-              <span class="ab-wave" style="--i:4"></span>
+          </div>
+
+          <!-- Hero Right: Interactive App Preview Window -->
+          <div class="landing-hero-preview">
+            <div class="preview-window">
+              <div class="preview-window-header">
+                <div class="window-controls">
+                  <span class="window-dot red"></span>
+                  <span class="window-dot yellow"></span>
+                  <span class="window-dot green"></span>
+                </div>
+                <div class="window-url-bar">ieltsprep.app / listening-reading</div>
+              </div>
+
+              <div class="preview-window-body">
+                <div class="preview-skills-bar">
+                  <span class="preview-skill-chip active">🎧 Listening</span>
+                  <span class="preview-skill-chip active-accent">📖 Reading</span>
+                  <span class="preview-skill-chip">✍️ Writing</span>
+                  <span class="preview-skill-chip">🎙 Speaking</span>
+                </div>
+
+                <div class="preview-workspace-split">
+                  <div class="preview-pane-left">
+                    <div class="preview-pdf-tag">📄 basic-ielts-listening.pdf</div>
+                    <div class="preview-lines">
+                      <div class="p-line w-80"></div>
+                      <div class="p-line w-100"></div>
+                      <div class="p-line w-60"></div>
+                      <div class="p-line w-90"></div>
+                    </div>
+                  </div>
+
+                  <div class="preview-pane-right">
+                    <div class="preview-track-item">
+                      <span class="play-icon-sm">▶</span>
+                      <div>
+                        <strong>Track 01 — Unit 1</strong>
+                        <small>Letters & Numbers</small>
+                      </div>
+                    </div>
+
+                    <div class="preview-equalizer">
+                      <span style="height: 40%"></span>
+                      <span style="height: 80%"></span>
+                      <span style="height: 100%"></span>
+                      <span style="height: 50%"></span>
+                      <span style="height: 90%"></span>
+                      <span style="height: 60%"></span>
+                    </div>
+
+                    <div class="preview-score-chip">
+                      <span>Band Score Calculated:</span>
+                      <strong>Band 8.5</strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          <!-- Equalizer bars floating below -->
-          <div class="ab-equalizer">
-            <span style="--d:0s;--h:60%"></span>
-            <span style="--d:0.1s;--h:100%"></span>
-            <span style="--d:0.2s;--h:45%"></span>
-            <span style="--d:0.05s;--h:80%"></span>
-            <span style="--d:0.15s;--h:55%"></span>
-            <span style="--d:0.25s;--h:90%"></span>
-            <span style="--d:0s;--h:40%"></span>
-            <span style="--d:0.3s;--h:70%"></span>
+        </div>
+
+        <!-- 4 Core Skills Feature Grid -->
+        <div class="landing-skills-section">
+          <div class="section-header-center">
+            <h2 class="section-title">Prepare for All 4 IELTS Sections</h2>
+            <p class="section-subtitle">Real exam standards, audio dictation, exam timers, and automatic score calculations.</p>
           </div>
-          <!-- Floating particles -->
-          <div class="ab-particles">
-            <span style="--px:20%;--py:15%;--pd:0s"></span>
-            <span style="--px:80%;--py:25%;--pd:0.6s"></span>
-            <span style="--px:55%;--py:80%;--pd:1.2s"></span>
-            <span style="--px:10%;--py:65%;--pd:0.3s"></span>
-            <span style="--px:90%;--py:70%;--pd:0.9s"></span>
+
+          <div class="skills-grid-4">
+            <!-- Skill 1: Listening -->
+            <div class="landing-skill-card skill-listening-card">
+              <div class="card-top-icon">🎧</div>
+              <h3 class="card-skill-title">IELTS Listening</h3>
+              <p class="card-skill-desc">PDF coursebook sync with 100+ audio tracks, A-B repeat loops, dictation pad, and notebook.</p>
+              <ul class="card-feature-list">
+                <li>✓ PDF Book Reader & Jump Links</li>
+                <li>✓ Dictation Pad & Stats Counter</li>
+                <li>✓ A-B Audio Repeat Loop</li>
+              </ul>
+            </div>
+
+            <!-- Skill 2: Reading -->
+            <div class="landing-skill-card skill-reading-card">
+              <div class="card-top-icon">📖</div>
+              <h3 class="card-skill-title">IELTS Reading</h3>
+              <p class="card-skill-desc">Split-screen passage viewer, 60-minute exam timer, True/False/Not Given sheet, and Band Score calculator.</p>
+              <ul class="card-feature-list">
+                <li>✓ Passage Viewer & Paragraph Markers</li>
+                <li>✓ 60-Min Test Countdown Timer</li>
+                <li>✓ Instant Band Score (1.0 - 9.0)</li>
+              </ul>
+            </div>
+
+            <!-- Skill 3: Writing -->
+            <div class="landing-skill-card skill-writing-card">
+              <div class="skill-soon-badge">Tez kunda</div>
+              <div class="card-top-icon">✍️</div>
+              <h3 class="card-skill-title">IELTS Writing</h3>
+              <p class="card-skill-desc">Task 1 chart templates, Task 2 smart essay editor, word counter, and model Band 9.0 answers.</p>
+              <ul class="card-feature-list">
+                <li>✓ Task 1 & Task 2 Essay Editor</li>
+                <li>✓ Real-time Word Counter</li>
+                <li>✓ Model Band 9.0 Sample Essays</li>
+              </ul>
+            </div>
+
+            <!-- Skill 4: Speaking -->
+            <div class="landing-skill-card skill-speaking-card">
+              <div class="skill-soon-badge">Tez kunda</div>
+              <div class="card-top-icon">🎙</div>
+              <h3 class="card-skill-title">IELTS Speaking</h3>
+              <p class="card-skill-desc">Part 1-3 cue card simulator, 1-minute preparation timer, high-quality voice recorder & transcript.</p>
+              <ul class="card-feature-list">
+                <li>✓ Part 1-3 Exam Cue Cards</li>
+                <li>✓ 1-Min Preparation Timer</li>
+                <li>✓ Voice Recorder & Speech-to-Text</li>
+              </ul>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
 
-    <!-- Main Workspace Split -->
-    <main class="main-workspace">
-      
-      <!-- Left Pane: PDF Book Viewer -->
-      <section class="pdf-pane" id="pdf-pane">
-        <div class="pdf-header-bar">
-          <div class="pdf-title">
-            <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: currentColor;">
-              <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4 6H9v2h6V9zm0 4H9v2h6v-2zm-6 4h6v2H9v-2z"/>
-            </svg>
-            <span>basic-ielts-listening.pdf</span>
+        <!-- Why Choose IELTSprep Feature Highlights -->
+        <div class="landing-why-section">
+          <div class="why-grid-2">
+            <div class="why-feature-box">
+              <div class="why-icon">⚡</div>
+              <h4>Real Exam Timers & Scoring</h4>
+              <p>Practice under authentic test time limits with instant feedback and accurate Band Score calculations.</p>
+            </div>
+            <div class="why-feature-box">
+              <div class="why-icon">📓</div>
+              <h4>Dictation Pad & Notebook</h4>
+              <p>Improve spelling, vocabulary retention, and active listening by typing transcripts while practicing.</p>
+            </div>
+            <div class="why-feature-box">
+              <div class="why-icon">🌐</div>
+              <h4>Dual Language Interface</h4>
+              <p>Seamlessly switch between English and Uzbek languages anytime with a single click.</p>
+            </div>
+            <div class="why-feature-box">
+              <div class="why-icon">📱</div>
+              <h4>Offline & PWA Supported</h4>
+              <p>Install IELTSprep on your desktop or smartphone and practice anywhere without interruptions.</p>
+            </div>
           </div>
-          
-          <div class="pdf-shortcuts" id="pdf-shortcuts">
-            <!-- Populated dynamically in JavaScript -->
-          </div>
         </div>
-        
-        <div class="pdf-viewer-container">
-          <iframe src="about:blank" class="pdf-viewer-frame" id="pdf-frame"></iframe>
-        </div>
-      </section>
 
-
-
-      <!-- Right Pane: Controls, Interactive Worksheets -->
-      <section class="control-pane">
-
-        <!-- Mobile book switcher (IELTS Practice only) -->
-        <div class="mobile-book-bar" id="mobile-book-bar">
-          <span class="mobile-book-label" data-i18n="about_app_book_label">Book</span>
-          <select id="mobile-book-select" class="book-select mobile-book-select" aria-label="Select book">
-            <option value="basic-ielts" data-i18n="book_basic_ielts">Basic IELTS Listening</option>
-            <option value="listening-strategies" data-i18n="book_listening_strategies">Listening Strategies</option>
-          </select>
-        </div>
-        
-        <!-- Tab Navigation -->
-        <nav class="pane-tabs-nav">
-          <button class="tab-btn active" data-tab="tracks">
-            <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0-2-.9-2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
-            <span data-i18n="tab_tracks">Tracks</span>
-          </button>
-
-          <button class="tab-btn" data-tab="dictation">
-            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/></svg>
-            <span data-i18n="tab_dictation">Dictation</span>
-          </button>
-          <button class="tab-btn" data-tab="notes">
-            <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-            <span data-i18n="tab_notes">Notebook</span>
-          </button>
-        </nav>
-
-        <!-- Tab Panel Contents -->
-        <div class="pane-content-wrapper">
-          
-          <!-- Playlist Tab -->
-          <div id="panel-tracks" class="pane-panel active">
-            <div class="playlist-layout">
-              <div class="playlist-toolbar">
-                <div class="search-input-wrapper">
-                  <svg class="search-icon" viewBox="0 0 24 24">
-                    <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+        <!-- Landing Footer -->
+        <footer class="landing-footer">
+          <div class="landing-footer-inner">
+            <div class="footer-brand-col">
+              <div class="footer-logo">
+                <div class="logo-icon sm">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
                   </svg>
-                  <input type="text" id="track-search" class="search-input" data-i18n-placeholder="search_placeholder" placeholder="Search track name, unit or notes...">
                 </div>
-                <select id="track-filter" class="filter-select">
-                  <option value="all" data-i18n="filter_all">All Tracks</option>
-                  <option value="completed" data-i18n="filter_completed">Completed</option>
-                  <option value="in-progress" data-i18n="filter_in_progress">In Progress</option>
-                  <option value="unattempted" data-i18n="filter_unattempted">Unattempted</option>
-                </select>
+                <span>IELTSprep</span>
               </div>
-              
-              <!-- Tracks Playlist Scroll Area -->
-              <div class="tracks-scroll-area" id="playlist-container">
-                <!-- Group folders dynamically in JavaScript -->
-              </div>
+              <p class="footer-brand-desc">IELTS Listening va Reading bo'limlari bo'yicha interaktiv tayyorgarlik platformasi. PDF kitoblar sinxronizatsiyasi, 60 daqiqalik simulyatorlar, diktant paneli va avtomatik Band Score kalkulyatori.</p>
+            </div>
+
+            <div class="footer-links-col">
+              <h4>Bo'limlar</h4>
+              <ul>
+                <li><a href="#listening" class="footer-link">🎧 IELTS Listening</a></li>
+                <li><a href="#reading" class="footer-link">📖 IELTS Reading</a></li>
+                <li><span class="footer-link muted">✍️ IELTS Writing <small class="badge-soon">Tez kunda</small></span></li>
+                <li><span class="footer-link muted">🎙 IELTS Speaking <small class="badge-soon">Tez kunda</small></span></li>
+              </ul>
+            </div>
+
+            <div class="footer-links-col">
+              <h4>Foydali</h4>
+              <ul>
+                <li><a href="/stats.html" target="_blank" class="footer-link">📊 Foydalanish statistikasi</a></li>
+                <li><a href="https://t.me/jaxongirtoshpolatov" target="_blank" rel="noopener noreferrer" class="footer-link">💬 Qayta aloqa (Telegram)</a></li>
+              </ul>
             </div>
           </div>
 
-          <!-- Dictation Workspace Tab -->
-          <div id="panel-dictation" class="pane-panel">
-            <div class="dictation-layout">
-              <div class="answer-sheet-controls">
-                <div>
-                  <span data-i18n="dictation_pad_title">Dictation Pad:</span> <strong id="dictation-track-title">Track 01</strong>
-                </div>
-                <div style="display: flex; gap: 8px;">
-                  <button id="btn-save-dictation" class="btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" data-i18n="btn_save_dictation">Save Dictation</button>
-                  <button id="btn-clear-dictation" class="btn-secondary" style="padding: 6px 12px; font-size: 0.8rem; border-color:var(--color-danger); color:var(--color-danger)" data-i18n="btn_clear">Clear</button>
-                </div>
-              </div>
-              <p class="panel-header-desc" data-i18n="dictation_desc">Listen to the segment and type what you hear. Use shortcuts to control the audio player directly from the keyboard.</p>
-              
-              <textarea id="dictation-text" class="dictation-textarea" data-i18n-placeholder="dictation_placeholder" placeholder="Start typing the transcript here..."></textarea>
-              
-              <div class="dictation-footer-row">
-                <div class="dictation-stats">
-                  <span data-i18n="stats_words">Words:</span> <strong id="dictation-word-count">0</strong>
-                  <span data-i18n="stats_chars">Characters:</span> <strong id="dictation-char-count">0</strong>
-                </div>
-                
-                <div class="shortcut-helper-tip">
-                  <span data-i18n="shortcuts_title">Keyboard Shortcuts:</span>
-                  <span><kbd>Esc</kbd> <span data-i18n="shortcut_play_pause">Play/Pause</span></span>
-                  <span><kbd>Ctrl</kbd>+<kbd>←</kbd> <span data-i18n="shortcut_rewind">Rewind 5s</span></span>
-                  <span><kbd>Ctrl</kbd>+<kbd>→</kbd> <span data-i18n="shortcut_forward">Fast Forward 5s</span></span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Notebook Tab -->
-          <div id="panel-notes" class="pane-panel">
-            <div class="notes-layout">
-              <div class="answer-sheet-controls">
-                <div>
-                  <span data-i18n="notebook_title">Vocab & General Notes</span>
-                </div>
-                <div style="display: flex; gap: 8px;">
-                  <button id="btn-export-notes" class="btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" data-i18n="btn_export_notes">Export Notes (.txt)</button>
-                  <button id="btn-save-notes" class="btn-primary" style="padding: 6px 12px; font-size: 0.8rem;" data-i18n="btn_save_notes">Save Notes</button>
-                </div>
-              </div>
-              <p class="panel-header-desc" data-i18n="notebook_desc">Keep track of spelling notes, tricky pronunciation patterns, or new vocabulary words you learn from this track.</p>
-              
-              <textarea id="notes-text" class="notes-editor" data-i18n-placeholder="notebook_placeholder" placeholder="Write down vocabulary, notes, or tips for the current track..."></textarea>
-            </div>
-          </div>
-
-
-
-        </div>
-
-        <!-- Bottom Custom Audio Player inside Right Pane -->
-        <footer class="audio-player-footer">
-          <!-- Audio tag -->
-          <audio id="main-audio" style="display:none;"></audio>
-          
-          <div class="player-left-info">
-            <h3 class="player-title" id="player-track-title" data-i18n="player_select_track">Select a track to practice</h3>
-            <span class="player-subtitle" id="player-track-subtitle" data-i18n="player_default_subtitle">Basic IELTS Listening</span>
-          </div>
-
-          <div class="player-center-controls">
-            <div class="player-buttons">
-              <!-- Rewind -->
-              <button id="player-prev" class="btn-player" title="Previous Track">
-                <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
-              </button>
-              <button id="player-backward" class="btn-player" title="Rewind 5s">
-                <svg viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05 1.05-6.9 2.75L3.5 8V14H9.5L7.35 11.85c1.4-1.25 3.25-2 5.15-2 3.6 0 6.6 2.6 7.25 6H21.8c-.7-4.35-4.45-7.5-9.3-7.5z"/></svg>
-              </button>
-              
-              <!-- Play / Pause -->
-              <button id="player-play-pause" class="btn-player btn-play-pause" title="Play / Pause">
-                <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                <svg id="pause-icon" viewBox="0 0 24 24" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-              </button>
-              
-              <!-- Fast Forward -->
-              <button id="player-forward" class="btn-player" title="Fast Forward 5s">
-                <svg viewBox="0 0 24 24"><path d="M11.5 8.01v-2.3L6.81 10.4 11.5 15.1v-2.3c3.85 0 6.95 2.8 7.45 6.4h2.1c-.5-4.8-4.65-8.6-9.55-8.6z" transform="scale(-1, 1) translate(-24, 0)"/></svg>
-              </button>
-              <!-- Next -->
-              <button id="player-next" class="btn-player" title="Next Track">
-                <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
-              </button>
-            </div>
-            
-            <!-- Seek Slider Row -->
-            <div class="player-progress-row">
-              <span class="time-display" id="player-time-current">0:00</span>
-              <div class="progress-slider-wrapper" id="progress-slider">
-                <div class="progress-bar-bg">
-                  <div class="progress-bar-fill" id="progress-fill"></div>
-                  <!-- A-B loop marker segment -->
-                  <div class="ab-loop-indicator" id="ab-indicator"></div>
-                </div>
-                <div class="progress-thumb" id="progress-thumb"></div>
-              </div>
-              <span class="time-display" id="player-time-total">0:00</span>
-            </div>
-            
-            <!-- Dynamic Nearby Jump Points Row -->
-            <div class="nearby-jumps-row" id="nearby-jumps-row" style="display: none;">
-              <!-- Dynamic buttons will be populated here -->
-            </div>
-          </div>
-
-          <div class="player-right-controls">
-            <!-- A-B Repeat Loop button -->
-            <button id="btn-ab-loop" class="btn-ab-loop" title="Set A-B Loop Repeat (Click to set A, click again to set B, click third time to cancel)">
-              <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: currentColor; display: inline-block; vertical-align: middle; margin-right: 4px;">
-                <path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/>
-              </svg>
-              <span id="ab-loop-text">A-B</span>
-            </button>
-
-            <!-- Playback Speed -->
-            <div class="playback-speed-control">
-              <button id="btn-speed-select" class="btn-speed" title="Adjust playback speed">1.0x</button>
-              <div class="speed-dropdown" id="speed-dropdown">
-                <div class="speed-option" data-speed="0.5">0.5x</div>
-                <div class="speed-option" data-speed="0.75">0.75x</div>
-                <div class="speed-option active" data-speed="1.0">1.0x</div>
-                <div class="speed-option" data-speed="1.25">1.25x</div>
-                <div class="speed-option" data-speed="1.5">1.5x</div>
-                <div class="speed-option" data-speed="2.0">2.0x</div>
-              </div>
-            </div>
-            
-            <!-- Volume Control -->
-            <div class="volume-control-wrapper">
-              <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: var(--text-secondary);">
-                <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
-              </svg>
-              <input type="range" class="volume-slider" id="volume-slider" min="0" max="1" step="0.05" value="0.8">
-            </div>
+          <div class="landing-footer-bottom">
+            <p>© 2026 IELTSprep — IELTS imtihoniga mukammal tayyorgarlik platformasi. Barcha huquqlar himoyalangan.</p>
           </div>
         </footer>
 
-      </section>
+      </div>
+    </section>
 
-    </main>
-
-    <!-- Dedicated Audiobook Workspace — Music Player Layout -->
-    <main class="audiobook-workspace" id="audiobook-workspace" style="display: none;">
-      <div class="ab-music-shell" id="ab-music-shell">
-
-        <!-- Cover + chapters zone (overlay shu yerda ochiladi) -->
-        <div class="ab-upper-zone" id="ab-upper-zone">
-          <div class="ab-blur-bg" id="ab-blur-bg"></div>
-          <section class="ab-hero">
-            <!-- Left: Toggle Cover button -->
-            <button type="button" id="ab-btn-toggle-cover" class="ab-toggle-cover-btn" title="Toggle Cover Art">
-              <svg class="ab-toggle-cover-icon-eye" viewBox="0 0 24 24" style="display:none;"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
-              <svg class="ab-toggle-cover-icon-eye-slash" viewBox="0 0 24 24"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.82l2.92 2.92c1.51-1.26 2.7-2.89 3.44-4.74-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/></svg>
-            </button>
-            <button type="button" id="ab-study-fab" class="ab-study-fab" aria-expanded="false" aria-controls="ab-study-panel">
-              <svg class="ab-study-fab-icon" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-              <span class="ab-study-fab-label" data-i18n="ab_study_fab">Dictation / Notes</span>
-            </button>
-            <div class="ab-cover-frame">
-              <img src="/dracula_cover.jpg" alt="Dracula Cover" class="ab-cover-art" id="ab-cover-art">
-              <div class="ab-cover-glow" aria-hidden="true"></div>
-            </div>
-            <div class="ab-now-playing">
-              <p class="ab-now-label" data-i18n="ab_now_playing">Now Playing</p>
-              <h2 class="ab-now-title" id="ab-now-title">Dracula</h2>
-              <p class="ab-now-author" id="ab-now-author">Bram Stoker</p>
-              <p class="ab-now-chapter" id="ab-now-chapter">Chapter 1</p>
-              <p class="ab-now-description" id="ab-now-description"></p>
-            </div>
-          </section>
-
-          <section class="ab-chapters-band">
-            <div class="ab-chapters-head">
-              <h3 class="ab-chapters-title" data-i18n="ab_chapters_title">Chapters</h3>
-            </div>
-            <div class="ab-chapters-scroll" id="audiobook-chapters-list" role="tablist" aria-label="Chapters">
-              <!-- Populated dynamically -->
-            </div>
-          </section>
-        </div>
-
-        <!-- Desktop: player + study | Mobile: player + FAB -->
-        <div class="ab-right-column" id="ab-right-column">
-          <div class="ab-player-stack" id="ab-player-stack">
-
-          <section class="ab-player-band">
-          <audio id="audiobook-audio" style="display:none;"></audio>
-
-          <div class="ab-player-progress-area">
-            <div class="ab-progress-row">
-              <span class="ab-time" id="ab-time-current">0:00</span>
-              <div class="ab-progress-slider-wrapper" id="ab-progress-slider">
-                <div class="ab-progress-bar-bg">
-                  <div class="ab-progress-bar-fill" id="ab-progress-fill"></div>
-                  <div class="ab-loop-indicator" id="ab-loop-indicator"></div>
-                </div>
-                <div class="ab-progress-thumb" id="ab-progress-thumb"></div>
-              </div>
-              <span class="ab-time" id="ab-time-total">0:00</span>
-            </div>
-            <div class="ab-minute-jumps-row" id="ab-minute-jumps-row"></div>
+    <!-- Skill Workspace: Listening (Direct Workspace Layout) -->
+    <div class="skill-workspace-pane active" id="skill-workspace-listening">
+      
+      <!-- Active Workspace Wrapper -->
+      <div class="listening-active-wrapper" id="listening-active-wrapper" style="display: flex;">
+        <!-- Sub Header inside Listening Workspace -->
+        <div class="listening-sub-header">
+          <div class="workspace-switcher" id="workspace-switcher">
+            <button class="switcher-btn active" data-workspace="ielts" data-i18n="workspace_ielts">Listening Kitoblari</button>
+            <button class="switcher-btn" data-workspace="audiobooks" data-i18n="workspace_audiobooks">Audiokitoblar</button>
           </div>
 
-          <div class="ab-player-main-controls">
-            <button id="ab-btn-prev-chapter" class="ab-skip-btn" title="Previous Chapter" aria-label="Previous Chapter">
-              <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
-            </button>
-            <button id="ab-btn-backward-15s" class="ab-rewind-btn" title="Back 15s" aria-label="Back 15 seconds">
-              <svg viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05 1.05-6.9 2.75L3.5 8V14H9.5L7.35 11.85c1.4-1.25 3.25-2 5.15-2 3.6 0 6.6 2.6 7.25 6H21.8c-.7-4.35-4.45-7.5-9.3-7.5z"/></svg>
-              <span>15</span>
-            </button>
-            <button id="ab-btn-play-pause" class="ab-play-btn-large" title="Play / Pause" aria-label="Play or Pause">
-              <svg id="ab-play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-              <svg id="ab-pause-icon" viewBox="0 0 24 24" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-            </button>
-            <button id="ab-btn-forward-15s" class="ab-rewind-btn ab-forward-btn" title="Forward 15s" aria-label="Forward 15 seconds">
-              <svg viewBox="0 0 24 24"><path d="M11.5 8.01v-2.3L6.81 10.4 11.5 15.1v-2.3c3.85 0 6.95 2.8 7.45 6.4h2.1c-.5-4.8-4.65-8.6-9.55-8.6z" transform="scale(-1, 1) translate(-24, 0)"/></svg>
-              <span>15</span>
-            </button>
-            <button id="ab-btn-next-chapter" class="ab-skip-btn" title="Next Chapter" aria-label="Next Chapter">
-              <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
-            </button>
+          <div class="book-select-wrapper" id="ielts-book-select-wrapper">
+            <select id="book-select" class="book-select">
+              <option value="basic-ielts" data-i18n="book_basic_ielts">Basic IELTS Listening</option>
+              <option value="listening-strategies" data-i18n="book_listening_strategies">Listening Strategies</option>
+            </select>
           </div>
 
-          <div class="ab-player-secondary-controls">
-            <button id="ab-btn-loop" class="ab-chip-btn" title="A-B Repeat">
-              <svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
-              <span id="ab-loop-label">A-B</span>
-            </button>
-            <div class="ab-speed-selector">
-              <button id="ab-btn-speed" class="ab-chip-btn ab-speed-chip">1.0x</button>
-              <div class="ab-speed-dropdown" id="ab-speed-dropdown">
-                <div class="ab-speed-opt" data-speed="0.5">0.5x</div>
-                <div class="ab-speed-opt" data-speed="0.75">0.75x</div>
-                <div class="ab-speed-opt active" data-speed="1.0">1.0x</div>
-                <div class="ab-speed-opt" data-speed="1.25">1.25x</div>
-                <div class="ab-speed-opt" data-speed="1.5">1.5x</div>
-                <div class="ab-speed-opt" data-speed="2.0">2.0x</div>
-              </div>
-            </div>
-          </div>
-          </section>
+          <!-- Audiobook selector (shown when in audiobooks workspace) -->
+          <div class="book-select-wrapper" id="audiobook-select-wrapper" style="display:none;">
+            <select id="audiobook-select" class="book-select">
+              <option value="dracula">🧛 Dracula — Bram Stoker</option>
+            </select>
           </div>
         </div>
 
-        <!-- Diktant / Daftar (desktop: o'ng ustunda, mobile: overlay) -->
-        <section class="ab-study-panel" id="ab-study-panel" aria-hidden="true">
-          <div class="ab-study-panel-inner">
-            <div class="ab-study-panel-header">
-              <nav class="ab-segmented-nav" id="ab-segmented-nav">
-                <div class="ab-segment-indicator" id="ab-segment-indicator"></div>
-                <button class="ab-segment-btn active" data-ab-tab="dictation" type="button">
-                  <span data-i18n="tab_dictation">Dictation</span>
-                </button>
-                <button class="ab-segment-btn" data-ab-tab="notes" type="button">
-                  <span data-i18n="tab_notes">Notebook</span>
-                </button>
-              </nav>
-
-              <!-- Mini player controls for mobile keyboard typing -->
-              <div class="ab-mini-player" id="ab-mini-player">
-                <button type="button" class="ab-mini-btn" id="ab-mini-backward" title="Back 15s">
-                  <svg viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05 1.05-6.9 2.75L3.5 8V14H9.5L7.35 11.85c1.4-1.25 3.25-2 5.15-2 3.6 0 6.6 2.6 7.25 6H21.8c-.7-4.35-4.45-7.5-9.3-7.5z"/></svg>
-                </button>
-                <button type="button" class="ab-mini-btn ab-mini-play-btn" id="ab-mini-play-pause" title="Play / Pause">
-                  <svg class="ab-mini-play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                  <svg class="ab-mini-pause-icon" viewBox="0 0 24 24" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-                </button>
-                <button type="button" class="ab-mini-btn" id="ab-mini-forward" title="Forward 15s">
-                  <svg viewBox="0 0 24 24"><path d="M11.5 8.01v-2.3L6.81 10.4 11.5 15.1v-2.3c3.85 0 6.95 2.8 7.45 6.4h2.1c-.5-4.8-4.65-8.6-9.55-8.6z" transform="scale(-1, 1) translate(-24, 0)"/></svg>
-                </button>
+        <!-- Main Workspace Split -->
+        <main class="main-workspace">
+          
+          <!-- Left Pane: PDF Book Viewer -->
+          <section class="pdf-pane" id="pdf-pane">
+            <div class="pdf-header-bar">
+              <div class="pdf-title">
+                <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: currentColor;">
+                  <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4 6H9v2h6V9zm0 4H9v2h6v-2zm-6 4h6v2H9v-2z"/>
+                </svg>
+                <span>basic-ielts-listening.pdf</span>
               </div>
+              
+              <div class="pdf-shortcuts" id="pdf-shortcuts">
+                <!-- Populated dynamically in JavaScript -->
+              </div>
+            </div>
+            
+            <div class="pdf-viewer-container">
+              <iframe src="about:blank" class="pdf-viewer-frame" id="pdf-frame"></iframe>
+            </div>
+          </section>
 
-              <button type="button" id="ab-study-close" class="ab-study-close-btn" aria-label="Close">
-                <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+          <!-- Right Pane: Controls, Interactive Worksheets -->
+          <section class="control-pane">
+            <!-- Mobile book switcher (IELTS Practice only) -->
+            <div class="mobile-book-bar" id="mobile-book-bar">
+              <span class="mobile-book-label" data-i18n="about_app_book_label">Book</span>
+              <select id="mobile-book-select" class="book-select mobile-book-select" aria-label="Select book">
+                <option value="basic-ielts" data-i18n="book_basic_ielts">Basic IELTS Listening</option>
+                <option value="listening-strategies" data-i18n="book_listening_strategies">Listening Strategies</option>
+              </select>
+            </div>
+            
+            <!-- Tab Navigation -->
+            <nav class="pane-tabs-nav">
+              <button class="tab-btn active" data-tab="tracks">
+                <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0-2-.9-2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+                <span data-i18n="tab_tracks">Tracks</span>
               </button>
-            </div>
-            <div class="ab-tools-content">
-              <div id="ab-panel-dictation" class="ab-tool-panel active">
-                <textarea id="ab-dictation-text" class="ab-textarea" data-i18n-placeholder="dictation_placeholder" placeholder="Start typing the transcript here..."></textarea>
-                <div class="ab-tool-actions">
-                  <div class="ab-textarea-stats">
-                    <span><span data-i18n="stats_words">Words:</span> <strong id="ab-dict-words">0</strong></span>
-                    <span><span data-i18n="stats_chars">Characters:</span> <strong id="ab-dict-chars">0</strong></span>
+              <button class="tab-btn" data-tab="dictation">
+                <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                <span data-i18n="tab_dictation">Dictation</span>
+              </button>
+              <button class="tab-btn" data-tab="notes">
+                <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                <span data-i18n="tab_notes">Notebook</span>
+              </button>
+              <button class="tab-btn" data-tab="analytics">
+                <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+                <span data-i18n="tab_analytics">Analytics</span>
+              </button>
+            </nav>
+
+            <!-- Pane Content Area -->
+            <div class="pane-content">
+              <!-- Tracks Playlist Panel -->
+              <div class="pane-panel active" id="panel-tracks">
+                <div class="playlist-toolbar">
+                  <div class="search-input-wrapper">
+                    <svg class="search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                    <input type="text" id="track-search" class="search-input" data-i18n-placeholder="search_placeholder" placeholder="Search track name, unit or notes...">
                   </div>
-                  <button id="ab-btn-save-dictation" class="ab-save-btn" data-i18n="btn_save_dictation">Save Dictation</button>
+                  <select id="track-filter" class="filter-select">
+                    <option value="all" data-i18n="filter_all">All Tracks</option>
+                    <option value="completed" data-i18n="filter_completed">Completed</option>
+                    <option value="in_progress" data-i18n="filter_in_progress">In Progress</option>
+                    <option value="unattempted" data-i18n="filter_unattempted">Unattempted</option>
+                  </select>
+                </div>
+                <div class="playlist-container" id="playlist-container">
+                  <!-- Dynamically populated tracks -->
                 </div>
               </div>
-              <div id="ab-panel-notes" class="ab-tool-panel">
-                <textarea id="ab-notes-text" class="ab-textarea" data-i18n-placeholder="notebook_placeholder" placeholder="Write down vocabulary, notes, or tips..."></textarea>
-                <div class="ab-tool-actions">
-                  <button id="ab-btn-save-notes" class="ab-save-btn" data-i18n="btn_save_notes">Save Notes</button>
-                  <button id="ab-btn-export-notes" class="ab-export-btn" data-i18n="btn_export_notes">Export Notes (.txt)</button>
+
+              <!-- Dictation Panel -->
+              <div class="pane-panel" id="panel-dictation">
+                <div class="panel-card">
+                  <h3 id="dictation-track-title" class="card-title" data-i18n="dictation_pad_title">Dictation Pad</h3>
+                  <p class="card-desc" data-i18n="dictation_desc">Listen to the segment and type what you hear.</p>
+                  <textarea id="dictation-text" class="dictation-textarea" data-i18n-placeholder="dictation_placeholder" placeholder="Start typing the transcript here..."></textarea>
+                  <div class="panel-actions">
+                    <div class="textarea-stats">
+                      <span><span data-i18n="stats_words">Words:</span> <strong id="dictation-word-count">0</strong></span>
+                      <span><span data-i18n="stats_chars">Characters:</span> <strong id="dictation-char-count">0</strong></span>
+                    </div>
+                    <div class="action-buttons-group">
+                      <button id="btn-clear-dictation" class="btn-secondary" data-i18n="btn_clear">Clear</button>
+                      <button id="btn-save-dictation" class="btn-primary" data-i18n="btn_save_dictation">Save Dictation</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Notebook Panel -->
+              <div class="pane-panel" id="panel-notes">
+                <div class="panel-card">
+                  <h3 class="card-title" data-i18n="notebook_title">Vocab & General Notes</h3>
+                  <p class="card-desc" data-i18n="notebook_desc">Keep track of spelling notes, tricky pronunciation patterns, or new vocabulary words.</p>
+                  <textarea id="notes-text" class="notes-textarea" data-i18n-placeholder="notebook_placeholder" placeholder="Write down vocabulary, notes, or tips for the current track..."></textarea>
+                  <div class="panel-actions">
+                    <div class="action-buttons-group">
+                      <button id="btn-export-notes" class="btn-secondary" data-i18n="btn_export_notes">Export Notes (.txt)</button>
+                      <button id="btn-save-notes" class="btn-primary" data-i18n="btn_save_notes">Save Notes</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Analytics Panel -->
+              <div class="pane-panel" id="panel-analytics">
+                <div class="panel-card">
+                  <h3 class="card-title" data-i18n="tab_analytics">Analytics & Progress</h3>
+                  <div class="dashboard-grid" id="dashboard-grid">
+                    <!-- Dynamically populated dashboard -->
+                  </div>
                 </div>
               </div>
             </div>
+
+            <!-- Bottom Custom Audio Player inside Right Pane -->
+            <footer class="audio-player-footer">
+              <audio id="main-audio" style="display:none;"></audio>
+
+              <!-- Floating task carousel above the player -->
+              <div id="track-task-nav" class="track-task-nav" style="display:none;">
+                <div class="ttn-track" id="track-task-track"></div>
+              </div>
+
+              <div class="player-left-info">
+                <h3 class="player-title" id="player-track-title" data-i18n="player_select_track">Select a track to practice</h3>
+                <span class="player-subtitle" id="player-track-subtitle" data-i18n="player_default_subtitle">Basic IELTS Listening</span>
+              </div>
+
+              <div class="player-center-controls">
+                <div class="player-buttons">
+                  <button id="player-prev" class="btn-player" title="Previous Track"><svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>
+                  <button id="player-backward" class="btn-player" title="Rewind 5s"><svg viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05 1.05-6.9 2.75L3.5 8V14H9.5L7.35 11.85c1.4-1.25 3.25-2 5.15-2 3.6 0 6.6 2.6 7.25 6H21.8c-.7-4.35-4.45-7.5-9.3-7.5z"/></svg></button>
+                  <button id="player-play-pause" class="btn-player btn-play-pause" title="Play / Pause">
+                    <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    <svg id="pause-icon" viewBox="0 0 24 24" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                  </button>
+                  <button id="player-forward" class="btn-player" title="Fast Forward 5s"><svg viewBox="0 0 24 24"><path d="M11.5 8.01v-2.3L6.81 10.4 11.5 15.1v-2.3c3.85 0 6.95 2.8 7.45 6.4h2.1c-.5-4.8-4.65-8.6-9.55-8.6z" transform="scale(-1, 1) translate(-24, 0)"/></svg></button>
+                  <button id="player-next" class="btn-player" title="Next Track"><svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg></button>
+                </div>
+                
+                <div class="player-progress-row">
+                  <span class="time-display" id="player-time-current">0:00</span>
+                  <div class="progress-slider-wrapper" id="progress-slider">
+                    <div class="progress-bar-bg">
+                      <div class="progress-bar-fill" id="progress-fill"></div>
+                      <div class="ab-loop-indicator" id="ab-indicator"></div>
+                    </div>
+                    <div class="progress-thumb" id="progress-thumb"></div>
+                  </div>
+                  <span class="time-display" id="player-time-total">0:00</span>
+                </div>
+              </div>
+
+              <div class="player-right-controls">
+                <button id="btn-ab-loop" class="btn-ab-loop" title="Set A-B Loop Repeat">
+                  <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: currentColor; display: inline-block; vertical-align: middle; margin-right: 4px;"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
+                  <span id="ab-loop-text">A-B</span>
+                </button>
+
+                <div class="playback-speed-control">
+                  <button id="btn-speed-select" class="btn-speed" title="Adjust playback speed">1.0x</button>
+                  <div class="speed-dropdown" id="speed-dropdown">
+                    <div class="speed-option" data-speed="0.5">0.5x</div>
+                    <div class="speed-option" data-speed="0.75">0.75x</div>
+                    <div class="speed-option active" data-speed="1.0">1.0x</div>
+                    <div class="speed-option" data-speed="1.25">1.25x</div>
+                    <div class="speed-option" data-speed="1.5">1.5x</div>
+                    <div class="speed-option" data-speed="2.0">2.0x</div>
+                  </div>
+                </div>
+                
+                <div class="volume-control-wrapper">
+                  <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: var(--text-secondary);"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                  <input type="range" class="volume-slider" id="volume-slider" min="0" max="1" step="0.05" value="0.8">
+                </div>
+              </div>
+            </footer>
+          </section>
+        </main>
+
+        <!-- Dedicated Audiobook Workspace -->
+        <main class="audiobook-workspace" id="audiobook-workspace" style="display: none;">
+          <div class="ab-music-shell" id="ab-music-shell">
+            <div class="ab-upper-zone" id="ab-upper-zone">
+              <div class="ab-blur-bg" id="ab-blur-bg"></div>
+              <section class="ab-hero">
+                <button type="button" id="ab-btn-toggle-cover" class="ab-toggle-cover-btn" title="Toggle Cover Art">
+                  <svg class="ab-toggle-cover-icon-eye" viewBox="0 0 24 24" style="display:none;"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                  <svg class="ab-toggle-cover-icon-eye-slash" viewBox="0 0 24 24"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.82l2.92 2.92c1.51-1.26 2.7-2.89 3.44-4.74-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/></svg>
+                </button>
+                <button type="button" id="ab-study-fab" class="ab-study-fab" aria-expanded="false" aria-controls="ab-study-panel">
+                  <svg class="ab-study-fab-icon" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                  <span class="ab-study-fab-label" data-i18n="ab_study_fab">Dictation / Notes</span>
+                </button>
+                <div class="ab-cover-frame">
+                  <img src="/dracula_cover.jpg" alt="Dracula Cover" class="ab-cover-art" id="ab-cover-art">
+                  <div class="ab-cover-glow" aria-hidden="true"></div>
+                </div>
+                <div class="ab-now-playing">
+                  <span class="ab-badge-now" data-i18n="ab_now_playing">Now Playing</span>
+                  <h2 class="ab-now-title" id="ab-now-title">Dracula — Bram Stoker</h2>
+                  <h3 class="ab-now-chapter" id="ab-now-chapter">Chapter 1: Jonathan Harker's Journal</h3>
+                </div>
+              </section>
+
+              <section class="ab-playlist-section">
+                <h3 class="ab-section-title" data-i18n="ab_chapters_title">Chapters</h3>
+                <div class="ab-chapters-list" id="audiobook-chapters-list"></div>
+              </section>
+            </div>
+
+            <div class="ab-player-stack" id="ab-player-stack">
+              <audio id="audiobook-audio" style="display:none;"></audio>
+              <section class="ab-hero-player">
+                <div class="ab-player-top-row">
+                  <span class="ab-time" id="ab-time-current">00:00</span>
+                  <div class="ab-slider-wrapper" id="ab-progress-slider">
+                    <div class="ab-slider-bg">
+                      <div class="ab-slider-fill" id="ab-progress-fill"></div>
+                      <div class="ab-loop-indicator" id="ab-loop-indicator"></div>
+                    </div>
+                    <div class="ab-slider-thumb" id="ab-progress-thumb"></div>
+                  </div>
+                  <span class="ab-time" id="ab-time-total">00:00</span>
+                </div>
+                <div class="ab-minute-jumps-row" id="ab-minute-jumps-row"></div>
+
+                <div class="ab-player-main-controls">
+                  <button id="ab-btn-prev-chapter" class="ab-skip-btn" title="Previous Chapter"><svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>
+                  <button id="ab-btn-backward-15s" class="ab-rewind-btn" title="Back 15s"><svg viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05 1.05-6.9 2.75L3.5 8V14H9.5L7.35 11.85c1.4-1.25 3.25-2 5.15-2 3.6 0 6.6 2.6 7.25 6H21.8c-.7-4.35-4.45-7.5-9.3-7.5z"/></svg><span>15</span></button>
+                  <button id="ab-btn-play-pause" class="ab-play-btn-large" title="Play / Pause">
+                    <svg id="ab-play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    <svg id="ab-pause-icon" viewBox="0 0 24 24" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                  </button>
+                  <button id="ab-btn-forward-15s" class="ab-rewind-btn ab-forward-btn" title="Forward 15s"><svg viewBox="0 0 24 24"><path d="M11.5 8.01v-2.3L6.81 10.4 11.5 15.1v-2.3c3.85 0 6.95 2.8 7.45 6.4h2.1c-.5-4.8-4.65-8.6-9.55-8.6z" transform="scale(-1, 1) translate(-24, 0)"/></svg><span>15</span></button>
+                  <button id="ab-btn-next-chapter" class="ab-skip-btn" title="Next Chapter"><svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg></button>
+                </div>
+
+                <div class="ab-player-secondary-controls">
+                  <button id="ab-btn-loop" class="ab-chip-btn" title="A-B Repeat"><svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg><span id="ab-loop-label">A-B</span></button>
+                  <div class="ab-speed-selector">
+                    <button id="ab-btn-speed" class="ab-chip-btn ab-speed-chip">1.0x</button>
+                    <div class="ab-speed-dropdown" id="ab-speed-dropdown">
+                      <div class="ab-speed-opt" data-speed="0.5">0.5x</div>
+                      <div class="ab-speed-opt" data-speed="0.75">0.75x</div>
+                      <div class="ab-speed-opt active" data-speed="1.0">1.0x</div>
+                      <div class="ab-speed-opt" data-speed="1.25">1.25x</div>
+                      <div class="ab-speed-opt" data-speed="1.5">1.5x</div>
+                      <div class="ab-speed-opt" data-speed="2.0">2.0x</div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </div>
+
+          <section class="ab-study-panel" id="ab-study-panel" aria-hidden="true">
+            <div class="ab-study-panel-inner">
+              <div class="ab-study-panel-header">
+                <nav class="ab-segmented-nav" id="ab-segmented-nav">
+                  <div class="ab-segment-indicator" id="ab-segment-indicator"></div>
+                  <button class="ab-segment-btn active" data-ab-tab="dictation" type="button"><span data-i18n="tab_dictation">Dictation</span></button>
+                  <button class="ab-segment-btn" data-ab-tab="notes" type="button"><span data-i18n="tab_notes">Notebook</span></button>
+                </nav>
+                <div class="ab-mini-player" id="ab-mini-player">
+                  <button type="button" class="ab-mini-btn" id="ab-mini-backward" title="Back 15s"><svg viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05 1.05-6.9 2.75L3.5 8V14H9.5L7.35 11.85c1.4-1.25 3.25-2 5.15-2 3.6 0 6.6 2.6 7.25 6H21.8c-.7-4.35-4.45-7.5-9.3-7.5z"/></svg></button>
+                  <button type="button" class="ab-mini-btn ab-mini-play-btn" id="ab-mini-play-pause" title="Play / Pause"><svg class="ab-mini-play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><svg class="ab-mini-pause-icon" viewBox="0 0 24 24" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg></button>
+                  <button type="button" class="ab-mini-btn" id="ab-mini-forward" title="Forward 15s"><svg viewBox="0 0 24 24"><path d="M11.5 8.01v-2.3L6.81 10.4 11.5 15.1v-2.3c3.85 0 6.95 2.8 7.45 6.4h2.1c-.5-4.8-4.65-8.6-9.55-8.6z" transform="scale(-1, 1) translate(-24, 0)"/></svg></button>
+                </div>
+                <button type="button" id="ab-study-close" class="ab-study-close-btn" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
+              </div>
+              <div class="ab-tools-content">
+                <div id="ab-panel-dictation" class="ab-tool-panel active">
+                  <textarea id="ab-dictation-text" class="ab-textarea" data-i18n-placeholder="dictation_placeholder" placeholder="Start typing transcript..."></textarea>
+                  <div class="ab-tool-actions">
+                    <div class="ab-textarea-stats"><span>Words: <strong id="ab-dict-words">0</strong></span><span>Chars: <strong id="ab-dict-chars">0</strong></span></div>
+                    <button id="ab-btn-save-dictation" class="ab-save-btn" data-i18n="btn_save_dictation">Save Dictation</button>
+                  </div>
+                </div>
+                <div id="ab-panel-notes" class="ab-tool-panel">
+                  <textarea id="ab-notes-text" class="ab-textarea" data-i18n-placeholder="notebook_placeholder" placeholder="Write down notes..."></textarea>
+                  <div class="ab-tool-actions">
+                    <button id="ab-btn-save-notes" class="ab-save-btn" data-i18n="btn_save_notes">Save Notes</button>
+                    <button id="ab-btn-export-notes" class="ab-export-btn" data-i18n="btn_export_notes">Export (.txt)</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </main>
+      </div>
+
+    </div>
+
+    <!-- Skill Workspace: Reading (Fully Functional) -->
+    <div class="skill-workspace-pane" id="skill-workspace-reading" style="display: none;">
+      <section class="reading-split-workspace">
+        
+        <!-- Left Pane: Passage Viewer -->
+        <section class="reading-passage-pane">
+          <div class="reading-passage-header">
+            <div class="passage-select-wrapper">
+              <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: var(--color-secondary); flex-shrink: 0;">
+                <path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/>
+              </svg>
+              <select id="reading-passage-select" class="book-select reading-passage-select">
+                <option value="" disabled selected>Passage tanlanmagan — pastdan yuklang</option>
+              </select>
+            </div>
+
+            <!-- Real-passage loader (free: Wikipedia + gap-fill) -->
+            <div class="reading-source-bar">
+              <input id="reading-topic-input" class="reading-topic-input" type="text"
+                     placeholder="Mavzu (masalan: Photosynthesis) yoki bo'sh = tasodifiy" />
+              <button id="btn-reading-load-topic" class="btn-secondary-sm" type="button">Yuklash</button>
+              <button id="btn-reading-load-random" class="btn-secondary-sm" type="button" title="Tasodifiy maqola">🎲</button>
+              <button id="btn-reading-ai-questions" class="btn-primary-sm" type="button"
+                      title="AI bilan TFNG/MCQ savollar (keshlanadi)" disabled>✨ AI savollar</button>
+            </div>
+          </div>
+
+          <div class="passage-content-scroll" id="reading-passage-content">
+            <!-- Dynamically populated passage content -->
           </div>
         </section>
 
+        <!-- Right Pane: Reading Questions & Answer Sheet -->
+        <section class="reading-questions-pane">
+          <div class="reading-quiz-toolbar">
+            <div class="quiz-timer-group">
+              <span class="timer-icon">⏱</span>
+              <span id="reading-timer-display" class="reading-timer-text">20:00</span>
+              <button id="btn-reading-timer-toggle" class="btn-secondary-sm">Pause</button>
+            </div>
+
+            <div class="quiz-actions-group">
+              <button id="btn-reading-reset" class="btn-secondary-sm">Reset</button>
+              <button id="btn-reading-submit" class="btn-primary-sm">Submit Test</button>
+            </div>
+          </div>
+
+          <!-- Score Result Banner (Hidden initially) -->
+          <div id="reading-score-result-banner" class="reading-score-banner" style="display: none;">
+            <div class="score-banner-content">
+              <div class="band-badge-lg" id="reading-band-badge">Band 7.5</div>
+              <div class="score-details">
+                <h4 id="reading-result-title">Excellent Score!</h4>
+                <p id="reading-result-stats">Correct Answers: 10 / 13 (77%)</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="questions-content-scroll" id="reading-questions-container">
+            <!-- Dynamically populated question sheets -->
+          </div>
+        </section>
+
+      </section>
+    </div>
+
+    <!-- Skill Workspace: Writing (Coming Soon) -->
+    <div class="skill-workspace-pane" id="skill-workspace-writing" style="display: none;">
+      <div class="coming-soon-wrapper">
+        <div class="coming-soon-card">
+          <div class="coming-soon-badge">Tez kunda / Coming Soon</div>
+          <div class="coming-soon-icon">✍️</div>
+          <h2>IELTS Writing Tool Suite</h2>
+          <p>Smart Essay Editor, Real-time Word Counter (Task 1 & Task 2), Model Band 9.0 Answers hamda AI Grammatika tahlili tizimi tez orada taqdim etiladi!</p>
+          <div class="feature-tags-grid">
+            <span class="feature-tag">📊 Task 1 Charts & Diagrams</span>
+            <span class="feature-tag">📝 Task 2 Essay Templates</span>
+            <span class="feature-tag">⏱ Real-time Word Counter</span>
+            <span class="feature-tag">💡 Band 9.0 Vocabulary Helper</span>
+          </div>
+        </div>
       </div>
-    </main>
+    </div>
 
-
+    <!-- Skill Workspace: Speaking (Coming Soon) -->
+    <div class="skill-workspace-pane" id="skill-workspace-speaking" style="display: none;">
+      <div class="coming-soon-wrapper">
+        <div class="coming-soon-card">
+          <div class="coming-soon-badge">Tez kunda / Coming Soon</div>
+          <div class="coming-soon-icon">🎙</div>
+          <h2>IELTS Speaking Practice Suite</h2>
+          <p>Part 1, Part 2 (Cue Card 1m/2m timer) va Part 3 simulyatori, Mikrofondan yozib olish va Speech-to-Text nutq tahlilchisi tez orada ishga tushadi!</p>
+          <div class="feature-tags-grid">
+            <span class="feature-tag">🎴 Part 1-3 Exam Cards</span>
+            <span class="feature-tag">⏱ Cue Card 1-Min Preparation Timer</span>
+            <span class="feature-tag">🎤 Voice Recorder & Waveform</span>
+            <span class="feature-tag">✨ Speech-to-Text Transcription</span>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Calibration / Settings Modal -->
     <div class="modal-overlay" id="settings-modal">
@@ -817,10 +964,10 @@
     <!-- About App Modal -->
     <div class="modal-overlay" id="about-app-modal">
       <div class="modal-box about-app-modal-box">
-        <h3 class="modal-title" data-i18n="about_app_title">About FluentEar</h3>
+        <h3 class="modal-title" data-i18n="about_app_title">About IELTSprep</h3>
         <div class="about-app-content">
           <div class="about-app-badge">&lt;/&gt;</div>
-          <p data-i18n="about_app_desc">FluentEar is a focused practice tool for IELTS Listening. It combines the PDF book, audio tracks, audiobooks, dictation, notes, progress saving, and a guided tour in one browser app.</p>
+          <p data-i18n="about_app_desc">IELTSprep is a comprehensive 4-skill preparation suite for IELTS Listening, Reading, Writing, and Speaking with built-in PDF reader, exam timers, and Band Score calculator.</p>
           <div class="about-app-meta">
             <div>
               <span data-i18n="about_app_book_label">Book</span>

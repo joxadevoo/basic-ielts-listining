@@ -3,7 +3,12 @@ const API_ROUTES = {
   '/api/stats': () => import('./api/stats.js'),
   '/api/webhook': () => import('./api/webhook.js'),
   '/api/blob-test': () => import('./api/blob-test.js'),
+  '/api/generate-questions': () => import('./api/generate-questions.js'),
 };
+
+// Routes that must always run the real handler in dev (never the Telegram stub),
+// because they depend on their own env (OpenAI / Supabase), not Telegram.
+const ALWAYS_REAL_ROUTES = new Set(['/api/generate-questions']);
 
 function readJsonBody(req) {
   return new Promise((resolve, reject) => {
@@ -100,7 +105,7 @@ export function vercelApiDevPlugin(env = {}) {
         try {
           const body = await readJsonBody(req);
 
-          if (!hasTelegramConfig(env)) {
+          if (!hasTelegramConfig(env) && !ALWAYS_REAL_ROUTES.has(urlPath)) {
             const vercelRes = createVercelResponse(res);
             vercelRes.status(200).json(devStubResponse(urlPath, body));
             return;

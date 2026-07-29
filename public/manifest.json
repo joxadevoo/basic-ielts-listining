@@ -1,7 +1,7 @@
 {
-  "short_name": "FluentEar",
-  "name": "FluentEar — IELTS Practice & Audiobooks",
-  "description": "FluentEar — IELTS Listening va Audiobooks uchun qulay mashq ilovasi.",
+  "short_name": "IELTSprep",
+  "name": "IELTSprep — Complete 4-Skill Preparation Suite",
+  "description": "IELTSprep — IELTS Listening, Reading, Writing va Speaking uchun qulay va barchasi birda mashq ilovasi.",
   "icons": [
     {
       "src": "favicon.svg",

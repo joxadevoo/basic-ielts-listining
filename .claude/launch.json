@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "ielts-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--", "--host", "--no-open"],
+      "cwd": "C:/Users/lorkl/OneDrive/Desktop/basic-ielts-listining",
+      "port": 3000
+    }
+  ]
+}

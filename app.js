@@ -1,5 +1,6 @@
 import { TRACKS } from './tracks.js';
 import { logSessionStart, logTrackPlay, logNoteSave, logDictationSave } from './system.js';
+import { fetchWikipediaPassage } from './reading-source.js';
 
 const BOOKS = [
   {
@@ -74,19 +75,19 @@ const BOOKS = [
 
 const TRANSLATIONS = {
   en: {
-    logo_title: "FluentEar",
-    logo_subtitle: "IELTS listening practice",
-    landing_kicker: "IELTS listening practice suite",
-    landing_title: "Basic IELTS Listening",
-    landing_author: "Book by Li Ya Bin",
-    landing_subtitle: "Study with the book, stream every track, write dictation, and save your progress in one focused workspace.",
-    landing_disclaimer: "Attention: For statistical purposes, your entry data is collected, including your device name and type.",
+    logo_title: "IELTSprep",
+    logo_subtitle: "IELTS preparation suite",
+    landing_kicker: "IELTS preparation suite",
+    landing_hero_badge: "✨ Ultimate IELTS Preparation Suite",
+    landing_title: "IELTSprep — Interactive Practice Suite",
+    landing_author: "Preparation Suite",
+    landing_subtitle: "IELTSprep is an interactive practice suite for IELTS preparation. Features active Listening (PDF book, audio tracks & dictation pad) and Reading (interactive passage simulator & exam timer), with Writing and Speaking modules coming soon.",
     landing_start: "Start practice",
     landing_preview: "View workspace",
     install_app: "Install app",
-    install_ready: "FluentEar is ready to install on this device.",
+    install_ready: "IELTSprep is ready to install on this device.",
     install_unavailable: "Use your browser menu and choose Install or Add to Home Screen.",
-    install_done: "FluentEar installed.",
+    install_done: "IELTSprep installed.",
     install_dismissed: "Install was cancelled.",
     landing_stat_tracks: "audio tracks",
     landing_stat_units: "study units",
@@ -110,8 +111,12 @@ const TRANSLATIONS = {
     tab_dictation: "Dictation",
     tab_notes: "Notebook",
     tab_analytics: "Analytics",
-    workspace_ielts: "IELTS Practice",
+    workspace_ielts: "Listening Books",
     workspace_audiobooks: "Audiobooks",
+    skill_listening: "Listening",
+    skill_reading: "Reading",
+    skill_writing: "Writing",
+    skill_speaking: "Speaking",
     ab_now_playing: "Now Playing",
     ab_study_fab: "Dictation / Notes",
     ab_chapters_title: "Chapters",
@@ -221,8 +226,8 @@ const TRANSLATIONS = {
     stats_unique_devices: "Unique Devices",
     stats_total_visits: "Total Visits",
     stats_monthly_active: "Monthly Active Users",
-    about_app_title: "About FluentEar",
-    about_app_desc: "FluentEar is a focused practice tool for IELTS Listening. It combines the PDF book, audio tracks, audiobooks, dictation, notes, progress saving, and a guided tour in one browser app.",
+    about_app_title: "About IELTSprep",
+    about_app_desc: "IELTSprep is a comprehensive practice tool for IELTS Listening, Reading, Writing, and Speaking with built-in PDF reader, exam timers, and Band Score calculator.",
     about_app_book_label: "Book",
     about_app_dev_label: "Developer",
     btn_copy_card: "Copy Card Number",
@@ -249,20 +254,20 @@ const TRANSLATIONS = {
     confirm_reset_data: "Are you absolutely sure you want to delete all practice history? This will delete all your written answers, dictation transcriptions, notes, and scores forever."
   },
   uz: {
-    logo_title: "FluentEar",
-    logo_subtitle: "IELTS listening mashq ilovasi",
-    landing_kicker: "IELTS listening mashq to'plami",
-    landing_title: "Basic IELTS Listening",
-    landing_author: "Kitob muallifi: Li Ya Bin",
-    landing_subtitle: "Kitob bilan ishlang, barcha treklarni tinglang, diktant yozing va natijangizni bitta qulay oynada saqlang.",
-    landing_disclaimer: "Diqqat: Statistik tahlil maqsadida sizning kirish ma'lumotlaringiz yig'iladi (shu jumladan qurilma nomi va turi).",
+    logo_title: "IELTSprep",
+    logo_subtitle: "IELTS tayyorgarlik suit-i",
+    landing_kicker: "IELTS tayyorgarlik majmuasi",
+    landing_hero_badge: "✨ Ultimate IELTS Preparation Suite",
+    landing_title: "IELTSprep — Interaktiv Tayyorgarlik Platformasi",
+    landing_author: "IELTS Tayyorgarlik Majmuasi",
+    landing_subtitle: "IELTSprep — IELTS imtihoniga tayyorlanish uchun mo'ljallangan interaktiv platforma. Hozirda Listening (PDF kitob, audio treklar va diktant) hamda Reading (interaktiv simulyator va taymer) bo'limlari to'liq ishlaydi. Writing va Speaking modullari tez kunda taqdim etiladi.",
     landing_start: "Mashqni boshlash",
     landing_preview: "Ish oynasini ko'rish",
     landing_install: "Ilovani o'rnatish",
     install_app: "Ilovani o'rnatish",
-    install_ready: "FluentEar'ni qurilmangizga o'rnatishingiz mumkin.",
+    install_ready: "IELTSprep'ni qurilmangizga o'rnatishingiz mumkin.",
     install_unavailable: "Brauzer menyusidan Install yoki Add to Home Screen ni tanlang.",
-    install_done: "FluentEar o'rnatildi.",
+    install_done: "IELTSprep o'rnatildi.",
     install_dismissed: "O'rnatish bekor qilindi.",
     landing_stat_tracks: "audio trek",
     landing_stat_units: "o'quv bo'lim",
@@ -286,8 +291,12 @@ const TRANSLATIONS = {
     tab_dictation: "Diktant",
     tab_notes: "Daftar",
     tab_analytics: "Analitika",
-    workspace_ielts: "IELTS Amaliyot",
+    workspace_ielts: "Listening Kitoblari",
     workspace_audiobooks: "Audiokitoblar",
+    skill_listening: "Listening",
+    skill_reading: "Reading",
+    skill_writing: "Writing",
+    skill_speaking: "Speaking",
     ab_now_playing: "Hozir ijro etilmoqda",
     ab_study_fab: "Diktant / Daftar",
     ab_chapters_title: "Boblar",
@@ -397,8 +406,8 @@ const TRANSLATIONS = {
     stats_unique_devices: "Unikal qurilmalar",
     stats_total_visits: "Umumiy kirishlar",
     stats_monthly_active: "Oylik faol foydalanuvchilar",
-    about_app_title: "FluentEar haqida",
-    about_app_desc: "FluentEar IELTS Listening uchun yaratilgan qulay mashq vositasi. Unda PDF kitob, audio treklar, audiokitoblar, diktant, eslatmalar va progress saqlash bir brauzer ilovasida jamlangan.",
+    about_app_title: "IELTSprep haqida",
+    about_app_desc: "IELTSprep — IELTS Listening, Reading, Writing va Speaking bo'limlari uchun yaratilgan majmuaviy ta'lim ilovasi.",
     about_app_book_label: "Kitob",
     about_app_dev_label: "Dasturchi",
     btn_copy_card: "Karta raqamini nusxalash",
@@ -445,6 +454,19 @@ let state = {
   volume: 0.8,
   language: 'uz',
   
+  // 4-Skill Framework State
+  activeSkill: 'listening', // 'listening', 'reading', 'writing', 'speaking'
+  readingState: {
+    activePassageId: null,
+    timerSeconds: 1200,
+    timerInterval: null,
+    isTimerRunning: false,
+    userAnswers: {},
+    isReviewMode: false,   // true after Submit: cards show correct/incorrect + explanations
+    results: {},           // qid -> { userVal, correctVal, isCorrect } for the active passage
+    progress: {}           // passageId -> { bestPct, lastPct, lastAnswers, attempts, updatedAt }
+  },
+
   // Dedicated Audiobook Workspace State
   activeWorkspace: "ielts", // "ielts" or "audiobooks"
   audiobookState: {
@@ -458,6 +480,682 @@ let state = {
     progress: {} // chapterProgress: { 'chapter_1': { status, dictation, notes } }
   }
 };
+
+// ==========================================================================
+// Reading Passages Database
+// ==========================================================================
+const READING_PASSAGES = {
+};
+
+// ==========================================================================
+// Reading Module Logic & Functions
+// ==========================================================================
+// Which paragraph markers to highlight in the passage pane (set during review).
+let readingHighlightMarkers = new Set();
+
+function renderReadingPassage(passageId) {
+  state.readingState.activePassageId = passageId;
+  const passage = passageId ? READING_PASSAGES[passageId] : null;
+
+  const container = document.getElementById('reading-passage-content');
+  if (!container) return;
+
+  // Empty state — no passage loaded yet.
+  if (!passage) {
+    container.innerHTML = `
+      <div class="reading-empty-state">
+        <div class="reading-empty-icon">📖</div>
+        <h3>Passage yuklanmagan</h3>
+        <p>Yuqoridagi maydonga mavzu yozing (masalan <em>Volcano</em>) va <strong>Yuklash</strong>ni bosing,
+        yoki 🎲 tugmasi bilan tasodifiy real maqola oling.</p>
+      </div>
+    `;
+    const qc = document.getElementById('reading-questions-container');
+    if (qc) qc.innerHTML = '';
+    return;
+  }
+
+  const meta = [passage.level, passage.source, passage.wordCount ? `${passage.wordCount} words` : null]
+    .filter(Boolean).join(' · ');
+
+  let html = `
+    <h2 class="passage-title-h2">${passage.title}</h2>
+    <p class="passage-subtitle-desc">${passage.subtitle}</p>
+    ${meta ? `<p class="passage-meta-line">${meta}</p>` : ''}
+  `;
+
+  passage.paragraphs.forEach(p => {
+    const hl = readingHighlightMarkers.has(p.marker) ? ' paragraph-highlight' : '';
+    html += `
+      <p class="passage-paragraph${hl}" data-marker="${p.marker}">
+        <span class="paragraph-marker">[Paragraph ${p.marker}]</span>
+        ${p.text}
+      </p>
+    `;
+  });
+
+  container.innerHTML = html;
+  renderReadingQuestions(passageId);
+  if (!state.readingState.isTimerRunning && !state.readingState.isReviewMode) {
+    startReadingTimer();
+  }
+}
+
+// HTML-escape helper for user-supplied strings echoed back into markup.
+function escapeReadingHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+// Normalize a free-text answer for forgiving comparison.
+function normalizeReadingAnswer(val) {
+  return String(val || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[.,!?;:"'()]/g, '')   // strip punctuation
+    .replace(/\s+/g, ' ');          // collapse whitespace
+}
+
+// Grade a single question. Returns true if the user's answer is correct.
+// Handles both fixed-choice types (tfng/ynng/mcq) and free-text types (text/short-answer),
+// with correctAnswer allowed to be a single string OR an array of accepted variants.
+function isReadingAnswerCorrect(q, rawUserVal) {
+  const accepted = Array.isArray(q.correctAnswer) ? q.correctAnswer : [q.correctAnswer];
+  const isTextType = q.type === 'text' || q.type === 'short-answer';
+
+  if (isTextType) {
+    const u = normalizeReadingAnswer(rawUserVal);
+    if (!u) return false;
+    return accepted.some(a => normalizeReadingAnswer(a) === u);
+  }
+  // Fixed-choice: exact (case-insensitive) match only — no substring matching.
+  const u = String(rawUserVal || '').trim().toUpperCase();
+  if (!u) return false;
+  return accepted.some(a => String(a).trim().toUpperCase() === u);
+}
+
+// Human-readable correct answer for the review panel.
+function formatReadingCorrectAnswer(q) {
+  const accepted = Array.isArray(q.correctAnswer) ? q.correctAnswer : [q.correctAnswer];
+  return accepted.map(escapeReadingHtml).join(' / ');
+}
+
+function renderReadingQuestions(passageId) {
+  const passage = passageId ? READING_PASSAGES[passageId] : null;
+  const container = document.getElementById('reading-questions-container');
+  if (!container) return;
+  if (!passage) { container.innerHTML = ''; return; }
+
+  const review = state.readingState.isReviewMode;
+  const results = state.readingState.results || {};
+  let html = '';
+
+  passage.questions.forEach(q => {
+    const userVal = state.readingState.userAnswers[q.id] || '';
+    const res = results[q.id];
+    const stateClass = review && res ? (res.isCorrect ? ' q-correct' : ' q-incorrect') : '';
+    const disabled = review ? 'disabled' : '';
+
+    html += `<div class="reading-question-card${stateClass}" data-qid="${q.id}">`;
+    html += `<div class="question-text">${q.question}</div>`;
+
+    if (q.type === 'tfng' || q.type === 'ynng') {
+      const opts = q.type === 'ynng' ? ['YES', 'NO', 'NOT GIVEN'] : ['TRUE', 'FALSE', 'NOT GIVEN'];
+      html += `<div class="tfng-options-row">`;
+      opts.forEach(opt => {
+        const checked = userVal === opt ? 'checked' : '';
+        html += `
+          <label class="option-radio-label">
+            <input type="radio" name="reading-q-${q.id}" value="${opt}" ${checked} ${disabled} onchange="handleReadingAnswerChange(${q.id}, '${opt}')">
+            <span>${opt}</span>
+          </label>
+        `;
+      });
+      html += `</div>`;
+    } else if (q.type === 'mcq') {
+      html += `<div class="mcq-options-column">`;
+      q.options.forEach(opt => {
+        const optKey = opt.trim().charAt(0);
+        const checked = userVal === optKey ? 'checked' : '';
+        html += `
+          <label class="option-radio-label">
+            <input type="radio" name="reading-q-${q.id}" value="${optKey}" ${checked} ${disabled} onchange="handleReadingAnswerChange(${q.id}, '${optKey}')">
+            <span>${escapeReadingHtml(opt)}</span>
+          </label>
+        `;
+      });
+      html += `</div>`;
+    } else if (q.type === 'text' || q.type === 'short-answer') {
+      html += `
+        <input type="text" class="text-answer-input" placeholder="Type your answer..." value="${escapeReadingHtml(userVal)}" ${disabled} oninput="handleReadingAnswerChange(${q.id}, this.value)">
+      `;
+    }
+
+    // Review feedback panel
+    if (review && res) {
+      const icon = res.isCorrect ? '✓' : '✗';
+      const userAnswered = (res.userVal || '').trim().length > 0;
+      html += `<div class="q-review-panel">`;
+      html += `<div class="q-review-verdict">${icon} ${res.isCorrect ? "To'g'ri / Correct" : "Xato / Incorrect"}</div>`;
+
+      // Always show what the user answered.
+      html += `<div class="q-review-your"><span class="rv-label">Sizning javobingiz:</span> ` +
+        (userAnswered
+          ? `<span class="rv-user ${res.isCorrect ? 'rv-ok' : 'rv-bad'}">${escapeReadingHtml(res.userVal)}</span>`
+          : `<span class="rv-user rv-empty">— (javob berilmagan)</span>`) +
+        `</div>`;
+
+      // Show the correct answer when the user was wrong.
+      if (!res.isCorrect) {
+        html += `<div class="q-review-correct"><span class="rv-label">To'g'ri javob:</span> ` +
+          `<span class="rv-correct">${formatReadingCorrectAnswer(q)}</span></div>`;
+      }
+      if (q.explanation) {
+        html += `<div class="q-review-explain">💡 ${escapeReadingHtml(q.explanation)}</div>`;
+      }
+      if (q.keywordParagraph) {
+        html += `<div class="q-review-source">📍 Javob manbasi: Paragraph ${q.keywordParagraph}</div>`;
+      }
+      html += `</div>`;
+    }
+
+    html += `</div>`;
+  });
+
+  container.innerHTML = html;
+}
+
+window.handleReadingAnswerChange = function(qid, value) {
+  state.readingState.userAnswers[qid] = value.trim();
+};
+
+function bandFromPct(pct) {
+  if (pct >= 90) return 'Band 9.0';
+  if (pct >= 80) return 'Band 8.5';
+  if (pct >= 70) return 'Band 7.5';
+  if (pct >= 60) return 'Band 6.5';
+  if (pct >= 50) return 'Band 5.5';
+  return 'Band 5.0';
+}
+
+function readingTypeLabel(type) {
+  switch (type) {
+    case 'tfng': return 'True / False / NG';
+    case 'ynng': return 'Yes / No / NG';
+    case 'mcq': return "Ko'p tanlovli (MCQ)";
+    case 'text':
+    case 'short-answer': return "To'ldirish (Gap-fill)";
+    default: return type;
+  }
+}
+
+// Encouraging title + message keyed to the score (Uzbek).
+function readingResultTone(pct) {
+  if (pct >= 80) return { title: "A'lo natija!", emoji: '🎉', msg: "Zo'r ishladingiz — shu tarzda davom eting." };
+  if (pct >= 65) return { title: 'Yaxshi natija!', emoji: '👍', msg: 'Band 7.0 gacha ozgina qoldi — xatolarni ko\'rib chiqing.' };
+  if (pct >= 50) return { title: 'Yomon emas', emoji: '🙂', msg: 'Xatolaringizni tahlil qilsangiz, tez o\'sasiz.' };
+  return { title: 'Mashq davom etadi', emoji: '💪', msg: 'Har bir xato — o\'rganish imkoni. Pastdagi izohlarni o\'qing.' };
+}
+
+function buildReadingResultBanner({ band, correctCount, totalCount, pct, byType, bestBefore }) {
+  const tone = readingResultTone(pct);
+  const incorrect = totalCount - correctCount;
+  const roundPct = Math.round(pct);
+
+  // Best-score / new-record chip
+  let bestChip = '';
+  if (bestBefore !== null && roundPct > bestBefore) {
+    bestChip = `<span class="rchip rchip-best">🏆 Yangi rekord!</span>`;
+  } else if (bestBefore !== null) {
+    bestChip = `<span class="rchip">Eng yaxshi: ${bestBefore}%</span>`;
+  }
+
+  // Per-type breakdown bars
+  const typeRows = Object.keys(byType).map(type => {
+    const { correct, total } = byType[type];
+    const p = total ? Math.round((correct / total) * 100) : 0;
+    return `
+      <div class="tb-item">
+        <span class="tb-label">${readingTypeLabel(type)}</span>
+        <div class="tb-bar"><i style="width:${p}%"></i></div>
+        <span class="tb-score">${correct}/${total}</span>
+      </div>`;
+  }).join('');
+
+  return `
+    <div class="score-banner-content">
+      <div class="band-badge-lg">${band}</div>
+      <div class="score-details">
+        <h4>${tone.title} ${tone.emoji}</h4>
+        <p class="result-encourage">${tone.msg}</p>
+        <div class="result-chips">
+          <span class="rchip rchip-ok">✓ ${correctCount} to'g'ri</span>
+          <span class="rchip rchip-bad">✗ ${incorrect} xato</span>
+          <span class="rchip">${roundPct}% · ${correctCount}/${totalCount}</span>
+          ${bestChip}
+        </div>
+      </div>
+    </div>
+    ${typeRows ? `<div class="result-typebreak">
+      <div class="result-typebreak-title">Savol turlari bo'yicha tahlil</div>
+      ${typeRows}
+    </div>` : ''}
+  `;
+}
+
+function submitReadingTest() {
+  const passageId = state.readingState.activePassageId;
+  const passage = passageId ? READING_PASSAGES[passageId] : null;
+  if (!passage) {
+    showToast('Avval passage yuklang', 'warning');
+    return;
+  }
+
+  let correctCount = 0;
+  const totalCount = passage.questions.length;
+  const results = {};
+  const highlight = new Set();
+  const byType = {};   // type -> { correct, total }
+
+  passage.questions.forEach(q => {
+    const rawUserVal = state.readingState.userAnswers[q.id] || '';
+    const isCorrect = isReadingAnswerCorrect(q, rawUserVal);
+    if (isCorrect) correctCount++;
+    results[q.id] = {
+      userVal: rawUserVal,
+      correctVal: formatReadingCorrectAnswer(q),
+      isCorrect
+    };
+    if (q.keywordParagraph) highlight.add(q.keywordParagraph);
+
+    const bt = byType[q.type] || (byType[q.type] = { correct: 0, total: 0 });
+    bt.total++;
+    if (isCorrect) bt.correct++;
+  });
+
+  const pct = totalCount ? (correctCount / totalCount) * 100 : 0;
+  const band = bandFromPct(pct);
+  const bestBefore = state.readingState.progress?.[passageId]?.bestPct ?? null;
+
+  // Enter review mode
+  state.readingState.results = results;
+  state.readingState.isReviewMode = true;
+  readingHighlightMarkers = highlight;
+
+  // Stop the timer if running
+  if (state.readingState.isTimerRunning) {
+    clearInterval(state.readingState.timerInterval);
+    state.readingState.isTimerRunning = false;
+    const tbtn = document.getElementById('btn-reading-timer-toggle');
+    if (tbtn) tbtn.textContent = 'Start';
+  }
+
+  // Persist result
+  saveReadingProgress(passageId, pct, correctCount, totalCount);
+
+  // Result banner (rich)
+  const banner = document.getElementById('reading-score-result-banner');
+  if (banner) {
+    banner.innerHTML = buildReadingResultBanner({
+      band, correctCount, totalCount, pct, byType, bestBefore
+    });
+    banner.style.display = 'block';
+  }
+
+  // Re-render passage (adds highlights) + questions (adds review panels)
+  renderReadingPassage(passageId);
+
+  showToast(`Test topshirildi! Natija: ${band} (${correctCount}/${totalCount})`, 'cyan');
+}
+
+function resetReadingTest() {
+  state.readingState.userAnswers = {};
+  state.readingState.results = {};
+  state.readingState.isReviewMode = false;
+  readingHighlightMarkers = new Set();
+  state.readingState.timerSeconds = 1200; // 20 minutes per IELTS passage
+  updateReadingTimerDisplay();
+
+  const banner = document.getElementById('reading-score-result-banner');
+  if (banner) banner.style.display = 'none';
+
+  renderReadingPassage(state.readingState.activePassageId);
+  startReadingTimer();
+  showToast("Test va taymer (20:00) qayta boshlandi!", "cyan");
+}
+
+// -------- Reading persistence (F1.4) --------
+const READING_PROGRESS_KEY = 'ielts_reading_progress';
+
+function saveReadingProgress(passageId, pct, correctCount, totalCount) {
+  const prog = state.readingState.progress || {};
+  const prev = prog[passageId] || { attempts: 0, bestPct: 0 };
+  prog[passageId] = {
+    lastPct: Math.round(pct),
+    bestPct: Math.max(prev.bestPct || 0, Math.round(pct)),
+    lastCorrect: correctCount,
+    lastTotal: totalCount,
+    lastAnswers: { ...state.readingState.userAnswers },
+    attempts: (prev.attempts || 0) + 1,
+    updatedAt: new Date().toISOString()
+  };
+  state.readingState.progress = prog;
+  try {
+    localStorage.setItem(READING_PROGRESS_KEY, JSON.stringify(prog));
+  } catch (e) {
+    console.warn('Could not save reading progress', e);
+  }
+}
+
+function loadReadingProgress() {
+  try {
+    const saved = localStorage.getItem(READING_PROGRESS_KEY);
+    if (saved) state.readingState.progress = JSON.parse(saved);
+  } catch (e) {
+    console.warn('Could not load reading progress', e);
+  }
+}
+
+// -------- Load a real passage from Wikipedia (free path) --------
+async function loadRealPassage(topic) {
+  const loadBtn = document.getElementById('btn-reading-load-topic');
+  const randBtn = document.getElementById('btn-reading-load-random');
+  const setBusy = (busy) => {
+    [loadBtn, randBtn].forEach(b => { if (b) b.disabled = busy; });
+    if (loadBtn) loadBtn.textContent = busy ? 'Yuklanmoqda…' : 'Yuklash';
+  };
+
+  setBusy(true);
+  try {
+    const passage = await fetchWikipediaPassage(topic, { simple: true });
+
+    // Register the passage and select it
+    READING_PASSAGES[passage.id] = passage;
+
+    const select = document.getElementById('reading-passage-select');
+    if (select) {
+      const opt = document.createElement('option');
+      opt.value = passage.id;
+      opt.textContent = `🌐 ${passage.title} (${passage.source})`;
+      select.appendChild(opt);
+      select.value = passage.id;
+    }
+
+    // Fresh test state for the new passage
+    state.readingState.userAnswers = {};
+    state.readingState.results = {};
+    state.readingState.isReviewMode = false;
+    readingHighlightMarkers = new Set();
+    const banner = document.getElementById('reading-score-result-banner');
+    if (banner) banner.style.display = 'none';
+
+    renderReadingPassage(passage.id);
+    const aiBtn = document.getElementById('btn-reading-ai-questions');
+    if (aiBtn) aiBtn.disabled = false;   // AI upgrade now available for this passage
+    showToast(`"${passage.title}" yuklandi — ${passage.questions.length} savol`, 'cyan');
+  } catch (err) {
+    console.warn('loadRealPassage failed', err);
+    showToast(err.message || 'Maqolani yuklab bo\'lmadi', 'warning');
+  } finally {
+    setBusy(false);
+  }
+}
+
+// Upgrade the active passage's questions using the server (OpenAI + Supabase cache).
+// Falls back silently to the existing free gap-fill questions on any failure.
+async function generateAiQuestions() {
+  const passageId = state.readingState.activePassageId;
+  const passage = passageId ? READING_PASSAGES[passageId] : null;
+  if (!passage) { showToast('Avval passage yuklang', 'warning'); return; }
+
+  const aiBtn = document.getElementById('btn-reading-ai-questions');
+  if (aiBtn) { aiBtn.disabled = true; aiBtn.textContent = 'AI ishlayapti…'; }
+
+  try {
+    const res = await fetch('/api/generate-questions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        passage,                       // full passage (paragraphs + metadata) so it can be saved
+        types: ['tfng', 'mcq', 'text'],
+        count: 2
+      })
+    });
+    const data = await res.json();
+
+    if (data && data.ok && Array.isArray(data.questions) && data.questions.length) {
+      passage.questions = data.questions.slice(0, 2);
+      if (data.hash) passage.hash = data.hash;
+      // Reset test/review state for the new question set
+      state.readingState.userAnswers = {};
+      state.readingState.results = {};
+      state.readingState.isReviewMode = false;
+      readingHighlightMarkers = new Set();
+      const banner = document.getElementById('reading-score-result-banner');
+      if (banner) banner.style.display = 'none';
+      renderReadingPassage(passage.id);
+      fetchSavedPassages();            // refresh the "saved" list so this passage appears
+      showToast(
+        data.cached ? 'AI savollar (2 ta savol keshdan) ✨' : '2 ta AI savol tayyor va saqlandi ✨',
+        'cyan'
+      );
+    } else {
+      const reason = data && data.reason === 'no-openai-key'
+        ? 'OpenAI kaliti sozlanmagan — bepul gap-fill saqlanmoqda'
+        : 'AI generatsiya imkoni bo\'lmadi — bepul savollar saqlanmoqda';
+      showToast(reason, 'warning');
+    }
+  } catch (err) {
+    console.warn('generateAiQuestions failed', err);
+    showToast('AI xizmatiga ulanib bo\'lmadi — bepul savollar saqlanmoqda', 'warning');
+  } finally {
+    if (aiBtn) { aiBtn.disabled = false; aiBtn.textContent = '✨ AI savollar'; }
+  }
+}
+
+// -------- Saved passages (from Supabase, via the server) --------
+// Populate a "💾 Saqlangan (bazadan)" optgroup in the passage selector.
+async function fetchSavedPassages() {
+  const select = document.getElementById('reading-passage-select');
+  if (!select) return;
+  try {
+    const res = await fetch('/api/generate-questions');   // GET list
+    const data = await res.json();
+    const items = (data && data.items) || [];
+
+    // Rebuild the saved optgroup
+    let group = select.querySelector('optgroup[data-saved="1"]');
+    if (group) group.remove();
+    if (!items.length) return;
+
+    group = document.createElement('optgroup');
+    group.label = '💾 Saqlangan (bazadan)';
+    group.dataset.saved = '1';
+    items.forEach(it => {
+      const opt = document.createElement('option');
+      opt.value = `db:${it.hash}`;
+      const meta = [it.level, it.source].filter(Boolean).join(' · ');
+      opt.textContent = `${it.title || 'Untitled'}${meta ? ' — ' + meta : ''}`;
+      group.appendChild(opt);
+    });
+    select.appendChild(group);
+  } catch (err) {
+    console.warn('fetchSavedPassages failed', err);
+  }
+}
+
+// Load one saved passage (paragraphs + questions) from the DB by hash — no tokens.
+async function loadSavedPassage(hash) {
+  try {
+    const res = await fetch(`/api/generate-questions?hash=${encodeURIComponent(hash)}`);
+    const data = await res.json();
+    if (!data || !data.ok || !data.passage) {
+      showToast('Saqlangan passage topilmadi', 'warning');
+      return;
+    }
+    const passage = data.passage;              // id is "db:<hash>"
+    READING_PASSAGES[passage.id] = passage;
+
+    // Fresh test state
+    state.readingState.userAnswers = {};
+    state.readingState.results = {};
+    state.readingState.isReviewMode = false;
+    readingHighlightMarkers = new Set();
+    const banner = document.getElementById('reading-score-result-banner');
+    if (banner) banner.style.display = 'none';
+
+    const select = document.getElementById('reading-passage-select');
+    if (select) select.value = passage.id;
+    const aiBtn = document.getElementById('btn-reading-ai-questions');
+    if (aiBtn) aiBtn.disabled = false;
+
+    renderReadingPassage(passage.id);
+    showToast(`"${passage.title}" bazadan yuklandi — ${passage.questions.length} savol (0 token)`, 'cyan');
+  } catch (err) {
+    console.warn('loadSavedPassage failed', err);
+    showToast('Bazadan yuklab bo\'lmadi', 'warning');
+  }
+}
+
+function startReadingTimer() {
+  if (state.readingState.timerInterval) {
+    clearInterval(state.readingState.timerInterval);
+  }
+  state.readingState.isTimerRunning = true;
+  const btn = document.getElementById('btn-reading-timer-toggle');
+  if (btn) btn.textContent = 'Pause';
+
+  updateReadingTimerDisplay();
+  state.readingState.timerInterval = setInterval(() => {
+    if (state.readingState.timerSeconds > 0) {
+      state.readingState.timerSeconds--;
+      updateReadingTimerDisplay();
+    } else {
+      clearInterval(state.readingState.timerInterval);
+      state.readingState.isTimerRunning = false;
+      showToast("Vaqt tugadi! Imtihon avtomatik topshirildi.", "warning");
+      submitReadingTest();
+    }
+  }, 1000);
+}
+
+function pauseReadingTimer() {
+  if (state.readingState.timerInterval) {
+    clearInterval(state.readingState.timerInterval);
+  }
+  state.readingState.isTimerRunning = false;
+  const btn = document.getElementById('btn-reading-timer-toggle');
+  if (btn) btn.textContent = 'Start';
+}
+
+function toggleReadingTimer() {
+  if (state.readingState.isTimerRunning) {
+    pauseReadingTimer();
+  } else {
+    startReadingTimer();
+  }
+}
+
+function updateReadingTimerDisplay() {
+  const display = document.getElementById('reading-timer-display');
+  if (!display) return;
+  const mins = Math.floor(state.readingState.timerSeconds / 60);
+  const secs = state.readingState.timerSeconds % 60;
+  display.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+}
+
+function switchSkill(skill, updateHash = true) {
+  state.activeSkill = skill;
+
+  // Always dismiss landing page if it is currently showing
+  openPracticeWorkspace();
+
+  if (updateHash && window.location.hash !== `#${skill}`) {
+    window.history.pushState(null, '', `#${skill}`);
+  }
+
+  document.querySelectorAll('#skill-nav-tabs .skill-tab-btn').forEach(btn => {
+    if (btn.dataset.skill === skill) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+
+  document.querySelectorAll('.skill-workspace-pane').forEach(pane => {
+    if (pane.id === `skill-workspace-${skill}`) {
+      pane.style.display = 'flex';
+      pane.classList.add('active');
+    } else {
+      pane.style.display = 'none';
+      pane.classList.remove('active');
+    }
+  });
+
+  const activePane = document.getElementById(`skill-workspace-${skill}`);
+  if (activePane) {
+    activePane.style.display = 'flex';
+    activePane.classList.add('active');
+  }
+
+  // If switching away from listening, pause audio
+  if (skill !== 'listening') {
+    if (state.isPlaying && audio) {
+      audio.pause();
+    }
+    if (state.audiobookState && state.audiobookState.isPlaying && abAudio) {
+      abAudio.pause();
+    }
+  }
+
+  // If switching to reading, load active passage (or show empty state) + refresh saved list
+  if (skill === 'reading') {
+    renderReadingPassage(state.readingState.activePassageId);
+    fetchSavedPassages();
+  }
+}
+
+
+
+function switchListeningSubWorkspace(workspaceType) {
+  state.activeWorkspace = workspaceType;
+
+  const mainWorkspace = document.querySelector('.main-workspace');
+  const audiobookWorkspace = document.getElementById('audiobook-workspace');
+  const ieltsBookWrapper = document.getElementById('ielts-book-select-wrapper');
+  const abBookWrapper = document.getElementById('audiobook-select-wrapper');
+
+  document.querySelectorAll('#workspace-switcher .switcher-btn').forEach(btn => {
+    if (btn.dataset.workspace === workspaceType) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+
+  if (workspaceType === 'audiobooks') {
+    if (mainWorkspace) mainWorkspace.style.display = 'none';
+    if (audiobookWorkspace) audiobookWorkspace.style.display = 'flex';
+    if (ieltsBookWrapper) ieltsBookWrapper.style.display = 'none';
+    if (abBookWrapper) abBookWrapper.style.display = 'block';
+    
+    if (state.isPlaying && audio) audio.pause();
+    ensureAbAudioSource();
+    renderAudiobookWorkspaceChapters();
+    loadAbChapterWorkspaceData();
+  } else {
+    if (mainWorkspace) mainWorkspace.style.display = 'flex';
+    if (audiobookWorkspace) audiobookWorkspace.style.display = 'none';
+    if (ieltsBookWrapper) ieltsBookWrapper.style.display = 'block';
+    if (abBookWrapper) abBookWrapper.style.display = 'none';
+
+    if (state.audiobookState.isPlaying && abAudio) abAudio.pause();
+  }
+}
 
 let activeTourStep = 0;
 let highlightedTourElement = null;
@@ -781,10 +1479,10 @@ function updateLandingScreenUI() {
   const landingBookTitle = document.querySelector('.landing-book-title');
 
   if (state.activeWorkspace === 'ielts') {
-    if (landingKicker) landingKicker.textContent = state.language === 'en' ? "IELTS listening practice suite" : "IELTS listening mashq to'plami";
-    if (landingTitle) landingTitle.textContent = state.activeBook ? state.activeBook.title : "Basic IELTS Listening";
-    if (landingAuthor) landingAuthor.textContent = state.language === 'uz' && state.activeBookId === 'basic-ielts' ? "Kitob muallifi: Li Ya Bin" : (state.activeBook ? state.activeBook.author : "Book by Li Ya Bin");
-    if (landingSubtitle) landingSubtitle.textContent = state.language === 'en' ? "Study with the book, stream every track, write dictation, and save your progress in one focused workspace." : "Kitob bilan ishlab, barcha treklarni tinglang, diktant yozing va natijangizni bitta qulay oynada saqlang.";
+    if (landingKicker) landingKicker.textContent = state.language === 'en' ? "IELTS preparation suite" : "IELTS tayyorgarlik majmuasi";
+    if (landingTitle) landingTitle.textContent = t('landing_title') || "IELTSprep";
+    if (landingAuthor) landingAuthor.textContent = state.language === 'uz' ? "IELTS Tayyorgarlik Majmuasi" : "Preparation Suite";
+    if (landingSubtitle) landingSubtitle.textContent = t('landing_subtitle');
     
     if (landingBookTitle && state.activeBook) {
       landingBookTitle.textContent = state.activeBook.title;
@@ -971,8 +1669,24 @@ function updateLanguageUI() {
 }
 
 function openPracticeWorkspace() {
-  appContainer.classList.add('landing-dismissed');
-  window.location.hash = 'app';
+  if (appContainer) {
+    appContainer.classList.add('landing-dismissed');
+  }
+  const landingScreen = document.getElementById('landing-screen');
+  if (landingScreen) {
+    landingScreen.style.display = 'none';
+  }
+
+  const activeSkill = state.activeSkill || 'listening';
+  document.querySelectorAll('.skill-workspace-pane').forEach(pane => {
+    if (pane.id === `skill-workspace-${activeSkill}`) {
+      pane.style.display = 'flex';
+      pane.classList.add('active');
+    } else {
+      pane.style.display = 'none';
+      pane.classList.remove('active');
+    }
+  });
 
   // After dismissing landing, show the correct workspace
   if (state.activeWorkspace === 'audiobooks') {
@@ -996,6 +1710,44 @@ function openPracticeWorkspace() {
     if (state.activeBook && state.activeBook.shortcuts && state.activeBook.shortcuts.length > 0) {
       syncPdfViewer(state.activeBook.shortcuts[0].page);
     }
+  }
+}
+
+function showLandingScreen(updateHash = true) {
+  if (appContainer) {
+    appContainer.classList.remove('landing-dismissed');
+  }
+  const landingScreen = document.getElementById('landing-screen');
+  if (landingScreen) {
+    landingScreen.style.display = 'block';
+  }
+  document.querySelectorAll('.skill-workspace-pane').forEach(pane => {
+    pane.style.display = 'none';
+    pane.classList.remove('active');
+  });
+  if (state.isPlaying && audio) {
+    audio.pause();
+  }
+  if (state.audiobookState && state.audiobookState.isPlaying && abAudio) {
+    abAudio.pause();
+  }
+  if (updateHash && window.location.hash !== '') {
+    window.history.pushState(null, '', window.location.pathname + window.location.search);
+  }
+}
+
+function handleRoute() {
+  const hash = window.location.hash.toLowerCase();
+  if (hash === '#reading') {
+    switchSkill('reading', false);
+  } else if (hash === '#listening' || hash === '#app') {
+    switchSkill('listening', false);
+  } else if (hash === '#writing') {
+    switchSkill('writing', false);
+  } else if (hash === '#speaking') {
+    switchSkill('speaking', false);
+  } else {
+    showLandingScreen(false);
   }
 }
 
@@ -1295,7 +2047,10 @@ function loadLocalStorage() {
   } else {
     state.audiobookState.progress = {};
   }
-  
+
+  // Load reading progress (F1.4)
+  loadReadingProgress();
+
   if (abAudio) {
     abAudio.volume = state.volume;
   }
@@ -2303,6 +3058,118 @@ function updateAbToggleCoverUI(isCollapsed) {
 }
 
 // Select Audio Track
+// ==========================================================================
+// Track task navigation — jump-to-timestamp buttons for combined tracks.
+// Times are in SECONDS. Keyed by track id (see tracks.js). Add more tracks as
+// their intervals are provided.
+// ==========================================================================
+const TRACK_SEGMENTS = {
+  // Listening Strategies — Trek 04 (id 1004, duration ~28:55). Contains the first
+  // half of Unit 3's tasks; they begin ~13:16 in (the earlier part is Unit 2).
+  // `unit` drives the label format "Task <unit>.<n>" (e.g. Task 3.1).
+  1004: {
+    unit: 3,
+    tasks: [
+      { start: 796,  end: 885  },  // Task 3.1  13:16 – 14:45
+      { start: 894,  end: 1035 },  // Task 3.2  14:54 – 17:15
+      { start: 1043, end: 1133 },  // Task 3.3  17:23 – 18:53
+      { start: 1140, end: 1216 },  // Task 3.4  19:00 – 20:16
+      { start: 1223, end: 1317 },  // Task 3.5  20:23 – 21:57
+      { start: 1325, end: 1398 },  // Task 3.6  22:05 – 23:18
+      { start: 1400, end: 1514 },  // Task 3.7  23:20 – 25:14
+      { start: 1518, end: 1572 },  // Task 3.8  25:18 – 26:12
+      { start: 1576, end: 1733 }   // Task 3.9  26:16 – 28:53
+    ]
+  }
+};
+
+function renderTrackTaskNav(track) {
+  const nav = document.getElementById('track-task-nav');
+  const trackEl = document.getElementById('track-task-track');
+  if (!nav || !trackEl) return;
+  const seg = track && TRACK_SEGMENTS[track.id];
+  if (!seg || !seg.tasks || !seg.tasks.length) {
+    nav.style.display = 'none';
+    trackEl.innerHTML = '';
+    return;
+  }
+  trackEl.innerHTML = seg.tasks.map((tk, idx) => {
+    const label = tk.name || `Task ${seg.unit}.${idx + 1}`;
+    return `<button type="button" class="ttn-btn" data-start="${tk.start}" data-end="${tk.end || ''}" ` +
+      `title="${formatTime(tk.start)} — ${formatTime(tk.end)}" onclick="seekTrackTask(${tk.start})">${label}</button>`;
+  }).join('');
+  nav.style.display = 'flex';
+  trackEl.scrollLeft = 0;
+  enableTaskCarouselMouse(trackEl);
+  updateActiveTaskHighlight();
+}
+
+// Seek the main audio to a task's start and play. Waits for metadata if needed.
+window.seekTrackTask = function(startSec) {
+  if (!audio) return;
+  const doSeek = () => { try { audio.currentTime = startSec; } catch (_) {} };
+  if (audio.readyState >= 1) doSeek();
+  else audio.addEventListener('loadedmetadata', doSeek, { once: true });
+  playAudio();
+};
+
+// Highlight the task whose [start, end) contains the current time, and keep it
+// visible in the horizontal carousel.
+let lastActiveTaskBtn = null;
+function updateActiveTaskHighlight() {
+  const nav = document.getElementById('track-task-nav');
+  if (!nav || nav.style.display === 'none') return;
+  const cur = audio.currentTime;
+  let activeBtn = null;
+  nav.querySelectorAll('.ttn-btn').forEach(btn => {
+    const s = parseFloat(btn.dataset.start);
+    const e = btn.dataset.end ? parseFloat(btn.dataset.end) : Infinity;
+    const isActive = cur >= s && cur < e;
+    btn.classList.toggle('active', isActive);
+    if (isActive) activeBtn = btn;
+  });
+  if (activeBtn && activeBtn !== lastActiveTaskBtn) {
+    activeBtn.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+    lastActiveTaskBtn = activeBtn;
+  }
+}
+
+// Make the task carousel scroll with the mouse (drag + vertical wheel), no scrollbar.
+// A drag suppresses the trailing click so it doesn't accidentally seek.
+function enableTaskCarouselMouse(el) {
+  if (!el || el.dataset.mouseWired) return;
+  el.dataset.mouseWired = '1';
+  let isDown = false, moved = false, startX = 0, startScroll = 0;
+
+  el.addEventListener('mousedown', (e) => {
+    isDown = true; moved = false;
+    startX = e.pageX; startScroll = el.scrollLeft;
+    el.classList.add('dragging');
+  });
+  window.addEventListener('mousemove', (e) => {
+    if (!isDown) return;
+    const dx = e.pageX - startX;
+    if (Math.abs(dx) > 4) moved = true;
+    el.scrollLeft = startScroll - dx;
+  });
+  window.addEventListener('mouseup', () => {
+    if (!isDown) return;
+    isDown = false;
+    el.classList.remove('dragging');
+    setTimeout(() => { moved = false; }, 0);
+  });
+  // Cancel the click that follows a real drag (capture phase, before button onclick).
+  el.addEventListener('click', (e) => {
+    if (moved) { e.stopPropagation(); e.preventDefault(); }
+  }, true);
+  // Vertical wheel scrolls the carousel horizontally.
+  el.addEventListener('wheel', (e) => {
+    if (el.scrollWidth <= el.clientWidth) return;
+    e.preventDefault();
+    el.scrollLeft += (e.deltaY || e.deltaX);
+  }, { passive: false });
+}
+
 function selectTrack(track, autoplay = true) {
   const isSameTrack = state.currentTrack && state.currentTrack.id === track.id;
   if (isSameTrack) {
@@ -2320,6 +3187,9 @@ function selectTrack(track, autoplay = true) {
   playerTrackTitle.textContent = `${t('track_label')} ${track.trackNum.toString().padStart(2, '0')}`;
   playerTrackSubtitle.textContent = track.title.split(' - ')[1] || getLocalizedUnitName(track.unit);
   dictationTrackTitle.textContent = `${t('track_label')} ${track.trackNum.toString().padStart(2, '0')} ${t('dictation_pad_title').replace(':', '')}`;
+
+  // Task jump buttons (only for tracks that have defined segments)
+  renderTrackTaskNav(track);
 
   // Highlight active card directly in DOM to preserve scroll position
   document.querySelectorAll('.track-item-card').forEach(card => {
@@ -2508,6 +3378,8 @@ function updatePlayerProgress() {
   if (state.abLoop.active && cur >= state.abLoop.end) {
     audio.currentTime = state.abLoop.start;
   }
+
+  updateActiveTaskHighlight();
 }
 
 
@@ -2592,25 +3464,66 @@ function logStatsSession() {
   updateStatsDashboard();
 }
 
-// Update Stats Dashboard (Header Progress)
+// Update Stats Dashboard (Header Progress & Analytics Panel)
 function updateStatsDashboard() {
   let completedCount = 0;
-  
+  let inProgressCount = 0;
+  let dictationCount = 0;
+  let notesCount = 0;
+
   state.tracks.forEach(t => {
     const p = state.progress[t.trackNum];
     if (p) {
-      if (p.status === 'completed') {
-        completedCount++;
-      }
+      if (p.status === 'completed') completedCount++;
+      if (p.status === 'in-progress') inProgressCount++;
+      if (p.dictation && p.dictation.trim()) dictationCount++;
+      if (p.notes && p.notes.trim()) notesCount++;
     }
   });
-  
-  const totalTracks = state.tracks.length;
-  
-  // Header simple tracker
+
+  const totalTracks = state.tracks.length || 97;
+  const pct = Math.round((completedCount / totalTracks) * 100);
+
+  const dashboardGrid = document.getElementById('dashboard-grid');
+  if (dashboardGrid) {
+    dashboardGrid.innerHTML = `
+      <div class="analytics-progress-card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:1.05rem; color:var(--text-primary);">${state.language === 'en' ? 'Overall Progress' : 'Umumiy O\'zlashtirish'}</strong>
+          <span style="font-size:1.2rem; font-weight:800; color:var(--color-primary);">${pct}%</span>
+        </div>
+        <div class="analytics-progress-bar-bg">
+          <div class="analytics-progress-bar-fill" style="width: ${pct}%;"></div>
+        </div>
+        <div style="font-size:0.85rem; color:var(--text-muted);">
+          ${completedCount} / ${totalTracks} ${state.language === 'en' ? 'tracks completed' : 'trek bajarildi'}
+        </div>
+      </div>
+
+      <div class="analytics-card-grid">
+        <div class="analytics-stat-card">
+          <span class="stat-val">${completedCount}</span>
+          <span class="stat-label">${state.language === 'en' ? 'Completed Tracks' : 'Tugallangan Treklar'}</span>
+        </div>
+        <div class="analytics-stat-card">
+          <span class="stat-val">${inProgressCount}</span>
+          <span class="stat-label">${state.language === 'en' ? 'In Progress' : 'Jarayondagi Treklar'}</span>
+        </div>
+        <div class="analytics-stat-card">
+          <span class="stat-val">${dictationCount}</span>
+          <span class="stat-label">${state.language === 'en' ? 'Dictations Written' : 'Yozilgan Diktantlar'}</span>
+        </div>
+        <div class="analytics-stat-card">
+          <span class="stat-val">${notesCount}</span>
+          <span class="stat-label">${state.language === 'en' ? 'Notebook Entries' : 'Daftardagi Qaydlar'}</span>
+        </div>
+      </div>
+    `;
+  }
+
   const headerPct = document.getElementById('header-progress-pct');
   if (headerPct) {
-    headerPct.textContent = `${Math.round((completedCount / totalTracks) * 100)}%`;
+    headerPct.textContent = `${pct}%`;
   }
 }
 
@@ -2775,6 +3688,40 @@ function setupEventListeners() {
   if (landingPreviewBtn) {
     landingPreviewBtn.addEventListener('click', openPracticeWorkspace);
   }
+
+  // Logo click returns to Landing Page
+  const logoSection = document.getElementById('logo-section') || document.querySelector('.logo-section');
+  if (logoSection) {
+    logoSection.addEventListener('click', () => showLandingScreen(true));
+  }
+
+  // Landing Feature Cards click opens respective workspace
+  const listeningCard = document.querySelector('.skill-listening-card');
+  if (listeningCard) {
+    listeningCard.style.cursor = 'pointer';
+    listeningCard.addEventListener('click', () => switchSkill('listening', true));
+  }
+
+  const readingCard = document.querySelector('.skill-reading-card');
+  if (readingCard) {
+    readingCard.style.cursor = 'pointer';
+    readingCard.addEventListener('click', () => switchSkill('reading', true));
+  }
+
+  // Header 4 Skill Navigation Tabs
+  document.querySelectorAll('#skill-nav-tabs .skill-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const skill = btn.dataset.skill;
+      switchSkill(skill, true);
+    });
+  });
+
+  // Browser Back/Forward navigation support
+  window.addEventListener('popstate', handleRoute);
+  window.addEventListener('hashchange', handleRoute);
+  
+  // Initial route handling on page load
+  handleRoute();
 
   if (installToggle) {
     installToggle.addEventListener('click', handleInstallClick);
@@ -3071,6 +4018,76 @@ function setupEventListeners() {
       }
     }
   });
+
+  // Skill Navigation Tabs Listener
+  document.querySelectorAll('#skill-nav-tabs .skill-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const skill = btn.dataset.skill;
+      switchSkill(skill);
+    });
+  });
+
+  // Reading Passage Selector
+  const readingPassageSelect = document.getElementById('reading-passage-select');
+  if (readingPassageSelect) {
+    readingPassageSelect.addEventListener('change', (e) => {
+      const val = e.target.value;
+      if (!val) return;
+      // Saved passage not yet in memory -> fetch it from the DB by hash.
+      if (val.startsWith('db:') && !READING_PASSAGES[val]) {
+        loadSavedPassage(val.slice(3));
+      } else {
+        renderReadingPassage(val);
+      }
+    });
+  }
+
+  // Reading Test Controls
+  const btnReadingSubmit = document.getElementById('btn-reading-submit');
+  if (btnReadingSubmit) {
+    btnReadingSubmit.addEventListener('click', submitReadingTest);
+  }
+
+  const btnReadingReset = document.getElementById('btn-reading-reset');
+  if (btnReadingReset) {
+    btnReadingReset.addEventListener('click', resetReadingTest);
+  }
+
+  // Real-passage loader (Wikipedia + gap-fill)
+  const btnReadingLoadTopic = document.getElementById('btn-reading-load-topic');
+  const readingTopicInput = document.getElementById('reading-topic-input');
+  if (btnReadingLoadTopic) {
+    btnReadingLoadTopic.addEventListener('click', () => {
+      loadRealPassage(readingTopicInput ? readingTopicInput.value : '');
+    });
+  }
+  if (readingTopicInput) {
+    readingTopicInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') loadRealPassage(readingTopicInput.value);
+    });
+  }
+  const btnReadingLoadRandom = document.getElementById('btn-reading-load-random');
+  if (btnReadingLoadRandom) {
+    btnReadingLoadRandom.addEventListener('click', () => loadRealPassage(''));
+  }
+  const btnReadingAiQuestions = document.getElementById('btn-reading-ai-questions');
+  if (btnReadingAiQuestions) {
+    btnReadingAiQuestions.addEventListener('click', generateAiQuestions);
+  }
+
+
+
+  document.querySelectorAll('#workspace-switcher .switcher-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const ws = btn.dataset.workspace;
+      switchListeningSubWorkspace(ws);
+    });
+  });
+
+  const btnReadingTimerToggle = document.getElementById('btn-reading-timer-toggle');
+  if (btnReadingTimerToggle) {
+    btnReadingTimerToggle.addEventListener('click', toggleReadingTimer);
+  }
 }
 
 // Run init
