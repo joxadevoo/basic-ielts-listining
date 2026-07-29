@@ -5219,7 +5219,6 @@ a.menu-item-link {
 }
 .ttn-track::-webkit-scrollbar { display: none; }  /* no bottom scrollbar */
 .ttn-track.dragging { cursor: grabbing; scroll-behavior: auto; }
-.ttn-track.dragging .ttn-btn { pointer-events: none; }  /* smoother drag over pills */
 
 .ttn-btn {
   flex: 0 0 auto;          /* never shrink — carousel scrolls instead */

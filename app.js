@@ -3110,6 +3110,16 @@ function renderTrackTaskNav(track) {
     return `<button type="button" class="ttn-btn" data-start="${tk.start}" data-end="${tk.end || ''}" ` +
       `title="${formatTime(tk.start)} — ${formatTime(tk.end)}" onclick="seekTrackTask(${tk.start})">${label}</button>`;
   }).join('');
+
+  trackEl.querySelectorAll('.ttn-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const startSec = parseFloat(btn.dataset.start);
+      if (!isNaN(startSec)) {
+        seekTrackTask(startSec);
+      }
+    });
+  });
+
   nav.style.display = 'flex';
   trackEl.scrollLeft = 0;
   enableTaskCarouselMouse(trackEl);
@@ -3146,34 +3156,73 @@ function updateActiveTaskHighlight() {
   }
 }
 
-// Make the task carousel scroll with the mouse (drag + vertical wheel), no scrollbar.
+// Make the task carousel scroll with the mouse/touch (drag + vertical wheel), no scrollbar.
 // A drag suppresses the trailing click so it doesn't accidentally seek.
 function enableTaskCarouselMouse(el) {
   if (!el || el.dataset.mouseWired) return;
   el.dataset.mouseWired = '1';
   let isDown = false, moved = false, startX = 0, startScroll = 0;
 
-  el.addEventListener('mousedown', (e) => {
-    isDown = true; moved = false;
-    startX = e.pageX; startScroll = el.scrollLeft;
-    el.classList.add('dragging');
-  });
-  window.addEventListener('mousemove', (e) => {
+  const onStart = (pageX) => {
+    isDown = true;
+    moved = false;
+    startX = pageX;
+    startScroll = el.scrollLeft;
+  };
+
+  const onMove = (pageX) => {
     if (!isDown) return;
-    const dx = e.pageX - startX;
-    if (Math.abs(dx) > 4) moved = true;
-    el.scrollLeft = startScroll - dx;
-  });
-  window.addEventListener('mouseup', () => {
+    const dx = pageX - startX;
+    if (Math.abs(dx) > 5) {
+      moved = true;
+      el.classList.add('dragging');
+    }
+    if (moved) {
+      el.scrollLeft = startScroll - dx;
+    }
+  };
+
+  const onEnd = () => {
     if (!isDown) return;
     isDown = false;
     el.classList.remove('dragging');
-    setTimeout(() => { moved = false; }, 0);
+    setTimeout(() => { moved = false; }, 50);
+  };
+
+  // Mouse listeners
+  el.addEventListener('mousedown', (e) => {
+    onStart(e.pageX);
   });
+  window.addEventListener('mousemove', (e) => {
+    onMove(e.pageX);
+  });
+  window.addEventListener('mouseup', () => {
+    onEnd();
+  });
+
+  // Touch listeners
+  el.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 1) {
+      onStart(e.touches[0].pageX);
+    }
+  }, { passive: true });
+  window.addEventListener('touchmove', (e) => {
+    if (isDown && e.touches.length === 1) {
+      onMove(e.touches[0].pageX);
+    }
+  }, { passive: true });
+  window.addEventListener('touchend', () => {
+    onEnd();
+  });
+
   // Cancel the click that follows a real drag (capture phase, before button onclick).
   el.addEventListener('click', (e) => {
-    if (moved) { e.stopPropagation(); e.preventDefault(); }
+    if (moved) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
   }, true);
+
   // Vertical wheel scrolls the carousel horizontally.
   el.addEventListener('wheel', (e) => {
     if (el.scrollWidth <= el.clientWidth) return;
@@ -3181,6 +3230,7 @@ function enableTaskCarouselMouse(el) {
     el.scrollLeft += (e.deltaY || e.deltaX);
   }, { passive: false });
 }
+
 
 function selectTrack(track, autoplay = true) {
   const isSameTrack = state.currentTrack && state.currentTrack.id === track.id;
