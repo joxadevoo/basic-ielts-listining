@@ -22,6 +22,26 @@ Tasks (from plan §4):
 
 <!-- New reports appended below this line as tasks complete -->
 
+### 2026-07-31 · Listening — Track 05 task jump buttons (Listening Strategies)
+
+Added timestamp navigation buttons for **Listening Strategies — Track 05** (`id: 1005` in `tracks.js`, Unit 3 second half, duration 26:52):
+- Task 3.10 (00:10 – 04:12 → 10s – 252s)
+- Task 3.12 (04:17 – 07:35 → 257s – 455s)
+- Task 3.13 (07:39 – 11:54 → 459s – 714s)
+- Task 3.14 (12:06 – 13:26 → 726s – 806s)
+- Task 3.15 (13:30 – 17:20 → 810s – 1040s)
+- Task 3.16 (17:25 – 18:55 → 1045s – 1135s)
+- Task 3.17 (19:02 – 23:12 → 1142s – 1392s)
+- Task 3.18 (23:20 – 26:52 → 1400s – 1612s)
+
+- Fixed overlapping `active` class highlighting in `updateActiveTaskHighlight()`: when task intervals overlap (e.g. Task 3.14 ending at 13:26 and Task 3.15 starting at 12:30), only the most recently started active candidate is marked `.active` so only ONE button is active at a time.
+- Updated task labels format to `Task 3.10`, `Task 3.12`, etc.
+
+Configured under `TRACK_SEGMENTS[1005]` in [`app.js`](file:///c:/Users/lorkl/OneDrive/Desktop/basic-ielts-listining/app.js).
+
+**Files touched:** `app.js`, `READING-PROGRESS.md`.
+
+
 ### 2026-07-28 · Task carousel polish (labels, mouse-drag, active style)
 
 Per user feedback on the floating task carousel:

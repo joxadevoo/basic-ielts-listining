@@ -3092,6 +3092,20 @@ const TRACK_SEGMENTS = {
       { start: 1518, end: 1572 },  // Task 3.8  25:18 – 26:12
       { start: 1576, end: 1733 }   // Task 3.9  26:16 – 28:53
     ]
+  },
+  // Listening Strategies — Trek 05 (id 1005, duration ~26:52). Unit 3 second half.
+  1005: {
+    unit: 3,
+    tasks: [
+      { name: "Task 3.10", start: 10,   end: 252  },  // 00:10 – 04:12
+      { name: "Task 3.12", start: 257,  end: 455  },  // 04:17 – 07:35
+      { name: "Task 3.13", start: 459,  end: 714  },  // 07:39 – 11:54
+      { name: "Task 3.14", start: 726,  end: 806  },  // 12:06 – 13:26
+      { name: "Task 3.15", start: 810,  end: 1040 },  // 13:30 – 17:20
+      { name: "Task 3.16", start: 1045, end: 1135 },  // 17:25 – 18:55
+      { name: "Task 3.17", start: 1142, end: 1392 },  // 19:02 – 23:12
+      { name: "Task 3.18", start: 1400, end: 1612 }   // 23:20 – 26:52
+    ]
   }
 };
 
@@ -3142,14 +3156,27 @@ function updateActiveTaskHighlight() {
   const nav = document.getElementById('track-task-nav');
   if (!nav || nav.style.display === 'none') return;
   const cur = audio.currentTime;
-  let activeBtn = null;
-  nav.querySelectorAll('.ttn-btn').forEach(btn => {
+  const btns = Array.from(nav.querySelectorAll('.ttn-btn'));
+  
+  const activeCandidates = btns.filter(btn => {
     const s = parseFloat(btn.dataset.start);
     const e = btn.dataset.end ? parseFloat(btn.dataset.end) : Infinity;
-    const isActive = cur >= s && cur < e;
-    btn.classList.toggle('active', isActive);
-    if (isActive) activeBtn = btn;
+    return cur >= s && cur < e;
   });
+
+  let activeBtn = null;
+  if (activeCandidates.length > 0) {
+    activeBtn = activeCandidates.reduce((best, btn) => {
+      const bestStart = parseFloat(best.dataset.start);
+      const btnStart = parseFloat(btn.dataset.start);
+      return btnStart >= bestStart ? btn : best;
+    });
+  }
+
+  btns.forEach(btn => {
+    btn.classList.toggle('active', btn === activeBtn);
+  });
+
   if (activeBtn && activeBtn !== lastActiveTaskBtn) {
     activeBtn.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
     lastActiveTaskBtn = activeBtn;
